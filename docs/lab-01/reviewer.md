@@ -7,16 +7,16 @@
 
 | PR # | Branch | ผลการประเมินจากผู้ตรวจ (Reviewer verdict) |
 |------|--------|-------------------------------------------|
-| #1   | feature/1-project-foundation | Approved |
-| #2   | feature/2-health-check | Approved |
-| #3   | feature/3-category-seed | Approved |
-| #4   | feature/4-category-list | Approved |
+| #1   | feature/1-project-foundation | Approved ✅ |
+| #2   | feature/2-health-check | (รอ Review) |
+| #3   | feature/3-category-seed | (รอ Review) |
+| #4   | feature/4-category-list | (รอ Review) |
 
 **ความคิดเห็นจากผู้ตรวจที่ได้รับ (Reviewer comment I received):**  
-"โค้ดเป็นระเบียบเรียบร้อย ทำงานตาม Acceptance criteria ได้ถูกต้องผ่านทุกเคสครับ"
+"ตรวจสอบโครงสร้างโปรเจกต์ client, server, docs และ README ถูกต้องครบตามเกณฑ์ Issue 1 ผ่าน ข้อแนะนำเล็กน้อย: อย่าลืมเช็ค .env ฝั่ง server ว่าต่อ PostgreSQL ได้เรียบร้อยเพื่อเตรียมพร้อมสำหรับ Issue 3 Approved ค่า เริ่ด"
 
 **การตอบกลับของฉัน (How I responded):**  
-"ขอบคุณครับ ได้ทำการตรวจสอบเพิ่มเติมและ Merge เข้า lab1-staging เรียบร้อยครับ"
+"ขอบคุณสำหรับคำแนะนำครับ รับทราบและจะตรวจสอบการเชื่อมต่อ PostgreSQL ใน server/.env ก่อนเริ่มทำ Issue 3 ครับ"
 
 ---
 
