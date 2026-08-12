@@ -39,4 +39,22 @@ describe("GET /api/categories", () => {
     expect(res.body[0].name).toBe("Account and Access");
     expect(res.body[res.body.length - 1].name).toBe("Email Support");
   });
+
+  it("returns an empty array when no categories exist", async () => {
+    const prisma = getPrisma();
+    await prisma.category.deleteMany({});
+    try {
+      const res = await request(app).get("/api/categories");
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual([]);
+    } finally {
+      for (const name of ["Account and Access", "Hardware", "Software", "Network"]) {
+        await prisma.category.upsert({
+          where: { name },
+          update: {},
+          create: { name },
+        });
+      }
+    }
+  });
 });
