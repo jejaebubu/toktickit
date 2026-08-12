@@ -24,7 +24,8 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: /check system/i }));
-    expect(await screen.findByText(/^System Online$/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^System Status: Online$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Supported Request Categories:/i)).toBeInTheDocument();
     expect(screen.getByText("Account and Access")).toBeInTheDocument();
     expect(screen.getByText("Hardware")).toBeInTheDocument();
     expect(screen.getByText("Software")).toBeInTheDocument();

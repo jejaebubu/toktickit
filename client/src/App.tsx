@@ -31,7 +31,8 @@ export default function App() {
 
       {state === "success" && (
         <div className="mt-3">
-          <p className="text-success mb-2">System Online</p>
+          <p className="text-success mb-1">System Status: Online</p>
+          <h2 className="h6 mb-2">Supported Request Categories:</h2>
           <ul className="list-group">
             {categories.map((category) => (
               <li key={category.id} className="list-group-item">
