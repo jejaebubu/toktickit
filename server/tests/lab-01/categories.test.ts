@@ -1,15 +1,60 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterAll } from "vitest";
 import request from "supertest";
 import { app } from "../../src/app.js";
-void request; void app;
+import { getPrisma } from "../../src/prisma.js";
 
-// Issue 4 — write this test yourself, using health.test.ts as the pattern.
+// Issue 4 — GET /api/categories returns the four seeded categories in id order.
 // Requires the DB to be migrated and seeded first.
-// It should assert: GET /api/categories returns 200 and the four seeded
-// category names in id order.
-describe.todo("GET /api/categories", () => {
-  it.todo("returns the four seeded categories in id order", async () => {
-    // TODO(Issue 4): implement this assertion.
-    expect(true).toBe(true);
+describe("GET /api/categories", () => {
+  const EXTRA_NAMES = ["Printing", "Email Support"];
+
+  afterAll(async () => {
+    await getPrisma().category.deleteMany({ where: { name: { in: EXTRA_NAMES } } });
+    await getPrisma().$disconnect();
+  });
+
+  it("returns the four seeded categories in id order", async () => {
+    const res = await request(app).get("/api/categories");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([
+      { id: 1, name: "Account and Access" },
+      { id: 2, name: "Hardware" },
+      { id: 3, name: "Software" },
+      { id: 4, name: "Network" },
+    ]);
+  });
+
+  it("returns categories sorted by id ascending, not by name", async () => {
+    for (const name of EXTRA_NAMES) {
+      await getPrisma().category.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      });
+    }
+    const res = await request(app).get("/api/categories");
+    expect(res.status).toBe(200);
+    const ids = res.body.map((c: { id: number }) => c.id);
+    expect(ids).toEqual([...ids].sort((a, b) => a - b));
+    expect(res.body[0].name).toBe("Account and Access");
+    expect(res.body[res.body.length - 1].name).toBe("Email Support");
+  });
+
+  it("returns an empty array when no categories exist", async () => {
+    const prisma = getPrisma();
+    await prisma.category.deleteMany({});
+    try {
+      const res = await request(app).get("/api/categories");
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual([]);
+    } finally {
+      for (const name of ["Account and Access", "Hardware", "Software", "Network"]) {
+        await prisma.category.upsert({
+          where: { name },
+          update: {},
+          create: { name },
+        });
+      }
+    }
   });
 });
