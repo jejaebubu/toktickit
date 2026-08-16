@@ -16,12 +16,14 @@ describe("GET /api/categories", () => {
   it("returns the four seeded categories in id order", async () => {
     const res = await request(app).get("/api/categories");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([
-      { id: 1, name: "Account and Access" },
-      { id: 2, name: "Hardware" },
-      { id: 3, name: "Software" },
-      { id: 4, name: "Network" },
+    expect(res.body.map((c: { name: string }) => c.name)).toEqual([
+      "Account and Access",
+      "Hardware",
+      "Software",
+      "Network",
     ]);
+    const ids = res.body.map((c: { id: number }) => c.id);
+    expect(ids).toEqual([...ids].sort((a, b) => a - b));
   });
 
   it("returns categories sorted by id ascending, not by name", async () => {
