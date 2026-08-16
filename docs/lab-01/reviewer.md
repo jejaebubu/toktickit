@@ -13,10 +13,10 @@
 
 | PR # | Branch | ผู้ตรวจ (Reviewer) | ผลการประเมิน (Reviewer verdict) |
 |------|--------|--------------------|---------------------------------|
-| #5   | feature/1-project-foundation | @natthakamol1130 | Approved ✅ |
-| #6   | feature/2-health-check | @natthakamol1130 | Approved ✅ |
-| #7   | feature/3-category-seed | @il0lk3, @Achikan | Changes requested → Approved ✅ |
-| #8   | feature/4-category-list | @phatthidawadi, @lmaybelgracel, @chanya06, @il0lk3 | Commented → Approved ✅ |
+| [#5](https://github.com/jejaebubu/toktickit/pull/5) | feature/1-project-foundation | @natthakamol1130 | Approved ✅ |
+| [#6](https://github.com/jejaebubu/toktickit/pull/6) | feature/2-health-check | @natthakamol1130 | Approved ✅ |
+| [#7](https://github.com/jejaebubu/toktickit/pull/7) | feature/3-category-seed | @il0lk3, @Achikan | Changes requested → Approved ✅ |
+| [#8](https://github.com/jejaebubu/toktickit/pull/8) | feature/4-category-list | @phatthidawadi, @lmaybelgracel, @chanya06, @il0lk3 | Commented → Approved ✅ |
 
 ทุก Pull Request ถูก merge เข้า `lab1-staging` แล้วจึง merge เข้า `main` เรียบร้อย
 
