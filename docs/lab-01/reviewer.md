@@ -1,7 +1,13 @@
 # Lab 1 — บันทึกการตรวจโค้ดโดยเพื่อน (Peer Review Record)
 
-**ผู้เขียน (Author):** <ชื่อของคุณ> — <รหัสนักศึกษา> — GitHub: @<username>  
-**ผู้ตรวจ (Peer reviewer):** <ชื่อเพื่อนคู่ตรวจ> — <รหัสนักศึกษา> — GitHub: @<username>  
+**ผู้เขียน (Author):** พัฒนาวดี แสงเงินยอด — 67070505222 — GitHub: @jejaebubu  
+**ผู้ตรวจ (Peer reviewers):**
+- ณัฏฐกมล มอญปาน — 67070505215 — GitHub: @natthakamol1130
+- ธนากร พหุลรัตน์ — 67070505217 — GitHub: @il0lk3
+- อชิรญา อินตา — 67070505229 — GitHub: @Achikan
+- ปทิตญา แก้ววิเชียร — 67070505220 — GitHub: @lmaybelgracel
+- ภัทร์ธิดาวดี อุ่นคำ — 67070505225 — GitHub: @phatthidawadi
+- ชัญญา พูลเขตกิจ — 67070501058 — GitHub: @chanya06
 
 ## Pull Requests ที่ฉันเขียน (ได้รับการตรวจโดยเพื่อนคู่ตรวจ)
 
