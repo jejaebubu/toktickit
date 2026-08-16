@@ -1,6 +1,6 @@
 # Lab 1 — รายงานการใช้ AI และข้อคิดเห็น (AI Use and Reflection)
 
-**ผู้ช่วย AI Coding Agent ที่ใช้:** Antigravity (โมเดล Gemini 3.6 Flash / Gemini 3.5 Flash)
+**ผู้ช่วย AI Coding Agent ที่ใช้:** opencode (AI coding agent CLI)
 
 ## รายการ Prompts สำคัญที่เลือกใช้ (6–10 ข้อ)
 
