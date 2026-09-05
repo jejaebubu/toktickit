@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { getPrisma } from "../../src/prisma.js";
 
-describe("Database Seed Data (Issue 6)", () => {
+describe("Database Seed Data (Issue #14)", () => {
   it("should contain seeded categories", async () => {
     const prisma = getPrisma();
     const categories = await prisma.category.findMany({
