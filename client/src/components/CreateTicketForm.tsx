@@ -154,6 +154,49 @@ export const CreateTicketForm: React.FC = () => {
         </div>
       </div>
 
+      {/* System-generated / read-only fields (ui-spec 3.2) */}
+      <div className="row g-3 mb-4">
+        <div className="col-12 col-md-4">
+          <label htmlFor="readonly-ticket-number" className="form-label fw-semibold text-dark mb-1">
+            Ticket Number
+          </label>
+          <div
+            id="readonly-ticket-number"
+            className="border rounded px-3 py-2 fw-semibold"
+            style={{ backgroundColor: "#F0F4F2", color: "#1F2923" }}
+            data-testid="readonly-ticket-number"
+          >
+            {createdTicket ? createdTicket.ticketNumber : "Auto-generated on submit"}
+          </div>
+        </div>
+        <div className="col-12 col-md-4">
+          <label htmlFor="readonly-ticket-date" className="form-label fw-semibold text-dark mb-1">
+            Ticket Date
+          </label>
+          <div
+            id="readonly-ticket-date"
+            className="border rounded px-3 py-2"
+            style={{ backgroundColor: "#F0F4F2", color: "#1F2923" }}
+            data-testid="readonly-ticket-date"
+          >
+            {new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+          </div>
+        </div>
+        <div className="col-12 col-md-4">
+          <label htmlFor="readonly-requester" className="form-label fw-semibold text-dark mb-1">
+            Requester
+          </label>
+          <div
+            id="readonly-requester"
+            className="border rounded px-3 py-2 fw-semibold"
+            style={{ backgroundColor: "#F0F4F2", color: "#1F2923" }}
+            data-testid="readonly-requester"
+          >
+            {selectedRequester ? selectedRequester.name : "—"}
+          </div>
+        </div>
+      </div>
+
       {createdTicket && (
         <div
           className="alert border-0 shadow-sm mb-4 p-4"

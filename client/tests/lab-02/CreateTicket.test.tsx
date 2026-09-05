@@ -103,8 +103,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
 
     // Success alert should be shown with Ticket Number
     await waitFor(() => {
-      expect(screen.getByTestId("success-alert")).toBeInTheDocument();
-      expect(screen.getByText("TKT-2026-000101")).toBeInTheDocument();
+      const alert = screen.getByTestId("success-alert");
+      expect(alert).toBeInTheDocument();
+      expect(alert).toHaveTextContent("TKT-2026-000101");
     });
   });
 });
