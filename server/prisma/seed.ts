@@ -1,6 +1,6 @@
 import { getPrisma } from "../src/prisma.js";
 
-// Issue 3 — Seed initial categories, requesters, and related systems.
+// Issue 6 — Seed initial categories, requesters, and related systems.
 // Requirement: running the seed twice must NOT create duplicates (idempotent).
 
 const CATEGORIES = [
