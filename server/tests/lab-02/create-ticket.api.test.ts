@@ -10,28 +10,31 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
     await prisma.ticket.deleteMany({});
   });
 
-  it("API-01: Creates a new ticket successfully and returns HTTP 201 with ticketNumber", async () => {
+  async function getValidTestEntities() {
     const prisma = getPrisma();
 
-    // Ensure category exists
     let category = await prisma.category.findFirst();
     if (!category) {
       category = await prisma.category.create({ data: { name: "Network" } });
     }
 
-    // Ensure related system exists
     let system = await prisma.relatedSystem.findFirst({ where: { isActive: true } });
     if (!system) {
       system = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     }
 
-    // Ensure requester user exists
     let requester = await prisma.requesterUser.findFirst({ where: { isActive: true } });
     if (!requester) {
       requester = await prisma.requesterUser.create({
         data: { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true },
       });
     }
+
+    return { category, system, requester };
+  }
+
+  it("API-01: Creates a new ticket successfully with Authorization Bearer header", async () => {
+    const { category, system, requester } = await getValidTestEntities();
 
     const payload = {
       categoryId: category.id,
@@ -43,7 +46,7 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
 
     const res = await request(app)
       .post("/api/tickets")
-      .set("X-Requester-Id", String(requester.id))
+      .set("Authorization", `Bearer dev_requester_${requester.id}`)
       .send(payload);
 
     expect(res.status).toBe(201);
@@ -55,19 +58,33 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
     expect(res.body).toHaveProperty("createdAt");
   });
 
-  it("API-02: Rejects ticket creation if mandatory fields are missing (HTTP 400 Bad Request)", async () => {
-    const prisma = getPrisma();
-    let requester = await prisma.requesterUser.findFirst({ where: { isActive: true } });
-    if (!requester) {
-      requester = await prisma.requesterUser.create({
-        data: { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true },
-      });
-    }
+  it("API-01b: Creates a new ticket successfully with X-Requester-Id header", async () => {
+    const { category, system, requester } = await getValidTestEntities();
 
-    // Missing summary
-    const resNoSummary = await request(app)
+    const payload = {
+      categoryId: category.id,
+      relatedSystemId: system.id,
+      summary: "VPN disconnections during peak hours",
+      description: "Frequent drops every 15 minutes.",
+      requestedPriority: "MEDIUM",
+    };
+
+    const res = await request(app)
       .post("/api/tickets")
       .set("X-Requester-Id", String(requester.id))
+      .send(payload);
+
+    expect(res.status).toBe(201);
+    expect(res.body.summary).toBe(payload.summary);
+  });
+
+  it("API-02: Rejects ticket creation if mandatory fields are missing (HTTP 400 Bad Request)", async () => {
+    const { requester } = await getValidTestEntities();
+
+    // Missing summary - returns specific error message
+    const resNoSummary = await request(app)
+      .post("/api/tickets")
+      .set("Authorization", `Bearer dev_requester_${requester.id}`)
       .send({
         categoryId: 1,
         relatedSystemId: 1,
@@ -77,8 +94,9 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
 
     expect(resNoSummary.status).toBe(400);
     expect(resNoSummary.body.error).toBe("Bad Request");
+    expect(resNoSummary.body.message).toBe("Validation failed: 'summary' is required.");
 
-    // Missing X-Requester-Id header
+    // Missing X-Requester-Id / Authorization header
     const resNoHeader = await request(app)
       .post("/api/tickets")
       .send({
@@ -95,7 +113,7 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
     // Invalid priority
     const resInvalidPriority = await request(app)
       .post("/api/tickets")
-      .set("X-Requester-Id", String(requester.id))
+      .set("Authorization", `Bearer dev_requester_${requester.id}`)
       .send({
         categoryId: 1,
         relatedSystemId: 1,

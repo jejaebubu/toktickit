@@ -112,21 +112,34 @@ async function generateTicketNumber(): Promise<string> {
   return `${prefix}${String(nextSeq).padStart(6, "0")}`;
 }
 
+function extractRequesterId(req: Request): number | null {
+  // 1. Try X-Requester-Id header
+  const xHeader = req.headers["x-requester-id"];
+  if (xHeader && !Array.isArray(xHeader)) {
+    const parsed = parseInt(xHeader, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+
+  // 2. Try Authorization: Bearer dev_requester_X or Bearer X header
+  const authHeader = req.headers["authorization"];
+  if (authHeader && typeof authHeader === "string") {
+    const match = authHeader.match(/(?:dev_requester_|\b)(\d+)\b/i);
+    if (match && match[1]) {
+      const parsed = parseInt(match[1], 10);
+      if (!isNaN(parsed)) return parsed;
+    }
+  }
+
+  return null;
+}
+
 app.post("/api/tickets", async (req: Request, res: Response) => {
   try {
-    const requesterIdHeader = req.headers["x-requester-id"];
-    if (!requesterIdHeader || Array.isArray(requesterIdHeader)) {
+    const requesterId = extractRequesterId(req);
+    if (!requesterId) {
       return res.status(400).json({
         error: "Bad Request",
-        message: "Validation failed: 'X-Requester-Id' header is required.",
-      });
-    }
-
-    const requesterId = parseInt(requesterIdHeader, 10);
-    if (isNaN(requesterId)) {
-      return res.status(400).json({
-        error: "Bad Request",
-        message: "Validation failed: 'X-Requester-Id' must be a valid integer.",
+        message: "Validation failed: Requester authentication header is required ('Authorization: Bearer dev_requester_X' or 'X-Requester-Id').",
       });
     }
 
@@ -148,7 +161,7 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
     if (!summary || typeof summary !== "string" || summary.trim() === "") {
       return res.status(400).json({
         error: "Bad Request",
-        message: "Validation failed: 'summary' and 'categoryId' are required.",
+        message: "Validation failed: 'summary' is required.",
       });
     }
 
@@ -162,7 +175,7 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
     if (!categoryId || isNaN(Number(categoryId))) {
       return res.status(400).json({
         error: "Bad Request",
-        message: "Validation failed: 'summary' and 'categoryId' are required.",
+        message: "Validation failed: 'categoryId' is required.",
       });
     }
 
