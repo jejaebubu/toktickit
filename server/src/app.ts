@@ -82,4 +82,163 @@ app.get("/api/related-systems", async (_req: Request, res: Response) => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Lab 2 (Issue 5) — Create Ticket REST API & Validation
+// ---------------------------------------------------------------------------
+const VALID_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
+
+async function generateTicketNumber(): Promise<string> {
+  const prisma = getPrisma();
+  const currentYear = new Date().getFullYear();
+  const prefix = `TKT-${currentYear}-`;
+
+  const lastTicket = await prisma.ticket.findFirst({
+    where: { ticketNumber: { startsWith: prefix } },
+    orderBy: { id: "desc" },
+    select: { ticketNumber: true },
+  });
+
+  let nextSeq = 1;
+  if (lastTicket?.ticketNumber) {
+    const parts = lastTicket.ticketNumber.split("-");
+    if (parts.length === 3) {
+      const seq = parseInt(parts[2], 10);
+      if (!isNaN(seq)) {
+        nextSeq = seq + 1;
+      }
+    }
+  }
+
+  return `${prefix}${String(nextSeq).padStart(6, "0")}`;
+}
+
+app.post("/api/tickets", async (req: Request, res: Response) => {
+  try {
+    const requesterIdHeader = req.headers["x-requester-id"];
+    if (!requesterIdHeader || Array.isArray(requesterIdHeader)) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: 'X-Requester-Id' header is required.",
+      });
+    }
+
+    const requesterId = parseInt(requesterIdHeader, 10);
+    if (isNaN(requesterId)) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: 'X-Requester-Id' must be a valid integer.",
+      });
+    }
+
+    const prisma = getPrisma();
+
+    // Verify requester exists and is active
+    const requester = await prisma.requesterUser.findUnique({
+      where: { id: requesterId },
+    });
+    if (!requester || !requester.isActive) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: Requester not found or inactive.",
+      });
+    }
+
+    const { categoryId, relatedSystemId, summary, description, requestedPriority } = req.body;
+
+    if (!summary || typeof summary !== "string" || summary.trim() === "") {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: 'summary' and 'categoryId' are required.",
+      });
+    }
+
+    if (!description || typeof description !== "string" || description.trim() === "") {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: 'description' is required.",
+      });
+    }
+
+    if (!categoryId || isNaN(Number(categoryId))) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: 'summary' and 'categoryId' are required.",
+      });
+    }
+
+    if (!relatedSystemId || isNaN(Number(relatedSystemId))) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: 'relatedSystemId' is required.",
+      });
+    }
+
+    if (!requestedPriority || !VALID_PRIORITIES.includes(requestedPriority)) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Invalid 'requestedPriority'. Must be one of LOW, MEDIUM, HIGH, URGENT.",
+      });
+    }
+
+    // Verify category exists
+    const category = await prisma.category.findUnique({
+      where: { id: Number(categoryId) },
+    });
+    if (!category) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: Category not found.",
+      });
+    }
+
+    // Verify related system exists
+    const relatedSystem = await prisma.relatedSystem.findUnique({
+      where: { id: Number(relatedSystemId) },
+    });
+    if (!relatedSystem || !relatedSystem.isActive) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Validation failed: Related system not found or inactive.",
+      });
+    }
+
+    const ticketNumber = await generateTicketNumber();
+
+    const ticket = await prisma.ticket.create({
+      data: {
+        ticketNumber,
+        requesterId,
+        categoryId: Number(categoryId),
+        relatedSystemId: Number(relatedSystemId),
+        summary: summary.trim(),
+        description: description.trim(),
+        requestedPriority,
+        itPriority: "MEDIUM",
+        status: "New",
+      },
+      select: {
+        id: true,
+        ticketNumber: true,
+        summary: true,
+        description: true,
+        requestedPriority: true,
+        itPriority: true,
+        status: true,
+        createdAt: true,
+        categoryId: true,
+        relatedSystemId: true,
+        requesterId: true,
+      },
+    });
+
+    return res.status(201).json(ticket);
+  } catch (err: any) {
+    console.error("Error creating ticket:", err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: err?.message || "Failed to create ticket.",
+    });
+  }
+});
+
 export default app;
