@@ -17,7 +17,7 @@ describe("GET /api/requesters (Issue 4)", () => {
     expect(first).toHaveProperty("isActive");
     expect(first.isActive).toBe(true);
 
-    // Verify all returned users are active (BR-09)
+    // Verify all returned users are active (BR-07)
     for (const user of res.body) {
       expect(user.isActive).toBe(true);
     }
