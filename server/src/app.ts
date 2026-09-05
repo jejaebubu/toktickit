@@ -36,4 +36,50 @@ app.get("/api/categories", async (_req: Request, res: Response) => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Lab 2 — Development Requesters list
+// ---------------------------------------------------------------------------
+app.get("/api/requesters", async (_req: Request, res: Response) => {
+  try {
+    const requesters = await getPrisma().requesterUser.findMany({
+      where: { isActive: true },
+      orderBy: { id: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        isActive: true,
+      },
+    });
+    res.status(200).json(requesters);
+  } catch {
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Failed to retrieve requesters list.",
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 2 — Related Systems list
+// ---------------------------------------------------------------------------
+app.get("/api/related-systems", async (_req: Request, res: Response) => {
+  try {
+    const systems = await getPrisma().relatedSystem.findMany({
+      where: { isActive: true },
+      orderBy: { id: "asc" },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    res.status(200).json(systems);
+  } catch {
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "Failed to retrieve related systems.",
+    });
+  }
+});
+
 export default app;
