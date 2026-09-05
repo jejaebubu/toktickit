@@ -92,22 +92,23 @@ async function generateTicketNumber(): Promise<string> {
   const currentYear = new Date().getFullYear();
   const prefix = `TKT-${currentYear}-`;
 
-  const lastTicket = await prisma.ticket.findFirst({
+  const existingNumbers = await prisma.ticket.findMany({
     where: { ticketNumber: { startsWith: prefix } },
-    orderBy: { id: "desc" },
     select: { ticketNumber: true },
   });
 
-  let nextSeq = 1;
-  if (lastTicket?.ticketNumber) {
-    const parts = lastTicket.ticketNumber.split("-");
+  let maxSeq = 0;
+  for (const { ticketNumber } of existingNumbers) {
+    const parts = ticketNumber.split("-");
     if (parts.length === 3) {
       const seq = parseInt(parts[2], 10);
-      if (!isNaN(seq)) {
-        nextSeq = seq + 1;
+      if (!isNaN(seq) && seq > maxSeq) {
+        maxSeq = seq;
       }
     }
   }
+
+  const nextSeq = maxSeq + 1;
 
   return `${prefix}${String(nextSeq).padStart(6, "0")}`;
 }
@@ -250,6 +251,154 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
     return res.status(500).json({
       error: "Internal Server Error",
       message: err?.message || "Failed to create ticket.",
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 2 (Issue 7) — My Tickets List REST API (Search, Filter, Sort, Page)
+// GET /api/tickets?search=&category=&priority=&status=&sort=&order=&page=&limit=
+// ---------------------------------------------------------------------------
+const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "summary", "requestedPriority", "status"];
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 50;
+
+function parsePositiveInt(raw: unknown): number | null {
+  if (typeof raw !== "string" || raw.trim() === "") return null;
+  const parsed = Number.parseInt(raw, 10);
+  if (Number.isNaN(parsed) || parsed < 1) return null;
+  return parsed;
+}
+
+app.get("/api/tickets", async (req: Request, res: Response) => {
+  const buildError = (message: string) =>
+    res.status(400).json({ error: "Bad Request", message: `Validation failed: ${message}` });
+
+  try {
+    const requesterId = extractRequesterId(req);
+    if (!requesterId) {
+      return buildError("Requester authentication header is required ('Authorization: Bearer dev_requester_X' or 'X-Requester-Id').");
+    }
+
+    const prisma = getPrisma();
+
+    const requester = await prisma.requesterUser.findUnique({
+      where: { id: requesterId },
+    });
+    if (!requester || !requester.isActive) {
+      return buildError("Requester not found or inactive.");
+    }
+
+    const pageRaw = typeof req.query.page === "string" ? req.query.page.trim() : "";
+    let page = 1;
+    if (pageRaw !== "") {
+      const p = parsePositiveInt(pageRaw);
+      if (p === null) return buildError("'page' must be a positive integer.");
+      page = p;
+    }
+
+    const limitRaw = typeof req.query.limit === "string" ? req.query.limit.trim() : "";
+    let limit = DEFAULT_PAGE_SIZE;
+    if (limitRaw !== "") {
+      const l = parsePositiveInt(limitRaw);
+      if (l === null) return buildError("'limit' must be a positive integer between 1 and 50.");
+      if (l > MAX_PAGE_SIZE) return buildError(`'limit' must be between 1 and ${MAX_PAGE_SIZE}.`);
+      limit = l;
+    }
+
+    const sort = typeof req.query.sort === "string" && VALID_SORT_FIELDS.includes(req.query.sort)
+      ? req.query.sort
+      : null;
+    if (typeof req.query.sort === "string" && req.query.sort !== "" && !sort) {
+      return buildError(`'sort' must be one of ${VALID_SORT_FIELDS.join(", ")}.`);
+    }
+
+    const order = req.query.order === "asc" ? "asc" : req.query.order === "desc" ? "desc" : null;
+    if (typeof req.query.order === "string" && req.query.order !== "" && !order) {
+      return buildError("'order' must be 'asc' or 'desc'.");
+    }
+
+    const categoryRaw = typeof req.query.category === "string" ? req.query.category.trim() : "";
+    let categoryId: number | undefined;
+    if (categoryRaw !== "") {
+      const c = parsePositiveInt(categoryRaw);
+      if (c === null) return buildError("'category' must be a positive integer.");
+      categoryId = c;
+    }
+
+    const priority = typeof req.query.priority === "string" ? req.query.priority : undefined;
+    if (priority !== undefined && priority !== "" && !VALID_PRIORITIES.includes(priority)) {
+      return buildError(`'priority' must be one of ${VALID_PRIORITIES.join(", ")}.`);
+    }
+
+    const status = typeof req.query.status === "string" && req.query.status.trim() !== ""
+      ? req.query.status.trim()
+      : undefined;
+
+    const search = typeof req.query.search === "string" && req.query.search.trim() !== ""
+      ? req.query.search.trim()
+      : undefined;
+
+    const where: any = { requesterId };
+    if (categoryId) where.categoryId = categoryId;
+    if (priority) where.requestedPriority = priority;
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { ticketNumber: { contains: search, mode: "insensitive" } },
+        { summary: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const [tickets, total] = await Promise.all([
+      prisma.ticket.findMany({
+        where,
+        orderBy: [{ [sort ?? "createdAt"]: order ?? "desc" }, { id: "desc" }],
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          id: true,
+          ticketNumber: true,
+          summary: true,
+          requestedPriority: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          categoryId: true,
+          category: { select: { name: true } },
+          relatedSystemId: true,
+          relatedSystem: { select: { name: true } },
+        },
+      }),
+      prisma.ticket.count({ where }),
+    ]);
+
+    return res.status(200).json({
+      tickets: tickets.map((t) => ({
+        id: t.id,
+        ticketNumber: t.ticketNumber,
+        summary: t.summary,
+        requestedPriority: t.requestedPriority,
+        status: t.status,
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+        categoryId: t.categoryId,
+        categoryName: t.category.name,
+        relatedSystemId: t.relatedSystemId,
+        relatedSystemName: t.relatedSystem.name,
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err: any) {
+    console.error("Error listing tickets:", err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: err?.message || "Failed to retrieve tickets.",
     });
   }
 });

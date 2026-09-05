@@ -88,37 +88,49 @@
 ---
 
 ### 2.4 GET /api/tickets
-- **คำอธิบาย**: ดึงรายการตั๋วของ Requester ปัจจุบัน (ตาม `X-Requester-Id`)
+- **คำอธิบาย**: ดึงรายการตั๋วของ Requester ปัจจุบันเท่านั้น (Ownership Filtering บังคับที่ฝั่ง Backend)
+- **Headers (บังคับ)**: `X-Requester-Id: <id>` หรือ `Authorization: Bearer dev_requester_<id>`
 - **Query Parameters**:
-  - `search` (string): ค้นหาในเลขตั๋วหรือ Summary
-  - `category` (int): กรองตาม Category ID
-  - `priority` (string): กรองตาม Priority (`LOW`, `MEDIUM`, `HIGH`, `URGENT`)
-  - `status` (string): กรองตาม Status
-  - `sort` (string): จัดเรียงตาม field (default: `createdAt`)
-  - `order` (string): `asc` หรือ `desc` (default: `desc`)
-  - `page` (int): หน้าปัจจุบัน (default: 1)
-  - `limit` (int): จำนวนรายการต่อหน้า (default: 10)
+  - `search` (string, optional): ค้นหาแบบ case-insensitive ใน `ticketNumber` หรือ `summary` (contains)
+  - `category` (int, optional): กรองตาม `categoryId` (ต้องเป็นจำนวนเต็มบวก)
+  - `priority` (string, optional): กรองตาม `requestedPriority` — ต้องเป็น `LOW`, `MEDIUM`, `HIGH`, `URGENT` เท่านั้น
+  - `status` (string, optional): กรองตาม `status` (การ match เป็นแบบ exact)
+  - `sort` (string, optional): หนึ่งใน `createdAt` (default), `ticketNumber`, `summary`, `requestedPriority`, `status`
+  - `order` (string, optional): `asc` หรือ `desc` (default: `desc`)
+  - `page` (int, optional): หมายเลขหน้า เริ่มต้นที่ 1 (default: 1)
+  - `limit` (int, optional): จำนวนรายการต่อหน้า อนุญาต `1–50` (default: 10)
 - **Success Response (`200 OK`)**:
   ```json
   {
-    "data": [
+    "tickets": [
       {
         "id": 101,
-        "ticketNumber": "TKT-2025-000101",
+        "ticketNumber": "TKT-2026-000101",
         "summary": "Cannot connect to campus Wi-Fi",
-        "category": { "name": "Network" },
         "requestedPriority": "HIGH",
         "status": "New",
-        "createdAt": "2025-09-03T10:00:00Z"
+        "createdAt": "2026-09-03T10:00:00Z",
+        "updatedAt": "2026-09-03T10:00:00Z",
+        "categoryId": 1,
+        "categoryName": "Network",
+        "relatedSystemId": 2,
+        "relatedSystemName": "Campus Wi-Fi"
       }
     ],
-    "pagination": { "page": 1, "limit": 10, "total": 1, "totalPages": 1 }
+    "meta": { "total": 1, "page": 1, "limit": 10, "totalPages": 1 }
   }
   ```
+  - **หมายเหตุ**: เมื่อ `page` เกินจำนวนหน้าที่มี จะคืน `tickets: []` โดย `meta.total` ยังคงเป็นจำนวนจริง
 - **Error Responses**:
-  - `400 Bad Request`: พารามิเตอร์ค้นหาหรือการแบ่งหน้าผิดพลาด (เช่น `page` $< 1$)
+  - `400 Bad Request`: ไม่มี Header ยืนยันตัวตน / Requester ไม่พบหรือ inactive / พารามิเตอร์ไม่ถูกต้อง
     ```json
-    { "error": "Bad Request", "message": "Invalid pagination parameters." }
+    { "error": "Bad Request", "message": "Validation failed: Requester authentication header is required ('Authorization: Bearer dev_requester_X' or 'X-Requester-Id')." }
+    ```
+    ```json
+    { "error": "Bad Request", "message": "Validation failed: 'limit' must be between 1 and 50." }
+    ```
+    ```json
+    { "error": "Bad Request", "message": "Validation failed: 'sort' must be one of createdAt, ticketNumber, summary, requestedPriority, status." }
     ```
   - `500 Internal Server Error`:
     ```json

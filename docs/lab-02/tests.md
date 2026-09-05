@@ -12,18 +12,28 @@
 | **API-03** | API | AC-03 | ปฏิเสธการเข้าถึงตั๋วของ Requester คนอื่น (Ownership Protection) | `server/tests/lab-02/ticket-detail.api.test.ts` | 403 / 404 | PASS |
 | **API-04** | API | AC-04 | บล็อกการอัปโหลดไฟล์ขนาดใหญ่เกิน 5MB หรือผิดประเภท | `server/tests/lab-02/attachments.api.test.ts` | 400 Bad Request | PASS |
 | **API-05** | API | AC-05 | ทำ Soft Removal ไฟล์แนบสำเร็จ และไม่อนุญาตให้ดาวน์โหลดไฟล์ที่ลบไปแล้ว | `server/tests/lab-02/attachments.api.test.ts` | 200 OK | PASS |
-| **UI-01** | UI | AC-02 | แสดงหน้า Requester Selector เมื่อยังไม่ได้เลือกผู้ใช้ | `client/src/tests/lab-02/RequesterSelector.test.tsx` | Selector Shown | PASS |
-| **UI-02** | UI | AC-01 | ฟอร์ม Create Ticket แสดงดอกจันสีแดงและข้อความเตือนเมื่อข้อมูลไม่ครบ | `client/src/tests/lab-02/CreateTicket.test.tsx` | Validation Shown | PASS |
-| **UI-03** | UI | AC-01 | ปุ่ม Submit แสดงสถานะ Busy ขณะกำลังส่งข้อมูล | `client/src/tests/lab-02/CreateTicket.test.tsx` | Disabled & Loading | PASS |
-| **UI-04** | UI | AC-05 | แสดงสถานะ `[Removed]` สำหรับไฟล์แนบที่ถูก Soft-removed | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Metadata Shown | PASS |
+| **UI-01** | UI | AC-02 | แสดงหน้า Requester Selector เมื่อยังไม่ได้เลือกผู้ใช้ | `client/tests/lab-02/RequesterSelector.test.tsx` | Selector Shown | PASS |
+| **UI-02** | UI | AC-01 | ฟอร์ม Create Ticket แสดงดอกจันสีแดงและข้อความเตือนเมื่อข้อมูลไม่ครบ | `client/tests/lab-02/CreateTicket.test.tsx` | Validation Shown | PASS |
+| **UI-03** | UI | AC-01 | ปุ่ม Submit แสดงสถานะ Busy ขณะกำลังส่งข้อมูล | `client/tests/lab-02/CreateTicket.test.tsx` | Disabled & Loading | PASS |
+| **UI-04** | UI | AC-05 | แสดงสถานะ `[Removed]` สำหรับไฟล์แนบที่ถูก Soft-removed | `client/tests/lab-02/AttachmentSection.test.tsx` | Metadata Shown | PASS |
+| **API-06** | API | FR-05 | My Tickets คืนเฉพาะตั๋วของ Requester ปัจจุบัน (Ownership Filtering) พร้อม `meta` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK | PASS |
+| **API-07** | API | FR-06 | ค้นหา `search` ตรง `ticketNumber` และ `summary` แบบ case-insensitive | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ผลลัพธ์ถูกต้อง | PASS |
+| **API-08** | API | FR-07 | กรองด้วย `category`, `priority`, `status` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, เฉพาะรายการที่ตรง | PASS |
+| **API-09** | API | FR-08 | จัดเรียง `sort`/`order` และแบ่งหน้า `page`/`limit` พร้อม `totalPages` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ลำดับ/หน้าถูกต้อง | PASS |
+| **API-10** | API | FR-08 | ปฏิเสธพารามิเตอร์ไม่ถูกต้อง (`page=0`, `limit>50`, `sort`/`order`/`priority` ผิด) | `server/tests/lab-02/my-tickets.api.test.ts` | 400 Bad Request | PASS |
+| **API-11** | API | AC-03, FR-05 | ปฏิเสธเมื่อไม่มี Header หรือ Requester inactive (Ownership & Active Check) | `server/tests/lab-02/my-tickets.api.test.ts` | 400 Bad Request | PASS |
 | **E2E-01** | E2E | AC-01, AC-03 | ทดสอบการทำงานครบวงจรตั้งแต่สลับผู้ใช้ -> สร้างตั๋ว -> ค้นหาตั๋ว -> ลบไฟล์แนบ | `e2e/lab-02/requester-ticket-flow.spec.ts` | Full Flow Success | PASS |
 
 ## 3. Acceptance Criteria Traceability (การเชื่อมโยง AC กับ Test)
 - **AC-01**: ครอบคลุมด้วย API-01, API-02, UI-02, UI-03, E2E-01
 - **AC-02**: ครอบคลุมด้วย UI-01
-- **AC-03**: ครอบคลุมด้วย API-03, E2E-01
+- **AC-03**: ครอบคลุมด้วย API-03, API-11, E2E-01
 - **AC-04**: ครอบคลุมด้วย API-04
 - **AC-05**: ครอบคลุมด้วย API-05, UI-04, E2E-01
+- **FR-05** (My Tickets เป็นของตัวเองเท่านั้น): ครอบคลุมด้วย API-06, API-11
+- **FR-06** (ค้นหาตั๋ว): ครอบคลุมด้วย API-07
+- **FR-07** (กรองตั๋ว): ครอบคลุมด้วย API-08
+- **FR-08** (เรียงลำดับ & หน้า): ครอบคลุมด้วย API-09, API-10
 
 ## 4. Test Commands
 ```bash
