@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { RequesterProvider, useRequester } from "./context/RequesterContext.js";
 import { Header } from "./components/Header.js";
 import { RequesterSelector } from "./components/RequesterSelector.js";
+import { CreateTicketForm } from "./components/CreateTicketForm.js";
 import { checkSystem, Category } from "./api.js";
 
 type UiState = "idle" | "loading" | "success" | "error";
@@ -29,34 +30,44 @@ function MainContent() {
       {/* Mandatory modal if no requester selected */}
       {!selectedRequester && <RequesterSelector isOpen={true} />}
 
-      <main className="container py-5" style={{ maxWidth: 640 }}>
+      <main className="container py-4" style={{ maxWidth: 900 }}>
         <h1 className="h3 mb-4">
           TokTickIT <span className="text-success">IT Service Desk</span>
         </h1>
 
-        <button className="btn btn-success" onClick={handleCheck} disabled={state === "loading"}>
-          {state === "loading" ? "Loading…" : "Check System"}
-        </button>
+        {/* Create Ticket Form (Issue 6) */}
+        <CreateTicketForm />
 
-        {state === "success" && (
-          <div className="mt-3">
-            <p className="text-success mb-1">System Status: Online</p>
-            <h2 className="h6 mb-2">Supported Request Categories:</h2>
-            <ul className="list-group">
-              {categories.map((category) => (
-                <li key={category.id} className="list-group-item">
-                  {category.name}
-                </li>
-              ))}
-            </ul>
+        {/* System Health Check Card (Lab 1 compatibility) */}
+        <div className="card border-0 shadow-sm p-4 mb-4" style={{ borderRadius: "16px", backgroundColor: "#FFFFFF" }}>
+          <h2 className="h5 fw-bold text-dark mb-2">🔍 System Health & Connectivity</h2>
+          <p className="text-muted small mb-3">Verify API backend connectivity and category initialization.</p>
+          <div className="d-flex gap-2">
+            <button className="btn btn-success" onClick={handleCheck} disabled={state === "loading"}>
+              {state === "loading" ? "Loading…" : "Check System"}
+            </button>
           </div>
-        )}
 
-        {state === "error" && (
-          <div className="alert alert-danger mt-3" role="alert">
-            System Offline — could not reach the TokTickIT API. Try again later.
-          </div>
-        )}
+          {state === "success" && (
+            <div className="mt-3">
+              <p className="text-success mb-1">System Status: Online</p>
+              <h2 className="h6 mb-2">Supported Request Categories:</h2>
+              <ul className="list-group">
+                {categories.map((category) => (
+                  <li key={category.id} className="list-group-item">
+                    {category.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {state === "error" && (
+            <div className="alert alert-danger mt-3" role="alert">
+              System Offline — could not reach the TokTickIT API. Try again later.
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
