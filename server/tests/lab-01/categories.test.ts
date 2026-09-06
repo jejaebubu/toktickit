@@ -44,6 +44,7 @@ describe("GET /api/categories", () => {
 
   it("returns an empty array when no categories exist", async () => {
     const prisma = getPrisma();
+    await prisma.ticket.deleteMany({});
     await prisma.category.deleteMany({});
     try {
       const res = await request(app).get("/api/categories");
