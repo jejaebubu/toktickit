@@ -78,6 +78,40 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(res.body.size).toBeGreaterThan(0);
   });
 
+  it("API-04a2: Upload JPG/PNG/WEBP attachments successfully (201)", async () => {
+    const prisma = getPrisma();
+    const cases = [
+      { name: "evidence.jpg", type: "image/jpeg", buf: Buffer.from("fake jpeg data") },
+      { name: "evidence.png", type: "image/png", buf: Buffer.from("fake png data") },
+      { name: "evidence.webp", type: "image/webp", buf: Buffer.from("fake webp data") },
+    ];
+    const created: { id: number; filename: string }[] = [];
+
+    try {
+      for (const c of cases) {
+        const res = await request(app)
+          .post(`/api/tickets/${ticketId}/attachments`)
+          .set("X-Requester-Id", String(owner.id))
+          .attach("file", c.buf, { filename: c.name, contentType: c.type });
+
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty("id");
+        expect(res.body.originalName).toBe(c.name);
+        expect(res.body.mimeType).toBe(c.type);
+        expect(res.body.isRemoved).toBe(false);
+        created.push({ id: res.body.id, filename: res.body.filename });
+      }
+    } finally {
+      for (const a of created) {
+        const fp = path.join(UPLOADS_DIR, a.filename);
+        if (fs.existsSync(fp)) fs.unlinkSync(fp);
+      }
+      if (created.length > 0) {
+        await prisma.attachment.deleteMany({ where: { id: { in: created.map((c) => c.id) } } });
+      }
+    }
+  });
+
   it("API-04b: Upload wrong file type returns 400 Bad Request", async () => {
     const res = await request(app)
       .post(`/api/tickets/${ticketId}/attachments`)

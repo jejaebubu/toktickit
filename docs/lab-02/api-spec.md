@@ -94,7 +94,7 @@
   - `search` (string, optional): ค้นหาแบบ case-insensitive ใน `ticketNumber` หรือ `summary` (contains)
   - `category` (int, optional): กรองตาม `categoryId` (ต้องเป็นจำนวนเต็มบวก)
   - `priority` (string, optional): กรองตาม `requestedPriority` — ต้องเป็น `LOW`, `MEDIUM`, `HIGH`, `URGENT` เท่านั้น
-  - `status` (string, optional): กรองตาม `status` (การ match เป็นแบบ exact)
+  - `status` (string, optional): กรองตาม `status` — เทียบแบบ case-insensitive (เช่น `new` ตรงกับ `New`) และต้องเป็น `New`, `In Progress`, `Resolved`, `Closed`, `Rejected` เท่านั้น
   - `sort` (string, optional): หนึ่งใน `createdAt` (default), `ticketNumber`, `summary`, `requestedPriority`, `status`
   - `order` (string, optional): `asc` หรือ `desc` (default: `desc`)
   - `page` (int, optional): หมายเลขหน้า เริ่มต้นที่ 1 (default: 1)

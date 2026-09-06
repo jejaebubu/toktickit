@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MyTicketsList } from "../../src/components/MyTicketsList.js";
 import { RequesterProvider } from "../../src/context/RequesterContext.js";
@@ -288,6 +288,38 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
       expect(last).toContain("search=printer");
       expect(last).toContain("page=1");
       expect(last).not.toContain("page=2");
+    });
+  });
+
+  it("UI-22: Shows loading state while tickets are being fetched", async () => {
+    let resolveTickets: (value: unknown) => void;
+    const pending = new Promise((resolve) => {
+      resolveTickets = resolve;
+    });
+
+    fetchMock.mockImplementation((url: string) => {
+      if (url.includes("/api/requesters")) return okRes([mockRequester]);
+      if (url.includes("/api/categories")) return okRes([{ id: 1, name: "Network" }]);
+      if (url.includes("/api/tickets")) return pending;
+      return Promise.reject(new Error("Unhandled URL: " + url));
+    });
+
+    render(
+      <RequesterProvider>
+        <MyTicketsList />
+      </RequesterProvider>
+    );
+
+    const loading = screen.getByTestId("my-tickets-loading");
+    expect(loading).toBeInTheDocument();
+    expect(loading).toHaveTextContent("Loading your tickets...");
+
+    await act(async () => {
+      resolveTickets({ ok: true, json: () => Promise.resolve(ticketsPage) });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("my-tickets-table")).toBeInTheDocument();
     });
   });
 });

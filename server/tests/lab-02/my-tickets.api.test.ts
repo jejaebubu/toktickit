@@ -9,6 +9,7 @@ const TEST_TICKET_NUMBERS = [
   "TKT-2026-700003",
   "TKT-2026-700004",
   "TKT-2026-700005",
+  "TKT-2026-700006",
 ];
 
 type RefRow = { id: number };
@@ -185,6 +186,55 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
 
     const badPriority = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ priority: "CRITICAL" });
     expect(badPriority.status).toBe(400);
+
+    const badStatus = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "Bogus" });
+    expect(badStatus.status).toBe(400);
+  });
+
+  it("API-07k: status filter is case-insensitive and returns 200 (FR-07)", async () => {
+    const reqA = requesterA.id;
+
+    const lower = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "new" });
+    expect(lower.status).toBe(200);
+    expect(lower.body.meta.total).toBeGreaterThanOrEqual(1);
+    lower.body.tickets.forEach((t: any) => expect(t.status).toBe("New"));
+
+    const mixed = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "iN pRoGrEsS" });
+    expect(mixed.status).toBe(200);
+    mixed.body.tickets.forEach((t: any) => expect(t.status).toBe("In Progress"));
+  });
+
+  it("API-07j: Filters by category (FR-07)", async () => {
+    const prisma = getPrisma();
+
+    let cat2 = await prisma.category.findUnique({ where: { name: "Software" } });
+    if (!cat2) cat2 = await prisma.category.create({ data: { name: "Software" } });
+
+    const t = await prisma.ticket.create({
+      data: {
+        ticketNumber: "TKT-2026-700006",
+        requesterId: requesterA.id,
+        categoryId: cat2.id,
+        relatedSystemId: system.id,
+        summary: "Category filter case",
+        description: "Created by category filter test.",
+        requestedPriority: "LOW",
+        status: "New",
+      },
+    });
+
+    try {
+      const res = await request(app)
+        .get("/api/tickets")
+        .set("X-Requester-Id", String(requesterA.id))
+        .query({ category: cat2.id });
+
+      expect(res.status).toBe(200);
+      expect(res.body.meta.total).toBe(1);
+      expect(res.body.tickets[0].ticketNumber).toBe("TKT-2026-700006");
+    } finally {
+      await prisma.ticket.delete({ where: { id: t.id } });
+    }
   });
 
   it("API-07i: Rejects inactive or missing requester with 400", async () => {

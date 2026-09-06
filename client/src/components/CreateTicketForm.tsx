@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Category,
   RelatedSystem,
   fetchCategories,
   fetchRelatedSystems,
   createTicket,
+  uploadAttachment,
   CreateTicketPayload,
   TicketResponse,
 } from "../api.js";
@@ -38,6 +39,9 @@ export const CreateTicketForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [createdTicket, setCreatedTicket] = useState<TicketResponse | null>(null);
+  const [uploadedCount, setUploadedCount] = useState<number>(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadFormData() {
@@ -108,6 +112,7 @@ export const CreateTicketForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiError(null);
+    setUploadedCount(0);
 
     if (!selectedRequester) {
       setApiError("Please select a Requester User context first.");
@@ -128,7 +133,23 @@ export const CreateTicketForm: React.FC = () => {
       };
 
       const result = await createTicket(payload, selectedRequester.id);
+
+      // Upload selected attachments after successful ticket creation (FR-04)
+      const toUpload = files;
+      let uploaded = 0;
+      const failed: string[] = [];
+
+      for (const file of toUpload) {
+        try {
+          await uploadAttachment(result.id, file, selectedRequester.id);
+          uploaded += 1;
+        } catch (uploadErr: any) {
+          failed.push(`${file.name}: ${uploadErr.message || "upload failed"}`);
+        }
+      }
+
       setCreatedTicket(result);
+      setUploadedCount(uploaded);
 
       // Reset form
       setSummary("");
@@ -136,6 +157,11 @@ export const CreateTicketForm: React.FC = () => {
       setRequestedPriority("MEDIUM");
       setFiles([]);
       setErrors({});
+      if (fileInputRef.current) fileInputRef.current.value = "";
+
+      if (failed.length > 0) {
+        setApiError(`Ticket created (${result.ticketNumber}), but ${failed.length} attachment(s) could not be uploaded: ${failed.join("; ")}`);
+      }
     } catch (err: any) {
       setApiError(err.message || "Failed to create ticket.");
     } finally {
@@ -211,12 +237,26 @@ export const CreateTicketForm: React.FC = () => {
               <div className="bg-white p-2 rounded border border-success border-opacity-25 d-inline-block">
                 Ticket Number: <strong className="fs-5 text-success">{createdTicket.ticketNumber}</strong>
               </div>
+              {uploadedCount > 0 && (
+                <p className="mt-2 mb-0 small" data-testid="uploaded-count">
+                  Attachments uploaded: <strong>{uploadedCount}</strong> file(s)
+                </p>
+              )}
+              {apiError && (
+                <div
+                  className="alert alert-warning border-0 shadow-sm mt-3 mb-0 py-2 px-3"
+                  role="alert"
+                  data-testid="upload-api-error"
+                >
+                  ⚠️ <strong>Warning:</strong> {apiError}
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {apiError && (
+      {apiError && !createdTicket && (
         <div className="alert alert-danger border-0 shadow-sm mb-4" role="alert" data-testid="api-error">
           ⚠️ <strong>Error:</strong> {apiError}
         </div>
@@ -302,37 +342,23 @@ export const CreateTicketForm: React.FC = () => {
 
         {/* Requested Priority */}
         <div className="mb-4">
-          <label className="form-label fw-semibold text-dark d-block">
+          <label htmlFor="requestedPriority" className="form-label fw-semibold text-dark">
             Requested Priority <span className="text-danger">*</span>
           </label>
-          <div className="btn-group w-100" role="group" aria-label="Requested Priority">
-            {(["LOW", "MEDIUM", "HIGH", "URGENT"] as const).map((priority) => (
-              <React.Fragment key={priority}>
-                <input
-                  type="radio"
-                  className="btn-check"
-                  name="requestedPriority"
-                  id={`priority-${priority}`}
-                  value={priority}
-                  checked={requestedPriority === priority}
-                  onChange={() => setRequestedPriority(priority)}
-                  disabled={isSubmitting}
-                />
-                <label
-                  className={`btn ${
-                    requestedPriority === priority ? "btn-success" : "btn-outline-secondary"
-                  }`}
-                  htmlFor={`priority-${priority}`}
-                  style={{
-                    backgroundColor: requestedPriority === priority ? "#006B3C" : undefined,
-                    borderColor: requestedPriority === priority ? "#006B3C" : undefined,
-                  }}
-                >
-                  {priority}
-                </label>
-              </React.Fragment>
+          <select
+            id="requestedPriority"
+            className={`form-select ${errors.requestedPriority ? "is-invalid" : ""}`}
+            value={requestedPriority}
+            onChange={(e) => setRequestedPriority(e.target.value as CreateTicketPayload["requestedPriority"])}
+            disabled={isSubmitting}
+          >
+            {(["LOW", "MEDIUM", "HIGH", "URGENT"] as const).map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
-          </div>
+          </select>
+          {errors.requestedPriority && <div className="invalid-feedback text-danger">{errors.requestedPriority}</div>}
         </div>
 
         {/* File Attachments */}
@@ -348,6 +374,8 @@ export const CreateTicketForm: React.FC = () => {
             accept=".jpg,.jpeg,.png,.webp,.pdf"
             onChange={handleFileChange}
             disabled={isSubmitting}
+            ref={fileInputRef}
+            data-testid="create-attachment-input"
           />
           {fileError && <div className="text-danger small mt-1">{fileError}</div>}
           {files.length > 0 && !fileError && (

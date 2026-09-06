@@ -31,7 +31,7 @@
 - **FR-04**: ระบบต้องรองรับการแนบไฟล์หลักฐานขณะสร้างตั๋วและในหน้ารายละเอียดตั๋ว
 - **FR-05**: ระบบต้องแสดงรายการตั๋วเฉพาะที่ถูกสร้างโดย Requester ที่เลือกอยู่ปัจจุบันในหน้า My Tickets
 - **FR-06**: ระบบต้องรองรับการค้นหาตั๋วตามเลขตั๋วหรือข้อความ Summary
-- **FR-07**: ระบบต้องรองรับการกรองตั๋วตาม Category, Requested Priority, IT Priority และ Status
+- **FR-07**: ระบบต้องรองรับการกรองตั๋วตาม Category, Requested Priority และ Status
 - **FR-08**: ระบบต้องรองรับการจัดเรียงตั๋ว (Sorting) และการแบ่งหน้า (Pagination)
 - **FR-09**: ระบบต้องปฏิเสธการเข้าถึงตั๋วของ Requester คนอื่น (Ownership Protection)
 - **FR-10**: ระบบต้องรองรับการลบไฟล์แนบแบบ Soft Removal โดยบันทึกเหตุผลการลบ และไม่อนุญาตให้ดาวน์โหลดไฟล์ที่ถูกลบไปแล้ว
@@ -69,7 +69,7 @@
 - `GET /api/categories`: ดึงรายชื่อ Active Categories
 - `GET /api/related-systems`: ดึงรายชื่อ Active Related Systems
 - `POST /api/tickets`: สร้างตั๋วแจ้งเรื่องใหม่
-- `GET /api/tickets`: ดึงรายการตั๋วของ Requester (รองรับ `requesterId`, `search`, `category`, `priority`, `status`, `sort`, `page`, `limit`)
+- `GET /api/tickets`: ดึงรายการตั๋วของ Requester (ระบุตัวผู้ใช้ผ่าน Mock Auth Header `X-Requester-Id` / `Authorization: Bearer dev_requester_X`; รองรับ `search`, `category`, `priority`, `status`, `sort`, `order`, `page`, `limit`)
 - `GET /api/tickets/:id`: ดึงรายละเอียดตั๋วรายใบ (เช็ค `requesterId`)
 - `POST /api/tickets/:id/attachments`: อัปโหลดไฟล์แนบ
 - `GET /api/attachments/:id/download`: ดาวน์โหลดไฟล์แนบ
@@ -93,4 +93,5 @@
 ## 11. Assumptions and Decisions (ข้อสมมติฐานและการตัดสินใจ)
 - กำหนดให้การสลับ Requester ใช้ LocalStorage หรือ React Context ในการจำลองสภาวะการเข้าสู่ระบบ
 - กำหนดให้ระบบสุ่ม/สร้าง Ticket Number ใช้รูปแบบปี ค.ศ. ปัจจุบัน ตามด้วยตัวเลขรันอัตโนมัติ 6 หลัก เช่น `TKT-2025-000001`
+- ตัวกรองใน FR-07 จำกัดเฉพาะ Category, Requested Priority และ Status — ฟิลด์ `itPriority` ยังไม่ถูกนำมาใช้กรองใน Lab 2 เนื่องจากยังไม่มี IT Staff workflow (งาน Lab 3) ที่จะกำหนดค่า IT Priority ให้ตั๋ว
 - การจัดเก็บไฟล์แนบในสภาพแวดล้อมการพัฒนาใน Local ให้เก็บในโฟลเดอร์ `server/uploads/`
