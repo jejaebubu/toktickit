@@ -49,6 +49,7 @@
 | **API-14** | API | AC-04 | อัปโหลดไฟล์ JPG/PNG/WEBP/PDF สำเร็จ (201), ดาวน์โหลดได้ (200 + Content-Disposition), เกิน 5MB/ผิดประเภท/ครบ 5 ไฟล์ → 400 | `server/tests/lab-02/attachments.api.test.ts` | 201 / 400 | PASS |
 | **API-15** | API | AC-05 | Soft Remove (DELETE + reason) สำเร็จ → isRemoved=true; ไฟล์ที่ลบแล้วดาวน์โหลดไม่ได้ (400), ลบไม่ใส่ reason → 400 | `server/tests/lab-02/attachments.api.test.ts` | 200 / 400 | PASS |
 | **E2E-01** | E2E | AC-01, AC-03, FR-04 | ทดสอบการทำงานครบวงจรตั้งแต่สลับผู้ใช้ -> สร้างตั๋วพร้อมแนบไฟล์ -> ค้นหาตั๋ว -> ดู detail -> Soft-remove ไฟล์แนบ | `e2e/lab-02/requester-ticket-flow.spec.ts` | Full Flow Success | PASS |
+| **E2E-02** | E2E | FR-01..FR-10, BR-01..BR-09, ui-spec 3.2/4/5 | Acceptance Checklist: เดินตรวจครบทุกฟังก์ชันหน้าจอบนแอปที่รันจริง (selector modal, create form dropdown ครบ, max-width 1200px, Search/Filter/Sort/แล้ว, detail + attachment + soft-remove, back nav) | `e2e/lab-02/checklist-smoke.spec.ts` | All Checks Passed | PASS |
 
 ## 3. Acceptance Criteria Traceability (การเชื่อมโยง AC กับ Test)
 - **AC-01**: ครอบคลุมด้วย API-01, API-02, UI-02, UI-03, UI-14, UI-20, E2E-01
@@ -94,7 +95,7 @@
 | V-05 | `[Removed]` badge แสดงหลัง soft-remove + ปุ่ม Download/Remove หายไป | assertion ใน E2E + screenshot ticket-detail-removed | PASS |
 | V-06 | Responsive: ตาราง desktop/tablet ↔ การ์ด mobile (<768px), ไม่มี horizontal scrollbar | viewport-specific locator ใน E2E | PASS |
 
-> ผลลัพธ์จริง: E2E-01 ผ่าน 3/3 viewport (2.0s/2.1s/2.7s) — รายละเอียดใน `playwright-report/` (git-ignored)
+> ผลลัพธ์จริง: E2E-01/02 ผ่าน 3/3 viewport (ทั้งหมด 6/6 test) — รายละเอียดใน `playwright-report/` (git-ignored)
 
 ## 5. Test Commands
 ```bash
