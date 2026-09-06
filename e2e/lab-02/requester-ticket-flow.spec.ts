@@ -5,9 +5,7 @@ function screenshotDir() {
   return path.join(__dirname, "..", "..", "artifacts", "lab-02", "screenshots");
 }
 
-let project = "desktop";
-
-function shot(sub: string, name: string): string {
+function shot(project: string, sub: string, name: string): string {
   return path.join(screenshotDir(), sub, `${name}-${project}.png`);
 }
 
@@ -23,7 +21,7 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
   test("select requester -> create ticket -> find in My Tickets -> detail + attachment upload/soft-remove", async ({
     page,
     }, testInfo) => {
-    project = testInfo.project.name;
+    const project = testInfo.project.name;
     const summary = `E2E WiFi reset ${Date.now()}`;
     const description = "Playwright end-to-end flow verifying the full requester ticket journey.";
     const fixture = path.join(__dirname, "fixtures", "wifi_error.png");
@@ -44,7 +42,7 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
     await page.locator("#description").fill(description);
     // Category & Related System default to first option; keep MEDIUM priority.
     await page.getByTestId("submit-ticket-btn").scrollIntoViewIfNeeded();
-    await page.screenshot({ path: shot("create-ticket", "create-ticket"), fullPage: true });
+    await page.screenshot({ path: shot(project, "create-ticket", "create-ticket"), fullPage: true });
 
     await page.getByTestId("submit-ticket-btn").click();
     await expect(page.getByTestId("success-alert")).toBeVisible();
@@ -70,7 +68,7 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
       .first();
     await expect(rowOrCard).toBeVisible();
     await rowOrCard.scrollIntoViewIfNeeded();
-    await page.screenshot({ path: shot("my-tickets", "my-tickets"), fullPage: true });
+    await page.screenshot({ path: shot(project, "my-tickets", "my-tickets"), fullPage: true });
     await expectNoHorizontalOverflow(page);
 
     // --- Step 4: Open Ticket Detail ---
@@ -88,7 +86,7 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
 
     // Capture detail WITH active attachment
     await page.locator('[data-testid^="attachment-download-"]').first().scrollIntoViewIfNeeded();
-    await page.screenshot({ path: shot("ticket-detail", "ticket-detail"), fullPage: true });
+    await page.screenshot({ path: shot(project, "ticket-detail", "ticket-detail"), fullPage: true });
     await expectNoHorizontalOverflow(page);
 
     // --- Step 6: Soft-remove attachment with reason (E2E-01) ---
@@ -103,7 +101,7 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
     await expect(page.locator('[data-testid^="attachment-removed-"]').first()).toContainText("[Removed]");
     await expect(page.locator('[data-testid^="attachment-download-"]').first()).not.toBeVisible();
     await page.locator('[data-testid^="attachment-removed-"]').first().scrollIntoViewIfNeeded();
-    await page.screenshot({ path: shot("ticket-detail", "ticket-detail-removed"), fullPage: true });
+    await page.screenshot({ path: shot(project, "ticket-detail", "ticket-detail-removed"), fullPage: true });
 
     // --- Step 7: Back navigation returns to My Tickets ---
     await page.getByTestId("back-to-my-tickets").click();
