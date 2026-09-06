@@ -52,7 +52,27 @@
 - **FR-07** (กรองตั๋ว): ครอบคลุมด้วย API-08, UI-06
 - **FR-08** (เรียงลำดับ & หน้า): ครอบคลุมด้วย API-09, API-10, UI-05, UI-07, UI-09
 
-## 4. Test Commands
+## 4. E2E & Visual Checklist (Issue 10)
+
+### 4.1 E2E Flow (`npm run test:e2e`)
+- รันด้วย Playwright (ชี้อัตโนมัติ: seed → build server → ขึ้น server `:3000` + client Vite `:5173`)
+- 3 โปรเจกต์ viewport: desktop (1280×800 ≥992px), tablet (820×1180, 768–991px), mobile (393×851 <768px) — รันตามลำดับด้วย `workers: 1` (กันการชนของ `generateTicketNumber`)
+- Flow ครบรอบ: เลือก Developer Requester → สร้าง Ticket → ค้นหาใน My Tickets → เปิด Ticket Detail → อัปโหลด attachment → Soft-remove พร้อมเหตุผล → Back กลับ My Tickets
+- Screenshots หลักฐานอยู่ที่ `artifacts/lab-02/screenshots/{create-ticket,my-tickets,ticket-detail}/` (รวม `ticket-detail-removed-<viewport>.png` หลัง soft-remove)
+
+### 4.2 Visual Checklist (ตรวจสอบตาม ui-spec.md ที่ทุก viewport)
+| # | รายการตรวจ | วิธีตรวจ | สถานะ |
+|---|---|---|---|
+| V-01 | ไม่มี horizontal page scrolling (document ไม่กว้างกว่า viewport) | `expectNoHorizontalOverflow` ในระหว่าง E2E flow (หน้า main + detail) | PASS ทุก viewport |
+| V-02 | ปุ่ม/ฟิลด์สำคัญไม่ถูกบัง และคลิกได้ (Selector card → Submit → Row/Card → Download/Remove → Back) | autocheck ผ่านการโต้ตอบจริงใน E2E | PASS ทุก viewport |
+| V-03 | Zen Green Theme คงที่ (Primary `#006B3C`, badge/ปุ่ม status) | ตรวจจาก screenshots | PASS |
+| V-04 | ฟิลด์ Commerce Edge: Summary/Description เป็น read-only บน Detail | screenshot ticket-detail | PASS |
+| V-05 | `[Removed]` badge แสดงหลัง soft-remove + ปุ่ม Download/Remove หายไป | assertion ใน E2E + screenshot ticket-detail-removed | PASS |
+| V-06 | Responsive: ตาราง desktop/tablet ↔ การ์ด mobile (<768px), ไม่มี horizontal scrollbar | viewport-specific locator ใน E2E | PASS |
+
+> ผลลัพธ์จริง: E2E-01 ผ่าน 3/3 viewport (2.0s/2.1s/2.7s) — รายละเอียดใน `playwright-report/` (git-ignored)
+
+## 5. Test Commands
 ```bash
 # รัน API Tests ฝั่ง Backend
 cd server && npm test
@@ -60,6 +80,6 @@ cd server && npm test
 # รัน UI Tests ฝั่ง Frontend
 cd client && npm test
 
-# รัน E2E Tests
+# รัน E2E Tests (seed อัตโนมัติ + ขึ้น webserver แล้วรัน 3 viewports)
 npm run test:e2e
 ```

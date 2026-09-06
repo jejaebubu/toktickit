@@ -13,6 +13,10 @@ server/prisma/*.db
 
 # uploads (test attachment artifacts - must not be committed)
 server/uploads/
+
+# playwright
+test-results/
+playwright-report/
 # logs & OS
 *.log
 .DS_Store
