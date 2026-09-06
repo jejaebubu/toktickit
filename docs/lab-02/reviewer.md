@@ -10,7 +10,7 @@
 
 | PR # | Branch | ผู้ตรวจ (Reviewer) | ผลการประเมิน (Reviewer verdict) | Merge commit |
 |------|--------|--------------------|---------------------------------|--------------|
-| [#11](https://github.com/jejaebubu/toktickit/pull/11) | feature/lab02-01-spec-docs | @Suprawi5227 | Approved (1 รอบ Changes requested → แก้แล้ว) | `c5b36f4` |
+| [#11](https://github.com/jejaebubu/toktickit/pull/11) | feature/lab02-01-spec-docs | @Suprawi5227 | Approved (1 รอบ Changes requested → แก้แล้ว); approval ตกลงกันนอก GitHub แล้วรวมกับคำตอบของกลุ่ม | `c5b36f4` |
 | [#21](https://github.com/jejaebubu/toktickit/pull/21) | feature/lab02-02-db-models | @titayaaa | Approved | `d7818a3` |
 | [#22](https://github.com/jejaebubu/toktickit/pull/22) | feature/lab02-03-seed-data | @titayaaa | Approved (1 รอบ Changes requested → แก้แล้ว) | `879b008` |
 | [#23](https://github.com/jejaebubu/toktickit/pull/23) | feature/lab02-04-requester-context | @titayaaa | Approved (1 รอบ Changes requested → แก้แล้ว) | `b8a8b7b` |
@@ -34,6 +34,8 @@
 "ขอบคุณสำหรับคำแนะนำค่ะ! ได้ทำการเพิ่มรายละเอียด HTTP Status Codes (400 Bad Request, 403 Forbidden, 404 Not Found, 500 Internal Server Error) พร้อมตัวอย่าง JSON Error Response สำหรับทุก Endpoint ในเอกสาร `docs/lab-02/api-spec.md` และตารางสรุปมาตรฐาน Status Code เรียบร้อยแล้วค่ะ ฝากตรวจทานอีกครั้งนะคะ"
 
 → Approved และ merged ครับ
+
+> **หมายเหตุ:** approval ของ PR #11 ไม่ได้กด Approve บน GitHub (ไม่มี review event ถูกบันทึกในฝั่ง Development ของ PR) — การยอมรับผลสอบทานตกลงกันนอก GitHub โดยผู้ตรวจ (@Suprawi5227) ยืนยันผลผ่านช่องทางติดต่อก่อนทำการ merge แล้ว
 
 ### PR #22 — seed data (@titayaaa, Changes requested → Approved)
 
