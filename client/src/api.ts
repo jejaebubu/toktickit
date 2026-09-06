@@ -1,5 +1,19 @@
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+async function parseApiError(res: Response): Promise<never> {
+  const errorData = await res.json().catch(() => ({}));
+  throw new ApiError(res.status, errorData.message || `Request failed with status ${res.status}`);
+}
+
 export interface Category {
   id: number;
   name: string;
@@ -133,6 +147,97 @@ export async function fetchMyTickets(
     throw new Error(errorData.message || "Failed to fetch tickets");
   }
 
+  return res.json();
+}
+
+export interface Attachment {
+  id: number;
+  originalName: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  isRemoved: boolean;
+  removeReason: string | null;
+  removedAt: string | null;
+  createdAt: string;
+}
+
+export interface TicketDetail {
+  id: number;
+  ticketNumber: string;
+  summary: string;
+  description: string;
+  requestedPriority: string;
+  itPriority: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  requester: { id: number; name: string; email: string };
+  category: { id: number; name: string };
+  relatedSystem: { id: number; name: string };
+  attachments: Attachment[];
+}
+
+export interface RemoveAttachmentResult {
+  id: number;
+  originalName: string;
+  isRemoved: boolean;
+  removeReason: string;
+  removedAt: string;
+}
+
+export async function fetchTicketDetail(
+  ticketId: number,
+  requesterId: number
+): Promise<TicketDetail> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}`, {
+    headers: { "X-Requester-Id": String(requesterId) },
+  });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
+  return res.json();
+}
+
+export async function uploadAttachment(
+  ticketId: number,
+  file: File,
+  requesterId: number
+): Promise<Attachment> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/attachments`, {
+    method: "POST",
+    headers: { "X-Requester-Id": String(requesterId) },
+    body: form,
+  });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
+  return res.json();
+}
+
+export function getAttachmentDownloadUrl(attachmentId: number, requesterId: number): string {
+  return `${API_URL}/api/attachments/${attachmentId}/download?X-Requester-Id=${requesterId}`;
+}
+
+export async function removeAttachment(
+  attachmentId: number,
+  reason: string,
+  requesterId: number
+): Promise<RemoveAttachmentResult> {
+  const res = await fetch(`${API_URL}/api/attachments/${attachmentId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requester-Id": String(requesterId),
+    },
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
   return res.json();
 }
 

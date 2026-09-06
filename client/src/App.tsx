@@ -4,6 +4,7 @@ import { Header } from "./components/Header.js";
 import { RequesterSelector } from "./components/RequesterSelector.js";
 import { CreateTicketForm } from "./components/CreateTicketForm.js";
 import { MyTicketsList } from "./components/MyTicketsList.js";
+import { TicketDetail } from "./components/TicketDetail.js";
 import { checkSystem, Category } from "./api.js";
 
 type UiState = "idle" | "loading" | "success" | "error";
@@ -12,6 +13,7 @@ function MainContent() {
   const { selectedRequester } = useRequester();
   const [state, setState] = useState<UiState>("idle");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [openTicketId, setOpenTicketId] = useState<number | null>(null);
 
   async function handleCheck() {
     setState("loading");
@@ -40,7 +42,11 @@ function MainContent() {
         <CreateTicketForm />
 
         {/* My Tickets List (Issue 8) */}
-        <MyTicketsList />
+        {openTicketId === null ? (
+          <MyTicketsList onOpenTicket={(id) => setOpenTicketId(id)} />
+        ) : (
+          <TicketDetail ticketId={openTicketId} onBack={() => setOpenTicketId(null)} />
+        )}
 
         {/* System Health Check Card (Lab 1 compatibility) */}
         <div className="card border-0 shadow-sm p-4 mb-4" style={{ borderRadius: "16px", backgroundColor: "#FFFFFF" }}>
