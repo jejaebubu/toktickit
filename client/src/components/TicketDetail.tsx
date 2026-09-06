@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TicketDetail as TicketDetailData, fetchTicketDetail } from "../api.js";
+import { ApiError, TicketDetail as TicketDetailData, fetchTicketDetail } from "../api.js";
 import { useRequester } from "../context/RequesterContext.js";
 import { AttachmentSection } from "./AttachmentSection.js";
 
@@ -49,7 +49,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
       .catch((err: any) => {
         if (!cancelled) {
           setError(err?.message || "Failed to load ticket details.");
-          setIsUnauthorized(/permission|forbidden/i.test(err?.message || "") || String(err?.message || "").includes("403"));
+          setIsUnauthorized(err instanceof ApiError && err.status === 403);
         }
       })
       .finally(() => {

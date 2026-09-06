@@ -575,38 +575,47 @@ app.post("/api/tickets/:id/attachments", async (req: Request, res: Response) => 
     if (!file) {
       return buildError(400, "Bad Request", "No file was uploaded. Use multipart field 'file'.");
     }
-    if (!(file.mimetype in MIME_TO_EXT)) {
-      fs.unlink(file.path, () => {});
-      return buildError(400, "Bad Request", `Invalid file type. Only JPG, PNG, WEBP, and PDF files are allowed.`);
+
+    // Guarantee cleanup: unlink the stored file on EVERY non-success exit path
+    // (invalid type, active limit reached, DB failure in catch), but keep it on success.
+    let fileSaved = false;
+    try {
+      if (!(file.mimetype in MIME_TO_EXT)) {
+        return buildError(400, "Bad Request", `Invalid file type. Only JPG, PNG, WEBP, and PDF files are allowed.`);
+      }
+
+      const activeCount = await prisma.attachment.count({
+        where: { ticketId, isRemoved: false },
+      });
+      if (activeCount >= MAX_ACTIVE_ATTACHMENTS) {
+        return buildError(400, "Bad Request", `Maximum active attachments limit (${MAX_ACTIVE_ATTACHMENTS}) reached for this ticket.`);
+      }
+
+      const attachment = await prisma.attachment.create({
+        data: {
+          ticketId,
+          filename: file.filename,
+          originalName: file.originalname,
+          mimeType: file.mimetype,
+          size: file.size,
+        },
+      });
+      fileSaved = true;
+
+      return res.status(201).json({
+        id: attachment.id,
+        originalName: attachment.originalName,
+        filename: attachment.filename,
+        mimeType: attachment.mimeType,
+        size: attachment.size,
+        isRemoved: attachment.isRemoved,
+        createdAt: attachment.createdAt,
+      });
+    } finally {
+      if (!fileSaved) {
+        fs.unlink(file.path, () => {});
+      }
     }
-
-    const activeCount = await prisma.attachment.count({
-      where: { ticketId, isRemoved: false },
-    });
-    if (activeCount >= MAX_ACTIVE_ATTACHMENTS) {
-      fs.unlink(file.path, () => {});
-      return buildError(400, "Bad Request", `Maximum active attachments limit (${MAX_ACTIVE_ATTACHMENTS}) reached for this ticket.`);
-    }
-
-    const attachment = await prisma.attachment.create({
-      data: {
-        ticketId,
-        filename: file.filename,
-        originalName: file.originalname,
-        mimeType: file.mimetype,
-        size: file.size,
-      },
-    });
-
-    return res.status(201).json({
-      id: attachment.id,
-      originalName: attachment.originalName,
-      filename: attachment.filename,
-      mimeType: attachment.mimeType,
-      size: attachment.size,
-      isRemoved: attachment.isRemoved,
-      createdAt: attachment.createdAt,
-    });
   } catch (err: any) {
     console.error("Error uploading attachment:", err);
     return buildError(500, "Internal Server Error", err?.message || "Failed to upload attachment.");

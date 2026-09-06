@@ -10,6 +10,9 @@ build/
 .vite/
 # prisma
 server/prisma/*.db
+
+# uploads (test attachment artifacts - must not be committed)
+server/uploads/
 # logs & OS
 *.log
 .DS_Store

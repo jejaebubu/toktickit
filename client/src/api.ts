@@ -1,5 +1,19 @@
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+async function parseApiError(res: Response): Promise<never> {
+  const errorData = await res.json().catch(() => ({}));
+  throw new ApiError(res.status, errorData.message || `Request failed with status ${res.status}`);
+}
+
 export interface Category {
   id: number;
   name: string;
@@ -180,8 +194,7 @@ export async function fetchTicketDetail(
     headers: { "X-Requester-Id": String(requesterId) },
   });
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to fetch ticket");
+    await parseApiError(res);
   }
   return res.json();
 }
@@ -200,8 +213,7 @@ export async function uploadAttachment(
     body: form,
   });
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to upload attachment");
+    await parseApiError(res);
   }
   return res.json();
 }
@@ -224,8 +236,7 @@ export async function removeAttachment(
     body: JSON.stringify({ reason }),
   });
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to remove attachment");
+    await parseApiError(res);
   }
   return res.json();
 }
