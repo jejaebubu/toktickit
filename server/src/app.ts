@@ -92,23 +92,22 @@ async function generateTicketNumber(): Promise<string> {
   const currentYear = new Date().getFullYear();
   const prefix = `TKT-${currentYear}-`;
 
-  const existingNumbers = await prisma.ticket.findMany({
+  const lastTicket = await prisma.ticket.findFirst({
     where: { ticketNumber: { startsWith: prefix } },
+    orderBy: { ticketNumber: "desc" },
     select: { ticketNumber: true },
   });
 
-  let maxSeq = 0;
-  for (const { ticketNumber } of existingNumbers) {
-    const parts = ticketNumber.split("-");
+  let nextSeq = 1;
+  if (lastTicket?.ticketNumber) {
+    const parts = lastTicket.ticketNumber.split("-");
     if (parts.length === 3) {
       const seq = parseInt(parts[2], 10);
-      if (!isNaN(seq) && seq > maxSeq) {
-        maxSeq = seq;
+      if (!isNaN(seq)) {
+        nextSeq = seq + 1;
       }
     }
   }
-
-  const nextSeq = maxSeq + 1;
 
   return `${prefix}${String(nextSeq).padStart(6, "0")}`;
 }
