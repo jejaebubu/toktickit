@@ -88,6 +88,6 @@ npm run test:e2e    # รัน seed + build server + ทดสอบ 3 viewport
 - `GET  /api/tickets/:id/attachments` — รายการไฟล์แนบ
 - `POST /api/tickets/:id/attachments` — อัปโหลดไฟล์แนบ
 - `GET  /api/attachments/:id/download` — ดาวน์โหลดไฟล์แนบ
-- `PATCH /api/attachments/:id` — soft remove ไฟล์แนบพร้อมเหตุผล
+- `DELETE /api/attachments/:id` — soft remove ไฟล์แนบพร้อมเหตุผล
 
 รายละเอียดเพิ่มเติม: `docs/lab-02/api-spec.md`
