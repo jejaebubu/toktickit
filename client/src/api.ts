@@ -44,6 +44,43 @@ export interface TicketResponse {
   requesterId: number;
 }
 
+export interface TicketListItem {
+  id: number;
+  ticketNumber: string;
+  summary: string;
+  requestedPriority: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  categoryId: number;
+  categoryName: string;
+  relatedSystemId: number;
+  relatedSystemName: string;
+}
+
+export interface TicketsMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface TicketsPage {
+  tickets: TicketListItem[];
+  meta: TicketsMeta;
+}
+
+export interface MyTicketsQuery {
+  search?: string;
+  category?: number;
+  priority?: string;
+  status?: string;
+  sort?: string;
+  order?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+}
+
 export async function checkSystem(): Promise<SystemStatus> {
   const healthRes = await fetch(`${API_URL}/api/health`);
   if (!healthRes.ok) throw new Error("Health check failed");
@@ -71,6 +108,34 @@ export async function fetchRelatedSystems(): Promise<RelatedSystem[]> {
   return res.json();
 }
 
+export async function fetchMyTickets(
+  query: MyTicketsQuery,
+  requesterId: number
+): Promise<TicketsPage> {
+  const params = new URLSearchParams();
+  if (query.search && query.search.trim() !== "") params.set("search", query.search.trim());
+  if (query.category) params.set("category", String(query.category));
+  if (query.priority) params.set("priority", query.priority);
+  if (query.status) params.set("status", query.status);
+  if (query.sort) params.set("sort", query.sort);
+  if (query.order) params.set("order", query.order);
+  if (query.page) params.set("page", String(query.page));
+  if (query.limit) params.set("limit", String(query.limit));
+
+  const res = await fetch(`${API_URL}/api/tickets?${params.toString()}`, {
+    headers: {
+      "X-Requester-Id": String(requesterId),
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to fetch tickets");
+  }
+
+  return res.json();
+}
+
 export async function createTicket(
   payload: CreateTicketPayload,
   requesterId: number
@@ -79,7 +144,6 @@ export async function createTicket(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer dev_requester_${requesterId}`,
       "X-Requester-Id": String(requesterId),
     },
     body: JSON.stringify(payload),

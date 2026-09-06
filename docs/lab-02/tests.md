@@ -16,6 +16,13 @@
 | **UI-02** | UI | AC-01 | ฟอร์ม Create Ticket แสดงดอกจันสีแดงและข้อความเตือนเมื่อข้อมูลไม่ครบ | `client/tests/lab-02/CreateTicket.test.tsx` | Validation Shown | PASS |
 | **UI-03** | UI | AC-01 | ปุ่ม Submit แสดงสถานะ Busy ขณะกำลังส่งข้อมูล | `client/tests/lab-02/CreateTicket.test.tsx` | Disabled & Loading | PASS |
 | **UI-04** | UI | AC-05 | แสดงสถานะ `[Removed]` สำหรับไฟล์แนบที่ถูก Soft-removed | `client/tests/lab-02/AttachmentSection.test.tsx` | Metadata Shown | PASS |
+| **UI-05** | UI | FR-05, FR-08 | My Tickets แสดงตาราง (Desktop) พร้อม Ticket No., Date, Summary, Category, Priority, Status และสรุปจำนวนรวม | `client/tests/lab-02/MyTicketsList.test.tsx` | Table/Badges/Total Shown | PASS |
+| **UI-06** | UI | FR-06, FR-07 | กล่องค้นหา และ Dropdown ตัวกรอง (Category/Priority/Status) ส่ง Query Params ถูกต้องไปยัง API | `client/tests/lab-02/MyTicketsList.test.tsx` | Correct Params Sent | PASS |
+| **UI-07** | UI | FR-08 | Pagination Previous/Next และปุ่มเลขหน้าเปลี่ยนหน้าได้ถูกต้อง (และ Prev Disabled บนหน้าแรก) | `client/tests/lab-02/MyTicketsList.test.tsx` | Page Change Works | PASS |
+| **UI-08** | UI | FR-05 | Empty State (ยังไม่มีตั๋ว) และ No-Results State (ค้นหา/กรองไม่เจอ) แสดงข้อความต่างกันถูกต้อง | `client/tests/lab-02/MyTicketsList.test.tsx` | Empty / No-Results Shown | PASS |
+| **UI-09** | UI | FR-08 | Dropdown Sort By และปุ่มสลับ Ascending/Descending ส่ง `sort`/`order` ถูกต้อง | `client/tests/lab-02/MyTicketsList.test.tsx` | Sort/Order Correct | PASS |
+| **UI-10** | UI | AC-01 | API พัง (500) → แสดงกล่องแจ้งเตือนสีแดง `my-tickets-error` พร้อมข้อความมีเหตุผล | `client/tests/lab-02/MyTicketsList.test.tsx` | Error Alert Shown | PASS |
+| **UI-11** | UI | FR-08 | Regression: ค้นหา/กรองใหม่จากหน้าที่ >1 ต้องรีเซ็ตกลับหน้า 1 เสมอ (ไม่ทิ้งผลลัพธ์ว่างเพราะค้างหน้า) | `client/tests/lab-02/MyTicketsList.test.tsx` | Page Reset to 1 | PASS |
 | **API-06** | API | FR-05 | My Tickets คืนเฉพาะตั๋วของ Requester ปัจจุบัน (Ownership Filtering) พร้อม `meta` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK | PASS |
 | **API-07** | API | FR-06 | ค้นหา `search` ตรง `ticketNumber` และ `summary` แบบ case-insensitive | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ผลลัพธ์ถูกต้อง | PASS |
 | **API-08** | API | FR-07 | กรองด้วย `category`, `priority`, `status` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, เฉพาะรายการที่ตรง | PASS |
@@ -30,10 +37,10 @@
 - **AC-03**: ครอบคลุมด้วย API-03, API-11, E2E-01
 - **AC-04**: ครอบคลุมด้วย API-04
 - **AC-05**: ครอบคลุมด้วย API-05, UI-04, E2E-01
-- **FR-05** (My Tickets เป็นของตัวเองเท่านั้น): ครอบคลุมด้วย API-06, API-11
-- **FR-06** (ค้นหาตั๋ว): ครอบคลุมด้วย API-07
-- **FR-07** (กรองตั๋ว): ครอบคลุมด้วย API-08
-- **FR-08** (เรียงลำดับ & หน้า): ครอบคลุมด้วย API-09, API-10
+- **FR-05** (My Tickets เป็นของตัวเองเท่านั้น): ครอบคลุมด้วย API-06, API-11, UI-05, UI-08
+- **FR-06** (ค้นหาตั๋ว): ครอบคลุมด้วย API-07, UI-06
+- **FR-07** (กรองตั๋ว): ครอบคลุมด้วย API-08, UI-06
+- **FR-08** (เรียงลำดับ & หน้า): ครอบคลุมด้วย API-09, API-10, UI-05, UI-07, UI-09
 
 ## 4. Test Commands
 ```bash
