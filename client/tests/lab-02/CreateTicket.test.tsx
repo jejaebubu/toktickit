@@ -237,4 +237,131 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     // Submission is blocked: no create request should be sent
     expect(createSpy).not.toHaveBeenCalled();
   });
+
+  it("UI-23: More than 5 selected files are rejected locally and block submission (BR-07)", async () => {
+    const createSpy = vi.spyOn(api, "createTicket").mockResolvedValue({
+      id: 101,
+      ticketNumber: "TKT-2026-000101",
+      summary: "Test Summary",
+      status: "New",
+      createdAt: new Date().toISOString(),
+    } as any);
+
+    const sixFiles = Array.from(
+      { length: 6 },
+      (_, i) => new File(["%PDF-1.4 test"], `f${i}.pdf`, { type: "application/pdf" })
+    );
+
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    const user = userEvent.setup();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Summary/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/Summary/i), "Test Summary");
+    await user.type(screen.getByLabelText(/Description/i), "Test Description");
+
+    fireEvent.change(screen.getByLabelText(/Attachments/i), { target: { files: sixFiles } });
+
+    expect(screen.getByText(/Maximum 5 attachments allowed per ticket\./)).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("submit-ticket-btn"));
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  it("UI-24: Failed attachment uploads surface a warning inside the success card (FR-04)", async () => {
+    const badFile = new File(["%PDF-1.4 bad"], "bad.pdf", { type: "application/pdf" });
+    const okFile = new File(["%PDF-1.4 ok"], "ok.pdf", { type: "application/pdf" });
+
+    vi.spyOn(api, "createTicket").mockResolvedValue({
+      id: 101,
+      ticketNumber: "TKT-2026-000101",
+      summary: "Test Summary",
+      status: "New",
+      createdAt: new Date().toISOString(),
+    } as any);
+    const uploadSpy = vi
+      .spyOn(api, "uploadAttachment")
+      .mockRejectedValueOnce(new Error("Server rejected oversized file"))
+      .mockResolvedValueOnce({
+        id: 1,
+        originalName: "ok.pdf",
+        mimeType: "application/pdf",
+        isRemoved: false,
+      } as any);
+
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    const user = userEvent.setup();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Summary/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/Summary/i), "Test Summary");
+    await user.type(screen.getByLabelText(/Description/i), "Test Description");
+    fireEvent.change(screen.getByLabelText(/Attachments/i), { target: { files: [badFile, okFile] } });
+
+    await user.click(screen.getByTestId("submit-ticket-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("success-alert")).toBeInTheDocument();
+    });
+
+    const warning = screen.getByTestId("upload-api-error");
+    expect(warning).toHaveTextContent(/could not be uploaded/);
+    expect(warning).toHaveTextContent("TKT-2026-000101");
+    expect(screen.getByTestId("uploaded-count")).toHaveTextContent("1");
+    expect(screen.queryByTestId("api-error")).not.toBeInTheDocument();
+    expect(uploadSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it("UI-25: Native file input value is cleared after a successful submit (UX)", async () => {
+    const file = new File(["%PDF-1.4 test evidence"], "evidence.pdf", { type: "application/pdf" });
+
+    vi.spyOn(api, "createTicket").mockResolvedValue({
+      id: 101,
+      ticketNumber: "TKT-2026-000101",
+      summary: "Test Summary",
+      status: "New",
+      createdAt: new Date().toISOString(),
+    } as any);
+    vi.spyOn(api, "uploadAttachment").mockResolvedValue({
+      id: 1,
+      originalName: "evidence.pdf",
+      mimeType: "application/pdf",
+      isRemoved: false,
+    } as any);
+
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    const user = userEvent.setup();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Summary/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/Summary/i), "Test Summary");
+    await user.type(screen.getByLabelText(/Description/i), "Test Description");
+    await user.upload(screen.getByLabelText(/Attachments/i), file);
+
+    await user.click(screen.getByTestId("submit-ticket-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("success-alert")).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId("create-attachment-input")).toHaveValue("");
+  });
 });

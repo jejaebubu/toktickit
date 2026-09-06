@@ -191,6 +191,19 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
     expect(badStatus.status).toBe(400);
   });
 
+  it("API-07k: status filter is case-insensitive and returns 200 (FR-07)", async () => {
+    const reqA = requesterA.id;
+
+    const lower = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "new" });
+    expect(lower.status).toBe(200);
+    expect(lower.body.meta.total).toBeGreaterThanOrEqual(1);
+    lower.body.tickets.forEach((t: any) => expect(t.status).toBe("New"));
+
+    const mixed = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "iN pRoGrEsS" });
+    expect(mixed.status).toBe(200);
+    mixed.body.tickets.forEach((t: any) => expect(t.status).toBe("In Progress"));
+  });
+
   it("API-07j: Filters by category (FR-07)", async () => {
     const prisma = getPrisma();
 

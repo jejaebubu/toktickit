@@ -390,10 +390,14 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       return buildError(`'priority' must be one of ${VALID_PRIORITIES.join(", ")}.`);
     }
 
-    const status = typeof req.query.status === "string" && req.query.status.trim() !== ""
+    const rawStatus = typeof req.query.status === "string" && req.query.status.trim() !== ""
       ? req.query.status.trim()
       : undefined;
-    if (status !== undefined && !VALID_STATUS.includes(status)) {
+    // Normalize case-insensitively (e.g. ?status=new matches "New") and use the canonical value
+    const status = rawStatus
+      ? VALID_STATUS.find((s) => s.toUpperCase() === rawStatus.toUpperCase())
+      : undefined;
+    if (rawStatus !== undefined && !status) {
       return buildError(`'status' must be one of ${VALID_STATUS.join(", ")}.`);
     }
 

@@ -34,9 +34,13 @@
 | **UI-20** | UI | AC-01 | สร้างตั๋วแล้ว API พัง (500) → แสดงกล่องข้อผิดพลาดสีแดง `api-error` พร้อมข้อความ | `client/tests/lab-02/CreateTicket.test.tsx` | Error Alert Shown | PASS |
 | **UI-21** | UI | AC-04 | เลือกไฟล์ประเภทไม่ถูกต้องตอนสร้างตั๋ว → แจ้ง Error ท้องถิ่น (fileError) และบล็อกการยื่นส่ง | `client/tests/lab-02/CreateTicket.test.tsx` | Blocked Locally | PASS |
 | **UI-22** | UI | FR-05 | My Tickets แสดง Loading State (`my-tickets-loading`) ขณะกำลังดึงข้อมูล | `client/tests/lab-02/MyTickets.test.tsx` | Loading Shown | PASS |
+| **UI-23** | UI | BR-07, AC-04 | เลือกไฟล์แนบเกิน 5 ไฟล์ตอนสร้างตั๋ว → แจ้ง Error ท้องถิ่นและบล็อกการยื่นส่ง | `client/tests/lab-02/CreateTicket.test.tsx` | Blocked Locally | PASS |
+| **UI-24** | UI | FR-04 | สร้างตั๋วสำเร็จแต่อัปโหลดบางไฟล์ล้มเหลว → แสดง Warning ภายใน Success Card (แจ้งจำนวน/ชื่อไฟล์ที่ fail + เลขตั๋ว) | `client/tests/lab-02/CreateTicket.test.tsx` | Warning in Success | PASS |
+| **UI-25** | UI | UX | หลัง submit สำเร็จ clear value ของ native file input (ชื่อไฟล์ไม่ค้างในหน้าจอ) | `client/tests/lab-02/CreateTicket.test.tsx` | Input Cleared | PASS |
 | **API-06** | API | FR-05 | My Tickets คืนเฉพาะตั๋วของ Requester ปัจจุบัน (Ownership Filtering) พร้อม `meta` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK | PASS |
 | **API-07** | API | FR-06 | ค้นหา `search` ตรง `ticketNumber` และ `summary` แบบ case-insensitive | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ผลลัพธ์ถูกต้อง | PASS |
 | **API-08** | API | FR-07 | กรองด้วย `category`, `priority`, `status` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, เฉพาะรายการที่ตรง | PASS |
+| **API-07k** | API | FR-07 | `status` filter เทียบแบบ case-insensitive (`new`, `iN pRoGrEsS`) → 200 OK พร้อม canonical value; ค่าที่ไม่อยู่ใน whitelist → 400 | `server/tests/lab-02/my-tickets.api.test.ts` | 200/400 ถูกต้อง | PASS |
 | **API-09** | API | FR-08 | จัดเรียง `sort`/`order` และแบ่งหน้า `page`/`limit` พร้อม `totalPages` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ลำดับ/หน้าถูกต้อง | PASS |
 | **API-10** | API | FR-08 | ปฏิเสธพารามิเตอร์ไม่ถูกต้อง (`page=0`, `limit>50`, `sort`/`order`/`priority`/`status` ผิด) | `server/tests/lab-02/my-tickets.api.test.ts` | 400 Bad Request | PASS |
 | **API-11** | API | AC-03, FR-05 | ปฏิเสธเมื่อไม่มี Header หรือ Requester inactive (Ownership & Active Check) | `server/tests/lab-02/my-tickets.api.test.ts` | 400 Bad Request | PASS |

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Category,
   RelatedSystem,
@@ -40,6 +40,8 @@ export const CreateTicketForm: React.FC = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const [createdTicket, setCreatedTicket] = useState<TicketResponse | null>(null);
   const [uploadedCount, setUploadedCount] = useState<number>(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadFormData() {
@@ -155,6 +157,7 @@ export const CreateTicketForm: React.FC = () => {
       setRequestedPriority("MEDIUM");
       setFiles([]);
       setErrors({});
+      if (fileInputRef.current) fileInputRef.current.value = "";
 
       if (failed.length > 0) {
         setApiError(`Ticket created (${result.ticketNumber}), but ${failed.length} attachment(s) could not be uploaded: ${failed.join("; ")}`);
@@ -239,12 +242,21 @@ export const CreateTicketForm: React.FC = () => {
                   Attachments uploaded: <strong>{uploadedCount}</strong> file(s)
                 </p>
               )}
+              {apiError && (
+                <div
+                  className="alert alert-warning border-0 shadow-sm mt-3 mb-0 py-2 px-3"
+                  role="alert"
+                  data-testid="upload-api-error"
+                >
+                  ⚠️ <strong>Warning:</strong> {apiError}
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {apiError && (
+      {apiError && !createdTicket && (
         <div className="alert alert-danger border-0 shadow-sm mb-4" role="alert" data-testid="api-error">
           ⚠️ <strong>Error:</strong> {apiError}
         </div>
@@ -362,6 +374,7 @@ export const CreateTicketForm: React.FC = () => {
             accept=".jpg,.jpeg,.png,.webp,.pdf"
             onChange={handleFileChange}
             disabled={isSubmitting}
+            ref={fileInputRef}
             data-testid="create-attachment-input"
           />
           {fileError && <div className="text-danger small mt-1">{fileError}</div>}
