@@ -238,7 +238,7 @@
 
 ### 2.7 GET /api/attachments/:id/download
 - **คำอธิบาย**: ดาวน์โหลดไฟล์แนบ (วาด Content-Type + `Content-Disposition: attachment` จากขื่อไฟล์ต้นฉบับ)
-- **Header จำเป็น**: `X-Requester-Id`
+- **Identification**: `X-Requester-Id` header หรือ `?X-Requester-Id=` query param ก็ได้ (จำเป็นสำหรับลิงก์ `<a download>` ของเบราว์เซอร์ที่ส่ง header ไม่ได้)
 - **Success Response (`200 OK`)**: สตรีมไฟล์ไบนารี (กลับไปส่งไฟล์ Content-Type ตาม MIME จริงของไฟล์)
 - **Error Responses**:
   - `400 Bad Request`: ไม่ได้ส่ง `X-Requester-Id` หรือไฟล์ถูก Soft-remove แล้ว (`Attachment has been removed and cannot be downloaded.`)

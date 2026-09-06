@@ -167,7 +167,19 @@ function extractRequesterId(req: Request): number | null {
     if (!isNaN(parsed)) return parsed;
   }
 
-  // 2. Try Authorization: Bearer dev_requester_X or Bearer X header
+  // 2. Try ?X-Requester-Id= query param (needed for browser <a download> links)
+  const queryId =
+    typeof req.query["x-requester-id"] === "string"
+      ? req.query["x-requester-id"]
+      : typeof req.query["X-Requester-Id"] === "string"
+        ? req.query["X-Requester-Id"]
+        : undefined;
+  if (typeof queryId === "string") {
+    const parsed = parseInt(queryId, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+
+  // 3. Try Authorization: Bearer dev_requester_X or Bearer X header
   const authHeader = req.headers["authorization"];
   if (authHeader && typeof authHeader === "string") {
     const match = authHeader.match(/(?:dev_requester_|\b)(\d+)\b/i);

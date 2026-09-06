@@ -157,6 +157,22 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(res.body.length).toBeGreaterThan(0);
   });
 
+  it("API-05a2: Download works via ?X-Requester-Id query param (browser <a download> link)", async () => {
+    const prisma = getPrisma();
+    const att = await prisma.attachment.findFirst({
+      where: { ticketId, isRemoved: false },
+      orderBy: { createdAt: "asc" },
+    });
+    expect(att).toBeTruthy();
+
+    const res = await request(app).get(
+      `/api/attachments/${att!.id}/download?X-Requester-Id=${owner.id}`
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.headers["content-type"]).toBe(att!.mimeType);
+  });
+
   it("API-05b: Soft-remove attachment successfully returns 200 + isRemoved", async () => {
     const prisma = getPrisma();
     const att = await prisma.attachment.findFirst({
