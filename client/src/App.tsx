@@ -33,7 +33,7 @@ function MainContent() {
       {/* Mandatory modal if no requester selected */}
       {!selectedRequester && <RequesterSelector isOpen={true} />}
 
-      <main className="container py-4" style={{ maxWidth: 900 }}>
+      <main className="container py-4" style={{ maxWidth: 1200 }}>
         <h1 className="h3 mb-4">
           TokTickIT <span className="text-success">IT Service Desk</span>
         </h1>

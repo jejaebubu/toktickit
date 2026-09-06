@@ -318,6 +318,7 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
 // GET /api/tickets?search=&category=&priority=&status=&sort=&order=&page=&limit=
 // ---------------------------------------------------------------------------
 const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "summary", "requestedPriority", "status"];
+const VALID_STATUS = ["New", "In Progress", "Resolved", "Closed", "Rejected"];
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
 
@@ -392,6 +393,9 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
     const status = typeof req.query.status === "string" && req.query.status.trim() !== ""
       ? req.query.status.trim()
       : undefined;
+    if (status !== undefined && !VALID_STATUS.includes(status)) {
+      return buildError(`'status' must be one of ${VALID_STATUS.join(", ")}.`);
+    }
 
     const search = typeof req.query.search === "string" && req.query.search.trim() !== ""
       ? req.query.search.trim()

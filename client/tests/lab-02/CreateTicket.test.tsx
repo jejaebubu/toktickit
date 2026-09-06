@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CreateTicketForm } from "../../src/components/CreateTicketForm.js";
 import { RequesterProvider } from "../../src/context/RequesterContext.js";
@@ -107,5 +107,134 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
       expect(alert).toBeInTheDocument();
       expect(alert).toHaveTextContent("TKT-2026-000101");
     });
+  });
+
+  it("UI-18: Create form loads Category & Related System options and Requested Priority dropdown (FR-01, FR-02)", async () => {
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Hardware Category" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Campus Wi-Fi" })).toBeInTheDocument();
+    });
+
+    // Requested Priority is a dropdown per ui-spec 3.2
+    const prioritySelect = screen.getByLabelText(/Requested Priority/i);
+    expect(prioritySelect.tagName).toBe("SELECT");
+    for (const p of ["LOW", "MEDIUM", "HIGH", "URGENT"]) {
+      expect(screen.getByRole("option", { name: p })).toBeInTheDocument();
+    }
+  });
+
+  it("UI-19: Attachments selected at create time are uploaded after ticket creation (FR-04)", async () => {
+    const file = new File(["%PDF-1.4 test evidence"], "evidence.pdf", { type: "application/pdf" });
+
+    vi.spyOn(api, "createTicket").mockResolvedValue({
+      id: 101,
+      ticketNumber: "TKT-2026-000101",
+      summary: "Test Summary",
+      status: "New",
+      createdAt: new Date().toISOString(),
+    } as any);
+    const uploadSpy = vi.spyOn(api, "uploadAttachment").mockResolvedValue({
+      id: 1,
+      originalName: "evidence.pdf",
+      mimeType: "application/pdf",
+      isRemoved: false,
+    } as any);
+
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    const user = userEvent.setup();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Summary/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/Summary/i), "Test Summary");
+    await user.type(screen.getByLabelText(/Description/i), "Test Description");
+    await user.upload(screen.getByLabelText(/Attachments/i), file);
+
+    // Show selected file info
+    expect(screen.getByText(/Selected 1 file/)).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("submit-ticket-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("uploaded-count")).toBeInTheDocument();
+      expect(screen.getByTestId("uploaded-count")).toHaveTextContent("1");
+    });
+
+    expect(uploadSpy).toHaveBeenCalledTimes(1);
+    expect(uploadSpy).toHaveBeenCalledWith(101, file, 1);
+  });
+
+  it("UI-20: API failure on create shows red error alert with message (AC-01)", async () => {
+    vi.spyOn(api, "createTicket").mockRejectedValue(new Error("Internal server error"));
+
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    const user = userEvent.setup();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Summary/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/Summary/i), "Test Summary");
+    await user.type(screen.getByLabelText(/Description/i), "Test Description");
+    await user.click(screen.getByTestId("submit-ticket-btn"));
+
+    await waitFor(() => {
+      const alert = screen.getByTestId("api-error");
+      expect(alert).toBeInTheDocument();
+      expect(alert).toHaveTextContent("Internal server error");
+    });
+  });
+
+  it("UI-21: Invalid attachment type shows local error and blocks submission (AC-04)", async () => {
+    const createSpy = vi.spyOn(api, "createTicket").mockResolvedValue({
+      id: 101,
+      ticketNumber: "TKT-2026-000101",
+      summary: "Test Summary",
+      status: "New",
+      createdAt: new Date().toISOString(),
+    } as any);
+
+    const badFile = new File(["not an image"], "notes.txt", { type: "text/plain" });
+
+    render(
+      <RequesterProvider>
+        <CreateTicketForm />
+      </RequesterProvider>
+    );
+
+    const user = userEvent.setup();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Summary/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/Summary/i), "Test Summary");
+    await user.type(screen.getByLabelText(/Description/i), "Test Description");
+
+    // fireEvent.change bypasses the accept filter to simulate a wrongly-typed file
+    fireEvent.change(screen.getByLabelText(/Attachments/i), {
+      target: { files: [badFile] },
+    });
+
+    expect(screen.getByText(/Invalid file type for "notes.txt"/)).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("submit-ticket-btn"));
+
+    // Submission is blocked: no create request should be sent
+    expect(createSpy).not.toHaveBeenCalled();
   });
 });

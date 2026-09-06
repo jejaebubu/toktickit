@@ -18,7 +18,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
-  test("select requester -> create ticket -> find in My Tickets -> detail + attachment upload/soft-remove", async ({
+  test("select requester -> create ticket with attachment -> find in My Tickets -> detail + soft-remove", async ({
     page,
     }, testInfo) => {
     const project = testInfo.project.name;
@@ -37,10 +37,12 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
     await expect(page.getByTestId("readonly-requester")).toHaveText(/Jennifer Anderson/);
     await expectNoHorizontalOverflow(page);
 
-    // --- Step 2: Create Ticket screen ---
+    // --- Step 2: Create Ticket screen (+ attach evidence file at create time, FR-04) ---
     await page.locator("#summary").fill(summary);
     await page.locator("#description").fill(description);
     // Category & Related System default to first option; keep MEDIUM priority.
+    await page.getByTestId("create-attachment-input").setInputFiles(fixture);
+    await expect(page.getByText(/Selected 1 file/)).toBeVisible();
     await page.getByTestId("submit-ticket-btn").scrollIntoViewIfNeeded();
     await page.screenshot({ path: shot(project, "create-ticket", "create-ticket"), fullPage: true });
 
@@ -78,9 +80,7 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
     await expect(page.getByTestId("detail-status")).toHaveText("New");
 
     // No vertical overflow artifacts / key info rendered
-    // --- Step 5: Attachment upload ---
-    await page.getByTestId("attachment-upload-input").setInputFiles(fixture);
-    // Upload POST completes and list refreshes (attachment name inside the list).
+    // --- Step 5: Attachment attached at create time is present in detail (FR-04) ---
     await expect(page.getByTestId("attachment-list").getByText("wifi_error.png")).toBeVisible();
     await expect(page.locator('[data-testid^="attachment-download-"]').first()).toBeVisible({ timeout: 10_000 });
 
