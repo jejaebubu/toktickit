@@ -141,23 +141,39 @@
 
 ### 2.5 GET /api/tickets/:id
 - **คำอธิบาย**: ดึงรายละเอียดตั๋วรายใบ (ตรวจสอบ Ownership Protection)
+- **Header จำเป็น**: `X-Requester-Id`
 - **Success Response (`200 OK`)**:
   ```json
   {
     "id": 101,
-    "ticketNumber": "TKT-2025-000101",
+    "ticketNumber": "TKT-2026-000101",
     "summary": "Cannot connect to campus Wi-Fi in Library",
     "description": "Getting authentication error when connecting since this morning.",
-    "category": { "id": 1, "name": "Network" },
-    "relatedSystem": { "id": 2, "name": "Campus Wi-Fi" },
     "requestedPriority": "HIGH",
     "itPriority": "MEDIUM",
     "status": "New",
-    "attachments": [],
-    "createdAt": "2025-09-03T10:00:00Z"
+    "createdAt": "2026-09-03T10:00:00.000Z",
+    "updatedAt": "2026-09-03T10:00:00.000Z",
+    "requester": { "id": 1, "name": "Jennifer Anderson", "email": "jennifer@example.com" },
+    "category": { "id": 1, "name": "Network" },
+    "relatedSystem": { "id": 2, "name": "Campus Wi-Fi" },
+    "attachments": [
+      {
+        "id": 501,
+        "originalName": "wifi_error.png",
+        "filename": "uuid.png",
+        "mimeType": "image/png",
+        "size": 1048576,
+        "isRemoved": false,
+        "removeReason": null,
+        "removedAt": null,
+        "createdAt": "2026-09-03T10:05:00.000Z"
+      }
+    ]
   }
   ```
 - **Error Responses**:
+  - `400 Bad Request`: ไม่ได้ส่ง `X-Requester-Id`
   - `403 Forbidden`: กรณีพยายามเปิดดูตั๋วของ Requester คนอื่น (Ownership Check Failed)
     ```json
     {
@@ -165,7 +181,7 @@
       "message": "Access denied. You do not have permission to view this ticket."
     }
     ```
-  - `404 Not Found`: ไม่พบตั๋วตาม ID ที่ระบุ
+  - `404 Not Found`: ไม่พบตั๋วตาม ID ที่ระบุ หรือ ID มีรูปแบบไม่ถูกต้อง
     ```json
     { "error": "Not Found", "message": "Ticket with ID 999 not found." }
     ```
@@ -177,24 +193,33 @@
 ---
 
 ### 2.6 POST /api/tickets/:id/attachments
-- **คำอธิบาย**: อัปโหลดไฟล์แนบประกอบตั๋ว (JPG, PNG, WEBP, PDF ขนาด $\le 5\text{MB}$)
-- **Content-Type**: `multipart/form-data`
+- **คำอธิบาย**: อัปโหลดไฟล์แนบประกอบตั๋ว (JPG, PNG, WEBP, PDF ขนาด $\le 5\text{MB}$, สูงสุด 5 ไฟล์ที่ยัง active)
+- **Header จำเป็น**: `X-Requester-Id`
+- **Content-Type**: `multipart/form-data` (field name: `file`)
 - **Success Response (`201 Created`)**:
   ```json
   {
     "id": 501,
-    "filename": "screenshot_wifi_error.png",
     "originalName": "wifi_error.png",
+    "filename": "uuid.png",
+    "mimeType": "image/png",
     "size": 1048576,
-    "createdAt": "2025-09-03T10:05:00Z"
+    "isRemoved": false,
+    "createdAt": "2026-09-03T10:05:00.000Z"
   }
   ```
 - **Error Responses**:
-  - `400 Bad Request` (Invalid File Type / File Size Exceeded / Active Limit Exceeded):
+  - `400 Bad Request` (Invalid File Type / File Size Exceeded / Active Limit Exceeded / No file):
     ```json
     {
       "error": "Bad Request",
       "message": "File size exceeds maximum limit of 5MB."
+    }
+    ```
+    ```json
+    {
+      "error": "Bad Request",
+      "message": "Invalid file type. Only JPG, PNG, WEBP, and PDF files are allowed."
     }
     ```
     ```json
@@ -205,14 +230,26 @@
     ```
   - `403 Forbidden`: ไม่ใช่เจ้าของตั๋วใบนี้
     ```json
-    { "error": "Forbidden", "message": "You cannot add attachments to this ticket." }
+    { "error": "Forbidden", "message": "You do not have permission to add attachments to this ticket." }
     ```
-  - `404 Not Found`: ไม่พบตั๋วที่ต้องการอัปโหลดไฟล์แนบ
+  - `404 Not Found`: ไม่พบตั๋วที่ต้องการอัปโหลดไฟล์แนบ หรือ ID มีรูปแบบไม่ถูกต้อง
 
 ---
 
-### 2.7 DELETE /api/attachments/:id
+### 2.7 GET /api/attachments/:id/download
+- **คำอธิบาย**: ดาวน์โหลดไฟล์แนบ (วาด Content-Type + `Content-Disposition: attachment` จากขื่อไฟล์ต้นฉบับ)
+- **Header จำเป็น**: `X-Requester-Id`
+- **Success Response (`200 OK`)**: สตรีมไฟล์ไบนารี (กลับไปส่งไฟล์ Content-Type ตาม MIME จริงของไฟล์)
+- **Error Responses**:
+  - `400 Bad Request`: ไม่ได้ส่ง `X-Requester-Id` หรือไฟล์ถูก Soft-remove แล้ว (`Attachment has been removed and cannot be downloaded.`)
+  - `403 Forbidden`: ไม่ใช่เจ้าของไฟล์แนบใบนี้
+  - `404 Not Found`: ไม่พบไฟล์แนบตาม ID หรือไฟล์บนดิสก์หายไป
+
+---
+
+### 2.8 DELETE /api/attachments/:id
 - **คำอธิบาย**: Soft-remove ไฟล์แนบ พร้อมบันทึกเหตุผลการลบ
+- **Header จำเป็น**: `X-Requester-Id`
 - **Request Body**:
   ```json
   { "reason": "Uploaded incorrect evidence document" }
@@ -221,9 +258,10 @@
   ```json
   {
     "id": 501,
+    "originalName": "wifi_error.png",
     "isRemoved": true,
     "removeReason": "Uploaded incorrect evidence document",
-    "removedAt": "2025-09-03T10:10:00Z"
+    "removedAt": "2026-09-03T10:10:00.000Z"
   }
   ```
 - **Error Responses**:
@@ -235,7 +273,7 @@
     ```json
     { "error": "Forbidden", "message": "You do not have permission to remove this attachment." }
     ```
-  - `404 Not Found`: ไม่พบไฟล์แนบตาม ID ที่ระบุ
+  - `404 Not Found`: ไม่พบไฟล์แนบตาม ID หรือ ID มีรูปแบบไม่ถูกต้อง
 
 ---
 

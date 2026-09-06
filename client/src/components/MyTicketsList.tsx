@@ -76,7 +76,11 @@ function getPageItems(current: number, totalPages: number): number[] {
   return Array.from({ length: 5 }, (_, i) => start + i);
 }
 
-export const MyTicketsList: React.FC = () => {
+interface MyTicketsListProps {
+  onOpenTicket?: (ticketId: number) => void;
+}
+
+export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket }) => {
   const { selectedRequester } = useRequester();
 
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -331,7 +335,12 @@ export const MyTicketsList: React.FC = () => {
                 </thead>
                 <tbody>
                   {tickets.map((t) => (
-                    <tr key={t.id} data-testid={`my-tickets-row-${t.id}`}>
+                    <tr
+                      key={t.id}
+                      onClick={() => onOpenTicket?.(t.id)}
+                      style={{ cursor: onOpenTicket ? "pointer" : "default" }}
+                      data-testid={`my-tickets-row-${t.id}`}
+                    >
                       <td className="fw-semibold text-success" style={{ whiteSpace: "nowrap" }}>
                         {t.ticketNumber}
                       </td>
@@ -380,7 +389,8 @@ export const MyTicketsList: React.FC = () => {
               <div
                 key={t.id}
                 className="border rounded-3 p-3 shadow-sm"
-                style={{ backgroundColor: "#F5F7F6", borderColor: "#EAF6EF" }}
+                style={{ backgroundColor: "#F5F7F6", borderColor: "#EAF6EF", cursor: onOpenTicket ? "pointer" : "default" }}
+                onClick={() => onOpenTicket?.(t.id)}
                 data-testid={`my-tickets-card-${t.id}`}
               >
                 <div className="d-flex justify-content-between align-items-start mb-1">
