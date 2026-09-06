@@ -218,4 +218,76 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
 
     expect(screen.getByTestId("my-tickets-order-toggle")).toHaveTextContent("↑ Ascending");
   });
+
+  it("UI-10: Shows red error alert when the API fails (e.g. 500)", async () => {
+    fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/requesters")) return okRes([mockRequester]);
+      if (url.includes("/api/categories")) {
+        return okRes([
+          { id: 1, name: "Network" },
+          { id: 2, name: "Hardware" },
+        ]);
+      }
+      if (url.includes("/api/tickets")) {
+        return Promise.resolve({
+          ok: false,
+          status: 500,
+          json: () =>
+            Promise.resolve({
+              error: "Internal Server Error",
+              message: "Failed to retrieve tickets.",
+            }),
+        });
+      }
+      return Promise.reject(new Error("Unhandled URL: " + url));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <RequesterProvider>
+        <MyTicketsList />
+      </RequesterProvider>
+    );
+
+    await waitFor(() => {
+      const errorBox = screen.getByTestId("my-tickets-error");
+      expect(errorBox).toBeInTheDocument();
+      expect(errorBox).toHaveTextContent("Failed to retrieve tickets.");
+      expect(errorBox).toHaveClass("alert-danger");
+    });
+  });
+
+  it("UI-11: New search from page 2 resets to page 1 (regression)", async () => {
+    ticketsPage = {
+      tickets: [makeTicket(1), makeTicket(2), makeTicket(3)],
+      meta: { total: 25, page: 1, limit: 10, totalPages: 3 },
+    };
+
+    render(
+      <RequesterProvider>
+        <MyTicketsList />
+      </RequesterProvider>
+    );
+
+    await screen.findByTestId("my-tickets-table");
+
+    const user = userEvent.setup();
+
+    // Move to page 2
+    await user.click(screen.getByTestId("my-tickets-next"));
+    await waitFor(() => {
+      expect(ticketUrls()[ticketUrls().length - 1]).toContain("page=2");
+    });
+
+    // New search must reset to page 1
+    await user.type(screen.getByTestId("my-tickets-search"), "printer");
+    await user.click(screen.getByTestId("my-tickets-search-btn"));
+
+    await waitFor(() => {
+      const last = ticketUrls()[ticketUrls().length - 1];
+      expect(last).toContain("search=printer");
+      expect(last).toContain("page=1");
+      expect(last).not.toContain("page=2");
+    });
+  });
 });

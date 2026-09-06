@@ -124,7 +124,6 @@ export async function fetchMyTickets(
 
   const res = await fetch(`${API_URL}/api/tickets?${params.toString()}`, {
     headers: {
-      "Authorization": `Bearer dev_requester_${requesterId}`,
       "X-Requester-Id": String(requesterId),
     },
   });
@@ -145,7 +144,6 @@ export async function createTicket(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer dev_requester_${requesterId}`,
       "X-Requester-Id": String(requesterId),
     },
     body: JSON.stringify(payload),

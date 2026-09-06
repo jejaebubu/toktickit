@@ -414,8 +414,8 @@ export const MyTicketsList: React.FC = () => {
               <button
                 type="button"
                 className="btn btn-outline-success btn-sm fw-semibold"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.min(Math.max(1, p - 1), totalPages))}
+                disabled={page <= 1 || totalPages <= 1}
                 data-testid="my-tickets-prev"
               >
                 ← Prev
@@ -441,8 +441,8 @@ export const MyTicketsList: React.FC = () => {
               <button
                 type="button"
                 className="btn btn-outline-success btn-sm fw-semibold"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(Math.max(1, p + 1), totalPages))}
+                disabled={page >= totalPages || totalPages <= 1}
                 data-testid="my-tickets-next"
               >
                 Next →

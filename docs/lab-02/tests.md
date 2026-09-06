@@ -21,6 +21,8 @@
 | **UI-07** | UI | FR-08 | Pagination Previous/Next และปุ่มเลขหน้าเปลี่ยนหน้าได้ถูกต้อง (และ Prev Disabled บนหน้าแรก) | `client/tests/lab-02/MyTicketsList.test.tsx` | Page Change Works | PASS |
 | **UI-08** | UI | FR-05 | Empty State (ยังไม่มีตั๋ว) และ No-Results State (ค้นหา/กรองไม่เจอ) แสดงข้อความต่างกันถูกต้อง | `client/tests/lab-02/MyTicketsList.test.tsx` | Empty / No-Results Shown | PASS |
 | **UI-09** | UI | FR-08 | Dropdown Sort By และปุ่มสลับ Ascending/Descending ส่ง `sort`/`order` ถูกต้อง | `client/tests/lab-02/MyTicketsList.test.tsx` | Sort/Order Correct | PASS |
+| **UI-10** | UI | AC-01 | API พัง (500) → แสดงกล่องแจ้งเตือนสีแดง `my-tickets-error` พร้อมข้อความมีเหตุผล | `client/tests/lab-02/MyTicketsList.test.tsx` | Error Alert Shown | PASS |
+| **UI-11** | UI | FR-08 | Regression: ค้นหา/กรองใหม่จากหน้าที่ >1 ต้องรีเซ็ตกลับหน้า 1 เสมอ (ไม่ทิ้งผลลัพธ์ว่างเพราะค้างหน้า) | `client/tests/lab-02/MyTicketsList.test.tsx` | Page Reset to 1 | PASS |
 | **API-06** | API | FR-05 | My Tickets คืนเฉพาะตั๋วของ Requester ปัจจุบัน (Ownership Filtering) พร้อม `meta` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK | PASS |
 | **API-07** | API | FR-06 | ค้นหา `search` ตรง `ticketNumber` และ `summary` แบบ case-insensitive | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ผลลัพธ์ถูกต้อง | PASS |
 | **API-08** | API | FR-07 | กรองด้วย `category`, `priority`, `status` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, เฉพาะรายการที่ตรง | PASS |
