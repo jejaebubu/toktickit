@@ -44,16 +44,19 @@ export const AttachmentSection: React.FC<AttachmentSectionProps> = ({
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type.toLowerCase())) {
+    if (!ALLOWED_MIME_TYPES.includes(file.type.toLowerCase()) && !file.name.match(/\.(jpg|jpeg|png|webp|pdf)$/i)) {
       onError(`Invalid file type for "${file.name}". Only JPG, PNG, WEBP, and PDF are allowed.`);
+      e.target.value = "";
       return;
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
       onError(`File "${file.name}" exceeds the maximum limit of 5MB.`);
+      e.target.value = "";
       return;
     }
     if (activeCount >= 5) {
       onError("Maximum 5 active attachments allowed per ticket.");
+      e.target.value = "";
       return;
     }
 

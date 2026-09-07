@@ -716,6 +716,9 @@ app.delete("/api/attachments/:id", async (req: Request, res: Response) => {
     if (attachment.ticket.requesterId !== requesterId) {
       return buildError(403, "Forbidden", "You do not have permission to remove this attachment.");
     }
+    if (attachment.isRemoved) {
+      return buildError(400, "Bad Request", "Attachment has already been removed.");
+    }
 
     const updated = await prisma.attachment.update({
       where: { id },

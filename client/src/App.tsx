@@ -14,6 +14,7 @@ function MainContent() {
   const [state, setState] = useState<UiState>("idle");
   const [categories, setCategories] = useState<Category[]>([]);
   const [openTicketId, setOpenTicketId] = useState<number | null>(null);
+  const [ticketListRefreshKey, setTicketListRefreshKey] = useState(0);
 
   async function handleCheck() {
     setState("loading");
@@ -39,11 +40,11 @@ function MainContent() {
         </h1>
 
         {/* Create Ticket Form (Issue 6) */}
-        <CreateTicketForm />
+        <CreateTicketForm onCreated={() => setTicketListRefreshKey((k) => k + 1)} />
 
         {/* My Tickets List (Issue 8) */}
         {openTicketId === null ? (
-          <MyTicketsList onOpenTicket={(id) => setOpenTicketId(id)} />
+          <MyTicketsList refreshKey={ticketListRefreshKey} onOpenTicket={(id) => setOpenTicketId(id)} />
         ) : (
           <TicketDetail ticketId={openTicketId} onBack={() => setOpenTicketId(null)} />
         )}

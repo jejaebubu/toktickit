@@ -44,8 +44,10 @@ cd ..
 ### 2. รัน Migration และ Seed ข้อมูลเริ่มต้น
 
 ```bash
-npx prisma migrate dev --name init   # รันจากโฟลเดอร์ server (ครั้งแรกเท่านั้น)
-npm run seed                         # รัน Prisma seed (idempotent — รันซ้ำได้)
+cd server
+npx prisma migrate dev            # สร้าง/อัปเดต schema (เครื่องใหม่ครั้งแรกจะสร้าง migrations)
+cd ..
+npm run seed                      # รัน Prisma seed (idempotent — รันซ้ำได้)
 ```
 
 ### 3. รันในโหมดพัฒนา (server + client พร้อมกัน)
@@ -57,7 +59,7 @@ npm run dev          # รัน server (http://localhost:3000) + client (http:/
 ### 4. การรันชุดทดสอบอัตโนมัติ (Unit + API + UI)
 
 ```bash
-npm test            # รัน test ทั้งหมด (server 37 tests + client 23 tests)
+npm test            # รัน test ทั้งหมด (server 41 tests + client 37 tests)
 ```
 
 หรือรันแยก:

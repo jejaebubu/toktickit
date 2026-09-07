@@ -265,9 +265,12 @@
   }
   ```
 - **Error Responses**:
-  - `400 Bad Request`: เมื่อไม่ได้ระบุเหตุผลการลบ (`reason`)
+  - `400 Bad Request`: เมื่อไม่ได้ระบุเหตุผลการลบ (`reason`) หรือไฟล์ถูก Soft-remove ไปแล้ว (กันลบซ้ำ / เขียนทับข้อมูลเดิม)
     ```json
     { "error": "Bad Request", "message": "'reason' for soft removal is required." }
+    ```
+    ```json
+    { "error": "Bad Request", "message": "Attachment has already been removed." }
     ```
   - `403 Forbidden`: ไม่ใช่เจ้าของไฟล์แนบหรือตั๋วใบนี้
     ```json

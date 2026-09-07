@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentSection } from "../../src/components/AttachmentSection.js";
 import { Attachment } from "../../src/api.js";
@@ -100,15 +100,56 @@ describe("Attachment Section (Issue 9 - Upload/Download/Soft-Remove)", () => {
     const onError = vi.fn();
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-    const badFile = new File(["hello"], "notes.png", { type: "text/plain" });
+    const badFile = new File(["hello"], "notes.txt", { type: "text/plain" });
 
     renderSection([], { onError });
 
     const input = screen.getByTestId("attachment-upload-input");
-    await userEvent.setup().upload(input, badFile);
+    fireEvent.change(input, { target: { files: [badFile] } });
 
     expect(onError).toHaveBeenCalledWith(expect.stringContaining("Invalid file type"));
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("UI-16b: File with empty MIME type but valid extension is accepted (Windows)", async () => {
+    const onError = vi.fn();
+    const onSuccess = vi.fn();
+    const onAttachChange = vi.fn();
+    const uploaded = baseAttachment(9, { originalName: "win.png" });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(uploaded),
+      })
+    );
+
+    renderSection([], { onError, onSuccess, onAttachmentsChange: onAttachChange });
+
+    const file = new File(["x"], "win.png", { type: "" });
+    const input = screen.getByTestId("attachment-upload-input");
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith(expect.stringContaining("win.png"));
+    });
+    expect(onError).not.toHaveBeenCalledWith(expect.stringContaining("Invalid file type"));
+    expect(onAttachChange).toHaveBeenCalledWith([uploaded]);
+  });
+
+  it("UI-16c: Invalid file clears the native input value", async () => {
+    const onError = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
+    const badFile = new File(["hello"], "notes.txt", { type: "text/plain" });
+
+    renderSection([], { onError });
+
+    const input = screen.getByTestId("attachment-upload-input") as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [badFile] } });
+
+    expect(input.value).toBe("");
+    expect(onError).toHaveBeenCalledWith(expect.stringContaining("Invalid file type"));
   });
 
   it("UI-17: Soft removal requires a reason and updates state on confirm (200)", async () => {
