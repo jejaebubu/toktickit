@@ -1,0 +1,16 @@
+{
+  "name": "toktickit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TokTickIT Lab 2 - Requester Ticket Management MVP (CPE 334)",
+  "scripts": {
+    "dev": "concurrently -n server,client -c green,cyan \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "seed": "npm --prefix server run prisma:seed",
+    "test": "npm --prefix server test && npm --prefix client test",
+    "test:e2e": "npm run seed && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.1",
+    "concurrently": "^9.1.2"
+  }
+}
