@@ -28,6 +28,8 @@
 | **UI-14** | UI | AC-01 | API พัง (500) ตอนโหลด Detail → แสดงกล่องแจ้งเตือนสีแดง `detail-error` | `client/tests/lab-02/RequesterTicketDetail.test.tsx` | Error Alert Shown | PASS |
 | **UI-15** | UI | AC-04 | อัปโหลดไฟล์: เลือกไฟล์ → POST attachments → รายการอัปเดต + แจ้งผลสำเร็จ | `client/tests/lab-02/AttachmentSection.test.tsx` | Upload Succeeds | PASS |
 | **UI-16** | UI | AC-04 | เลือกไฟล์ประเภทไม่ถูกต้อง → แจ้ง Error ไม่ส่งคำขอ API | `client/tests/lab-02/AttachmentSection.test.tsx` | Blocked Locally | PASS |
+| **UI-16b** | UI | AC-04, BR-05 | ไฟล์ที่ `file.type` ว่าง (Windows) แต่มีนามสกุล `.png` ถูกต้อง → อัปโหลดผ่าน | `client/tests/lab-02/AttachmentSection.test.tsx` | Accepted | PASS |
+| **UI-16c** | UI | AC-04 | ไฟล์ผิดประเภท → เคลียร์ native file input value เสมอ (เลือกไฟล์เดิมซ้ำได้) | `client/tests/lab-02/AttachmentSection.test.tsx` | Input Cleared | PASS |
 | **UI-17** | UI | AC-05 | Soft Remove: ต้องระบุเหตุผล ก่อนยืนยัน → DELETE + reason → แสดง `[Removed]` และแจ้งผลสำเร็จ | `client/tests/lab-02/AttachmentSection.test.tsx` | Removed + Notice | PASS |
 | **UI-18** | UI | FR-01, FR-02 | Create form โหลด Category / Related System ลง Dropdown และ Requested Priority เป็น Dropdown (ตาม ui-spec 3.2) | `client/tests/lab-02/CreateTicket.test.tsx` | Options Loaded | PASS |
 | **UI-19** | UI | FR-04 | เลือกไฟล์แนบขณะสร้างตั๋ว → หลังสร้างตั๋วสำเร็จระบบอัปโหลดไฟล์ให้อัตโนมัติ และแสดงจำนวนไฟล์ใน Success Alert | `client/tests/lab-02/CreateTicket.test.tsx` | Uploaded Count | PASS |
@@ -37,6 +39,7 @@
 | **UI-23** | UI | BR-07, AC-04 | เลือกไฟล์แนบเกิน 5 ไฟล์ตอนสร้างตั๋ว → แจ้ง Error ท้องถิ่นและบล็อกการยื่นส่ง | `client/tests/lab-02/CreateTicket.test.tsx` | Blocked Locally | PASS |
 | **UI-24** | UI | FR-04 | สร้างตั๋วสำเร็จแต่อัปโหลดบางไฟล์ล้มเหลว → แสดง Warning ภายใน Success Card (แจ้งจำนวน/ชื่อไฟล์ที่ fail + เลขตั๋ว) | `client/tests/lab-02/CreateTicket.test.tsx` | Warning in Success | PASS |
 | **UI-25** | UI | UX | หลัง submit สำเร็จ clear value ของ native file input (ชื่อไฟล์ไม่ค้างในหน้าจอ) | `client/tests/lab-02/CreateTicket.test.tsx` | Input Cleared | PASS |
+| **UI-26** | UI | FR-05 | `refreshKey` เปลี่ยน → My Tickets refetch อัตโนมัติ (ลิสต์อัปเดตหลังสร้างตั๋วโดยไม่ต้องค้นหาใหม่) | `client/tests/lab-02/MyTickets.test.tsx` | Refetched | PASS |
 | **API-06** | API | FR-05 | My Tickets คืนเฉพาะตั๋วของ Requester ปัจจุบัน (Ownership Filtering) พร้อม `meta` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK | PASS |
 | **API-07** | API | FR-06 | ค้นหา `search` ตรง `ticketNumber` และ `summary` แบบ case-insensitive | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, ผลลัพธ์ถูกต้อง | PASS |
 | **API-08** | API | FR-07 | กรองด้วย `category`, `priority`, `status` | `server/tests/lab-02/my-tickets.api.test.ts` | 200 OK, เฉพาะรายการที่ตรง | PASS |
@@ -48,6 +51,7 @@
 | **API-13** | API | AC-03, AC-04 | ปฏิเสธการดู/อัปโหลด/ลบ ของต้อง Ownership ตรงตาม X-Requester-Id (403) + ไม่พบตั๋ว/ไฟล์ (404) | `server/tests/lab-02/ticket-detail.api.test.ts`, `server/tests/lab-02/attachments.api.test.ts` | 403 / 404 | PASS |
 | **API-14** | API | AC-04 | อัปโหลดไฟล์ JPG/PNG/WEBP/PDF สำเร็จ (201), ดาวน์โหลดได้ (200 + Content-Disposition), เกิน 5MB/ผิดประเภท/ครบ 5 ไฟล์ → 400 | `server/tests/lab-02/attachments.api.test.ts` | 201 / 400 | PASS |
 | **API-15** | API | AC-05 | Soft Remove (DELETE + reason) สำเร็จ → isRemoved=true; ไฟล์ที่ลบแล้วดาวน์โหลดไม่ได้ (400), ลบไม่ใส่ reason → 400 | `server/tests/lab-02/attachments.api.test.ts` | 200 / 400 | PASS |
+| **API-05f** | API | AC-05 | ลบไฟล์ที่ถูกลบไปแล้วซ้ำอีกครั้ง → 400 `already been removed` (กันเขียนทับ removeReason/removedAt) | `server/tests/lab-02/attachments.api.test.ts` | 400 | PASS |
 | **E2E-01** | E2E | AC-01, AC-03, FR-04 | ทดสอบการทำงานครบวงจรตั้งแต่สลับผู้ใช้ -> สร้างตั๋วพร้อมแนบไฟล์ -> ค้นหาตั๋ว -> ดู detail -> Soft-remove ไฟล์แนบ | `e2e/lab-02/requester-ticket-flow.spec.ts` | Full Flow Success | PASS |
 | **E2E-02** | E2E | FR-01..FR-10, BR-01..BR-09, ui-spec 3.2/4/5 | Acceptance Checklist: เดินตรวจครบทุกฟังก์ชันหน้าจอบนแอปที่รันจริง (selector modal, create form dropdown ครบ, max-width 1200px, Search/Filter/Sort/แล้ว, detail + attachment + soft-remove, back nav) | `e2e/lab-02/checklist-smoke.spec.ts` | All Checks Passed | PASS |
 
@@ -56,7 +60,7 @@
 - **AC-02**: ครอบคลุมด้วย UI-01
 - **AC-03**: ครอบคลุมด้วย API-03, API-11, API-12, API-13, UI-12, UI-13, E2E-01
 - **AC-04**: ครอบคลุมด้วย API-04, API-13, API-14, UI-15, UI-16, UI-21
-- **AC-05**: ครอบคลุมด้วย API-05, API-15, UI-04, UI-17, E2E-01
+- **AC-05**: ครอบคลุมด้วย API-05, API-15, API-05f, UI-04, UI-17, E2E-01
 - **FR-01** (Development Requester Selector): ครอบคลุมด้วย UI-01, UI-18, UI-19 (เปลี่ยนผู้ใช้)
 - **FR-02** (สร้างตั๋วด้วย Summary/Description/Category/Related System/Requested Priority): ครอบคลุมด้วย UI-18, E2E-01
 - **FR-03** (Ticket Number TKT-YYYY-XXXXXX จาก backend): ครอบคลุมด้วย API-01, UI-03, E2E-01
@@ -71,7 +75,7 @@
 - **BR-02** (ตั๋วใหม่เริ่มต้น status `New`): ครอบคลุมด้วย API-01, API-12
 - **BR-03** (Requester จำลองไม่ใช่ล็อกอิน): ครอบคลุมด้วย UI-01, UI-19
 - **BR-04** (เข้าได้เฉพาะตั๋วของตน): ครอบคลุมด้วย API-03, API-06, API-11, API-13
-- **BR-05** (ไฟล์แนบ JPG/JPEG/PNG/WEBP/PDF เท่านั้น): ครอบคลุมด้วย API-04, API-14, UI-16, UI-21
+- **BR-05** (ไฟล์แนบ JPG/JPEG/PNG/WEBP/PDF เท่านั้น): ครอบคลุมด้วย API-04, API-14, UI-16, UI-16b, UI-21
 - **BR-06** (ขนาดไม่เกิน 5MB/ไฟล์): ครอบคลุมด้วย API-04, API-14
 - **BR-07** (Active attachments ไม่เกิน 5 ไฟล์/ตั๋ว): ครอบคลุมด้วย API-04, API-14, UI-15
 - **BR-08** (Soft removal คง Metadata, ไม่อนุญาตให้ดาวน์โหลด): ครอบคลุมด้วย API-05, API-15, UI-04, UI-17, E2E-01

@@ -4,9 +4,9 @@
 
 **ผู้ตรวจ (Reviewers):**
 - @Suprawi5227 — ตรวจ PR docs (PR #11)
-- @titayaaa — ตรวจ PR implementation ทั้งหมด 9 ตัว (PR #21–#31)
+- @titayaaa — ตรวจ PR implementation ทั้งหมด (PR #21–#32, #34–#35 และ PR release #33)
 
-## Pull Requests สำหรับ Lab 2 (เรียงตาม Issues 1–10)
+## Pull Requests สำหรับ Lab 2 (ทุก PR ตาม git log — Issue 1-11)
 
 | PR # | Branch | ผู้ตรวจ (Reviewer) | ผลการประเมิน (Reviewer verdict) | Merge commit |
 |------|--------|--------------------|---------------------------------|--------------|
@@ -20,6 +20,10 @@
 | [#29](https://github.com/jejaebubu/toktickit/pull/29) | feature/lab02-08-my-tickets-ui | @titayaaa | Approved (1 รอบ Changes requested → แก้แล้ว) | `1ce3f1f` |
 | [#30](https://github.com/jejaebubu/toktickit/pull/30) | feature/lab02-09-ticket-detail-attachments | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ) | `91dc225` |
 | [#31](https://github.com/jejaebubu/toktickit/pull/31) | feature/lab02-10-e2e-visual-evidence | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ) | `93be330` |
+| [#32](https://github.com/jejaebubu/toktickit/pull/32) | feature/lab02-11-release-preparation | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ — แก้ PATCH→DELETE ใน README) | `0897788` |
+| [#34](https://github.com/jejaebubu/toktickit/pull/34) | feature/lab02-11-polish-labsheet-conformance | @titayaaa | Approved (คอมเมนต์ 4 จุด → แก้ครบ + re-review) | `f576456` |
+| [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | (merge ผ่าน staging) |
+| [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | release commit |
 
 ---
 
@@ -158,10 +162,38 @@
 
 → Approved และ merged ครับ
 
+### PR #34 — Labsheet Conformance Polish (@titayaaa, Comment 4 จุด → Approved)
+
+**คอมเมนต์ผู้ตรวจ:**  
+1) เตือนว่าถ้ามีไฟล์แนบอัปโหลดไม่ผ่าน หน้า Success Card ไม่แสดงข้อความ error ให้เห็น  
+2) `<input type="file">` ยังไม่มี ref เคลียร์ DOM value หลัง submit  
+3) อยากให้เพิ่ม validation ไม่เกิน 5 ไฟล์ (BR-07) ฝั่ง client  
+4) `status` filter ยังเป็น case-sensitive  
+
+**การตอบกลับ:**  
+แก้ครบทั้ง 4 จุดใน commit `20b3af7` — (1) เพิ่ม `upload-api-error` (alert-warning) ไว้ในบล็อก Success Card และแยกจาก `api-error` (แดง) ที่จะโชว์เฉพาะตอนยังสร้างไม่สำเร็จ (2) เพิ่ม `fileInputRef.current.value = ""` หลัง reset ฟอร์ม (3) เดิมมีเช็ค `>5` อยู่แล้ว เพิ่มเทส UI-23 ครอบคลุม (4) normalizes เป็น case-insensitive ใน `app.ts` + เทส API-07k — server 40/40, client 34/34, E2E 3/3
+
+→ Approved และ merged ครับ
+
+### PR #33 — Lab 2 Release Integration (lab2-staging → main) (@titayaaa, Comment 6 จุด → Approved)
+
+**คอมเมนต์ผู้ตรวจ:**  
+1) หลังสร้างตั๋ว MyTicketsList ด้านล่างไม่อัปเดตอัตโนมัติ ต้องกดค้นหาใหม่  
+2) DELETE `/api/attachments/:id` ยังไม่มีเช็คว่าไฟล์ลบไปแล้ว ถ้ายิงซ้ำจะเขียนทับ removeReason/removedAt  
+3) `AttachmentSection` เช็คไฟล์ด้วย `file.type` อย่างเดียว Windows ส่ง type ว่าง → ควรเช็คนามสกุลด้วย; และต้องเคลียร์ `e.target.value` ก่อน return ตอนไฟล์ error  
+4) ยอดเทสใน README/PR Description ยังเป็นตัวเลขเก่า (37/23)  
+5) ขั้นตอน `prisma migrate` ใน README ต้องให้ `cd server` ชัดเจน  
+6) `reviewer.md` ขาด PR #32/#34/#33  
+
+**การตอบกลับ:**  
+แก้ครบทั้ง 6 จุด — (1) เพิ่ม `onCreated` callback → `refreshKey` prop ให้ `MyTicketsList` refetch อัตโนมัติหลังสร้างตั๋ว (2) เพิ่ม guard `if (attachment.isRemoved) return 400` + เทส API-05f (3) เพิ่ม fallback เช็คนามสกุล `/\.(jpg|jpeg|png|webp|pdf)$/i` + เคลียร์ `e.target.value` ก่อน return ทุกจุด error + เทส UI-16b/16c (4) อัปเดต README เป็น Server **41** / Client **37** (รวม 78) (5) แก้ README ขั้นตอนที่ 2 เป็น `cd server && npx prisma migrate dev` (6) เพิ่มแถว PR #32/#34/#33(/#35) ครบในตาราง
+
+→ Approved และ merged ครับ
+
 ---
 
 ## สรุป (Summary)
 
-- ทั้ง 10 PR ผ่านการ peer review โดยเพื่อน (1–2 รอบ ผล final ทุกตัวเป็น **Approved**) ก่อน merge เข้า `lab2-staging`
+- ทั้ง 13 PR ผ่านการ peer review โดยเพื่อน (1–2 รอบ ผล final ทุกตัวเป็น **Approved**) ก่อน merge เข้า `lab2-staging` / `main`
 - ทุก PR จับคู่ปิด Issue ของตัวเองผ่าน `Closes #N` และย้ายเป็น **Done** บน GitHub Project board หลังจาก verify จริง
-- Release ไป `main` ผ่าน PR release พร้อมกับงาน Issue 11
+- Release ไป `main` ผ่าน PR release (#33) พร้อมกับงาน Issue 11

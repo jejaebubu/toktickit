@@ -20,7 +20,7 @@ const ALLOWED_MIME_TYPES = [
 ];
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
-export const CreateTicketForm: React.FC = () => {
+export const CreateTicketForm: React.FC<{ onCreated?: () => void }> = ({ onCreated }) => {
   const { selectedRequester } = useRequester();
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -150,6 +150,7 @@ export const CreateTicketForm: React.FC = () => {
 
       setCreatedTicket(result);
       setUploadedCount(uploaded);
+      onCreated?.();
 
       // Reset form
       setSummary("");

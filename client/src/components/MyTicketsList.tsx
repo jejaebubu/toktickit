@@ -78,9 +78,10 @@ function getPageItems(current: number, totalPages: number): number[] {
 
 interface MyTicketsListProps {
   onOpenTicket?: (ticketId: number) => void;
+  refreshKey?: number;
 }
 
-export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket }) => {
+export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refreshKey = 0 }) => {
   const { selectedRequester } = useRequester();
 
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -135,7 +136,7 @@ export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket }) =>
     return () => {
       cancelled = true;
     };
-  }, [selectedRequester?.id, filters, page]);
+  }, [selectedRequester?.id, filters, page, refreshKey]);
 
   const updateFilter = (patch: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...patch }));

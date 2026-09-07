@@ -322,4 +322,25 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
       expect(screen.getByTestId("my-tickets-table")).toBeInTheDocument();
     });
   });
+
+  it("UI-26: Changing refreshKey refetches the ticket list (auto-refresh after create)", async () => {
+    render(
+      <RequesterProvider>
+        <MyTicketsList />
+      </RequesterProvider>
+    );
+
+    await screen.findByTestId("my-tickets-table");
+    expect(ticketUrls()).toHaveLength(1);
+
+    render(
+      <RequesterProvider>
+        <MyTicketsList refreshKey={1} />
+      </RequesterProvider>
+    );
+
+    await waitFor(() => {
+      expect(ticketUrls().length).toBeGreaterThanOrEqual(2);
+    });
+  });
 });
