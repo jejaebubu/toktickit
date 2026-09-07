@@ -244,7 +244,7 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
   it("API-05d: Download soft-removed attachment returns 400", async () => {
     const prisma = getPrisma();
     const removed = await prisma.attachment.findFirst({ where: { ticketId, isRemoved: true } });
-    if (!removed) return;
+    expect(removed).toBeTruthy();
 
     const res = await request(app)
       .get(`/api/attachments/${removed.id}/download`)
@@ -257,7 +257,7 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
   it("API-05f: Soft-removing an already-removed attachment returns 400", async () => {
     const prisma = getPrisma();
     const removed = await prisma.attachment.findFirst({ where: { ticketId, isRemoved: true } });
-    if (!removed) return;
+    expect(removed).toBeTruthy();
 
     const res = await request(app)
       .delete(`/api/attachments/${removed.id}`)
