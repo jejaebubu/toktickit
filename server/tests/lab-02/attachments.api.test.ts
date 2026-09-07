@@ -254,6 +254,20 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(res.body.message).toContain("removed");
   });
 
+  it("API-05f: Soft-removing an already-removed attachment returns 400", async () => {
+    const prisma = getPrisma();
+    const removed = await prisma.attachment.findFirst({ where: { ticketId, isRemoved: true } });
+    if (!removed) return;
+
+    const res = await request(app)
+      .delete(`/api/attachments/${removed.id}`)
+      .set("X-Requester-Id", String(owner.id))
+      .send({ reason: "trying to remove again" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toContain("already been removed");
+  });
+
   it("API-05e: Another requester cannot download, remove, or upload attachments (403)", async () => {
     const prisma = getPrisma();
     const att = await prisma.attachment.findFirst({ where: { ticketId } });
