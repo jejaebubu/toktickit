@@ -98,6 +98,9 @@
 | V-04 | ฟิลด์ Commerce Edge: Summary/Description เป็น read-only บน Detail | screenshot ticket-detail | PASS |
 | V-05 | `[Removed]` badge แสดงหลัง soft-remove + ปุ่ม Download/Remove หายไป | assertion ใน E2E + screenshot ticket-detail-removed | PASS |
 | V-06 | Responsive: ตาราง desktop/tablet ↔ การ์ด mobile (<768px), ไม่มี horizontal scrollbar | viewport-specific locator ใน E2E | PASS |
+| V-07 | ข้อความ Validation แสดงตำแหน่งใต้ฟิลด์ที่ผิดพลาด (in-field) ไม่รวมกับ banner | screenshot validation + assertion ใน E2E (ชื่อ/nามสกุลถูกต้อง ตรงตาม ui-spec §3.2) | PASS |
+| V-08 | Button hierarchy: Primary `#006B3C` (Submit), Secondary outline (Back), Destructive เปิด modal ยืนยัน (Remove) — ไม่มีการสลับลำดับสี | assert สีใน ui-spec + screenshots ทั้ง 3 หน้า | PASS |
+| V-09 | ไม่มี clipping/overlap ระหว่าง card, banner, modal, alert ในทุก viewport | autocheck คลิกทุกองค์ประกอบจริงใน E2E + ตรวจ screenshots | PASS |
 
 > ผลลัพธ์จริง: E2E-01/02 ผ่าน 3/3 viewport (ทั้งหมด 6/6 test) — รายละเอียดใน `playwright-report/` (git-ignored)
 
@@ -112,3 +115,20 @@ cd client && npm test
 # รัน E2E Tests (seed อัตโนมัติ + ขึ้น webserver แล้วรัน 3 viewports)
 npm run test:e2e
 ```
+
+## 6. Final Results (ผลลัพธ์สุดท้าย บน branch `main`)
+| ชุดทดสอบ | คำสั่งรัน | ผลรวม | สถานะ |
+|---|---|---|---|
+| Server API + Unit | `cd server && npm test` | 41/41 | PASS |
+| Client UI (React Testing Library) | `cd client && npm test -- --coverage=false` | 37/37 | PASS |
+| Client Build (TypeScript strict) | `cd client && npm run build` | bundling+tsc | PASS |
+| E2E Playwright (E2E-01 + E2E-02 × desktop/tablet/mobile) | `npm run test:e2e` | 6/6 | PASS |
+
+> รายละเอียดข้อซ้อน fail-ล่าสุดทั้งหมดถูกแก้และรันซ้ำจนผ่านแล้ว ยกเว้นที่ระบุไว้ในข้อ 7
+
+## 7. Known Limitations or Deferred Tests (ข้อจำกัด/ทดสอบที่เลื่อน)
+- **Pagination ใน E2E**: รันบน seed ขนาดเล็ก (ผู้ใช้แต่ละคน ≤ 5 ตั๋ว) page size ทำให้มี 1 หน้า → pagination ตรวจผ่าน Unit/API test (API-07f) แต่ยังไม่มี E2E ย่อยหน้าในข้อมูลจำนวนมาก
+- **Dev Requester Selector บังคับ**: ตรวจผ่าน Unit/API tests (AC-02, API-02b) และ E2E เลือก user จริง แต่ไม่มีกรณี "พยายามเข้าหน้าที่ต้อง login" แบบแยกหน้าใน E2E — หน้า selector ถูก render เป็นหน้าหลักแทน
+- **Timeout/flaky**: โฟลเดอร์ `server/uploads` ต้องมี permission เขียนได้ของ process server (เจอปัญหาตอนรัน E2E เป็นครั้งคราว) — ถ้าเกิด `EACCES` ให้ `chown` โฟลเดอร์คืนให้ user ที่รัน seed/server
+- **การขอใช้ภาพ evidence state ย่อย (Part 6–8 ของ labsheet)**: อ่านในรายงาน PDF (ภาพ validation/submitting/API-failure/selector/empty/no-results ถูกถ่ายเก็บในขั้นตอนทำ PDF ตาม HEAD)
+  - ภาพหลักฐานใน `artifacts/lab-02/screenshots/` เป็นภาพจาก E2E flow หลัก (create/my-tickets/detail/removed × 3 viewports) ที่ถูก generate อัตโนมัติและ commit ไว้
