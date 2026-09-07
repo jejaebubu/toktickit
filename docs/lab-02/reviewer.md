@@ -24,6 +24,8 @@
 | [#34](https://github.com/jejaebubu/toktickit/pull/34) | feature/lab02-11-polish-labsheet-conformance | @titayaaa | Approved (คอมเมนต์ 4 จุด → แก้ครบ + re-review) | `f576456` |
 | [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | (merge ผ่าน staging) |
 | [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | release commit |
+| [#36](https://github.com/jejaebubu/toktickit/pull/36) | fix/lab02-missing-api-05f-test | @titayaaa | Approved (1 จุด → แก้ `if (!removed) return` → `expect(removed).toBeTruthy()` + API-05d) | `ebc6460` |
+| [#37](https://github.com/jejaebubu/toktickit/pull/37) | lab2-staging → main (post-release verification) | @titayaaa | Approved | release commit |
 
 ---
 
@@ -190,10 +192,20 @@
 
 → Approved และ merged ครับ
 
+### PR #36 — Missing API-05f test (@titayaaa, 1 จุด → Approved)
+
+**คอมเมนต์ผู้ตรวจ:**  
+"ตรงบรรทัด `if (!removed) return;` ใน API-05f ถ้ารันแยกเดี่ยวแล้วหาไฟล์ที่ลบไม่เจอ เทสจะ return จบเลย → Vitest นับ PASS ทั้งที่ไม่ได้รัน expect จริง (False Positive) เปลี่ยนเป็น `expect(removed).toBeTruthy();` ก่อนยิง API"
+
+**การตอบกลับ:**  
+เปลี่ยน `if (!removed) return;` → `expect(removed).toBeTruthy();` ใน API-05f และพบ pattern เดียวกันใน **API-05d** ด้วยจึงแก้ให้พร้อมกัน — `attachments.api.test.ts` 13/13 ผ่าน, server suite **41/41**
+
+→ Approved และ merged (`ebc6460`)
+
 ---
 
 ## สรุป (Summary)
 
-- ทั้ง 13 PR ผ่านการ peer review โดยเพื่อน (1–2 รอบ ผล final ทุกตัวเป็น **Approved**) ก่อน merge เข้า `lab2-staging` / `main`
+- ทุก PR ในตารางผ่านการ peer review โดยเพื่อน (1–2 รอบ ผล final ทุกตัวเป็น **Approved**) ก่อน merge เข้า `lab2-staging` / `main`
 - ทุก PR จับคู่ปิด Issue ของตัวเองผ่าน `Closes #N` และย้ายเป็น **Done** บน GitHub Project board หลังจาก verify จริง
-- Release ไป `main` ผ่าน PR release (#33) พร้อมกับงาน Issue 11
+- Release ไป `main` ผ่าน PR release (#33) พร้อมงาน Issue 11 และรอบยืนยัน final (**#36 → #37**) เพื่อให้ main ที่ส่งงานมีเทส 41/41 ตรงเอกสารทุกจุด
