@@ -4,7 +4,7 @@
 
 **ผู้ตรวจ (Reviewers):**
 - @Suprawi5227 — ตรวจ PR docs (PR #11)
-- @titayaaa — ตรวจ PR implementation ทั้งหมด (PR #21–#32, #34–#35 และ PR release #33)
+- @titayaaa — ตรวจ PR implementation ทั้งหมด (PR #21–#32, #34–#37)
 
 ## Pull Requests สำหรับ Lab 2 (ทุก PR ตาม git log — Issue 1-11)
 
@@ -25,7 +25,7 @@
 | [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | `8e9e69e` |
 | [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | `fac2f82` |
 | [#36](https://github.com/jejaebubu/toktickit/pull/36) | fix/lab02-missing-api-05f-test | @titayaaa | Approved (1 จุด → แก้ `if (!removed) return` → `expect(removed).toBeTruthy()` + API-05d) | `ebc6460` |
-| [#37](https://github.com/jejaebubu/toktickit/pull/37) | lab2-staging → main (post-release verification) | @titayaaa | Approved | release commit |
+| [#37](https://github.com/jejaebubu/toktickit/pull/37) | release/lab02-post-merge-verification → main | @titayaaa | Approved | release commit |
 
 ---
 
