@@ -17,6 +17,9 @@ server/uploads/
 # playwright
 test-results/
 playwright-report/
+# coverage
+coverage/
+**/coverage/
 # logs & OS
 *.log
 .DS_Store

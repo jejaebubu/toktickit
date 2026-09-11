@@ -83,12 +83,12 @@
 - **AC-05**: Given ผู้ใช้กดลบไฟล์แนบและกรอกเหตุผลการลบ, When ยืนยันการลบ, Then สถานะไฟล์เปลี่ยนเป็น Soft-removed แสดงรายการ Metadata แต่บล็อกปุ่มดาวน์โหลด
 
 ## 10. Definition of Done (นิยามความสำเร็จของสปรินต์)
-- [ ] โค้ดทั้งหมดผ่านการตรวจสอบ Acceptance Criteria ทุกข้อ
-- [ ] ชุดทดสอบอัตโนมัติ (Unit, API, UI, E2E) รันผ่าน 100% บน branch `main`
-- [ ] เอกสารประกอบใน `docs/lab-02/` จัดทำสมบูรณ์ทุกไฟล์
-- [ ] มีการ Peer Review อนุมัติ (Approved) และ Merge ผ่าน Branch `lab2-staging` ตามกติกา
-- [ ] การแสดงผลบน Desktop, Tablet, Mobile ถูกต้องตามสเปก Zen Green Theme
-- [ ] รวบรวมเอกสารและรูปภาพหลักฐานจัดทำเป็นไฟล์ PDF 1 ไฟล์ตามรูปแบบการส่งงาน
+- [x] โค้ดทั้งหมดผ่านการตรวจสอบ Acceptance Criteria ทุกข้อ
+- [x] ชุดทดสอบอัตโนมัติ (Unit, API, UI, E2E) รันผ่าน 100% บน branch `main`
+- [x] เอกสารประกอบใน `docs/lab-02/` จัดทำสมบูรณ์ทุกไฟล์
+- [x] มีการ Peer Review อนุมัติ (Approved) และ Merge ผ่าน Branch `lab2-staging` ตามกติกา
+- [x] การแสดงผลบน Desktop, Tablet, Mobile ถูกต้องตามสเปก Zen Green Theme
+- [x] รวบรวมเอกสารและรูปภาพหลักฐานจัดทำเป็นไฟล์ PDF 1 ไฟล์ตามรูปแบบการส่งงาน
 
 ## 11. Assumptions and Decisions (ข้อสมมติฐานและการตัดสินใจ)
 - กำหนดให้การสลับ Requester ใช้ LocalStorage หรือ React Context ในการจำลองสภาวะการเข้าสู่ระบบ

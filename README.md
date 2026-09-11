@@ -76,7 +76,7 @@ npm run test:e2e    # รัน seed + build server + ทดสอบ 3 viewport
 ```
 
 หมายเหตุ: `test:e2e` จะสร้าง ticket ใหม่ระหว่างทดสอบ และบันทึก screenshot ลง
-`artifacts/lab-02/screenshots/` เพื่อใช้เป็นหลักฐานส่งงาน (ผลลัพธ์ที่ควรได้: 3 passed)
+`artifacts/lab-02/screenshots/` เพื่อใช้เป็นหลักฐานส่งงาน (ผลลัพธ์ที่ควรได้: 6 passed = 2 specs ต่อ 3 viewports)
 
 ## Backend API
 
