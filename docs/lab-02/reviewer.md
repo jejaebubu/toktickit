@@ -22,8 +22,8 @@
 | [#31](https://github.com/jejaebubu/toktickit/pull/31) | feature/lab02-10-e2e-visual-evidence | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ) | `93be330` |
 | [#32](https://github.com/jejaebubu/toktickit/pull/32) | feature/lab02-11-release-preparation | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ — แก้ PATCH→DELETE ใน README) | `0897788` |
 | [#34](https://github.com/jejaebubu/toktickit/pull/34) | feature/lab02-11-polish-labsheet-conformance | @titayaaa | Approved (คอมเมนต์ 4 จุด → แก้ครบ + re-review) | `f576456` |
-| [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | (merge ผ่าน staging) |
-| [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | release commit |
+| [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | `8e9e69e` |
+| [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | `fac2f82` |
 | [#36](https://github.com/jejaebubu/toktickit/pull/36) | fix/lab02-missing-api-05f-test | @titayaaa | Approved (1 จุด → แก้ `if (!removed) return` → `expect(removed).toBeTruthy()` + API-05d) | `ebc6460` |
 | [#37](https://github.com/jejaebubu/toktickit/pull/37) | lab2-staging → main (post-release verification) | @titayaaa | Approved | release commit |
 

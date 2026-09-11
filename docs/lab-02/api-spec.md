@@ -59,7 +59,7 @@
   ```json
   {
     "id": 101,
-    "ticketNumber": "TKT-2025-000101",
+    "ticketNumber": "TKT-2026-000101",
     "summary": "Cannot connect to campus Wi-Fi in Library",
     "status": "New",
     "createdAt": "2025-09-03T10:00:00Z"

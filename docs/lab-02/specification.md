@@ -9,7 +9,7 @@
 ## 3. Scope (ขอบเขตระบบ)
 ### Included (สิ่งที่รวมในสปรินต์นี้)
 - หน้าสลับผู้ใช้จำลอง (Development Requester Selection Screen) และการจัดการ Context ผู้ใช้ที่เลือก
-- การสร้างตั๋วแจ้งเรื่อง (Create Ticket Screen) พร้อม Validation และการออกเลขตั๋ว `TKT-2025-XXXXXX`
+- การสร้างตั๋วแจ้งเรื่อง (Create Ticket Screen) พร้อม Validation และการออกเลขตั๋ว `TKT-2026-XXXXXX`
 - การแนบไฟล์หลักฐาน (JPG, PNG, WEBP, PDF ขนาด $\le 5\text{MB}$, สูงสุด 5 ไฟล์/ตั๋ว)
 - หน้าแสดงรายการตั๋วของฉัน (My Tickets Screen) พร้อมระบบค้นหา, กรอง, จัดเรียง, แบ่งหน้า (Pagination), Empty State และ No-Results State
 - หน้ารายละเอียดตั๋ว (Requester Ticket Detail Screen) แบบ Read-only
@@ -92,6 +92,6 @@
 
 ## 11. Assumptions and Decisions (ข้อสมมติฐานและการตัดสินใจ)
 - กำหนดให้การสลับ Requester ใช้ LocalStorage หรือ React Context ในการจำลองสภาวะการเข้าสู่ระบบ
-- กำหนดให้ระบบสุ่ม/สร้าง Ticket Number ใช้รูปแบบปี ค.ศ. ปัจจุบัน ตามด้วยตัวเลขรันอัตโนมัติ 6 หลัก เช่น `TKT-2025-000001`
+- กำหนดให้ระบบสุ่ม/สร้าง Ticket Number ใช้รูปแบบปี ค.ศ. ปัจจุบัน ตามด้วยตัวเลขรันอัตโนมัติ 6 หลัก เช่น `TKT-2026-000001`
 - ตัวกรองใน FR-07 จำกัดเฉพาะ Category, Requested Priority และ Status — ฟิลด์ `itPriority` ยังไม่ถูกนำมาใช้กรองใน Lab 2 เนื่องจากยังไม่มี IT Staff workflow (งาน Lab 3) ที่จะกำหนดค่า IT Priority ให้ตั๋ว
 - การจัดเก็บไฟล์แนบในสภาพแวดล้อมการพัฒนาใน Local ให้เก็บในโฟลเดอร์ `server/uploads/`

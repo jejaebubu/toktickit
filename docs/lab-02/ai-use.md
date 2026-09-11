@@ -11,7 +11,7 @@
 | 3 | ออกแบบ Prisma Schema สำหรับ `RequesterUser`, `Ticket`, `Attachment`, `RelatedSystem` | AI ออกแบบโมเดลความสัมพันธ์และฟิลด์ต่างๆ สำหรับสร้าง Migration |
 | 4 | พัฒนาสคริปต์ `seed.ts` สำหรับใส่ข้อมูลเริ่มต้นอย่างปลอดภัย (Idempotent) | AI เขียนฟังก์ชัน `upsert` สำหรับใส่ข้อมูลหมวดหมู่ ระบบที่เกี่ยวข้อง และผู้ใช้จำลอง |
 | 5 | พัฒนา REST API และหน้าจอเลือกผู้ใช้จำลอง (Requester Selector) | AI พัฒนา API `GET /api/requesters` และหน้าจอเปลี่ยน Context ผู้ใช้ |
-| 6 | พัฒนาฟังก์ชันสร้างตั๋ว (Create Ticket) พร้อมสุ่มเลขตั๋วและ Validation | AI สร้าง API `POST /api/tickets`, ระบบออกเลข `TKT-2025-XXXXXX` และหน้าฟอร์ม Zen Green |
+| 6 | พัฒนาฟังก์ชันสร้างตั๋ว (Create Ticket) พร้อมสุ่มเลขตั๋วและ Validation | AI สร้าง API `POST /api/tickets`, ระบบออกเลข `TKT-2026-XXXXXX` และหน้าฟอร์ม Zen Green |
 | 7 | พัฒนาตารางตั๋ว (My Tickets) พร้อม Search, Filter, Sort & Pagination | AI สร้าง API และ UI หน้า My Tickets รองรับพารามิเตอร์ค้นหา กรอง จัดเรียง และแบ่งหน้า |
 | 8 | พัฒนาการจัดการไฟล์แนบและสิทธิ์ความเป็นเจ้าของตั๋ว (Soft Removal) | AI สร้าง API เช็คสิทธิ์ 403/404 และระบบ Soft removal ไฟล์แนบพร้อมบันทึกเหตุผล |
 
