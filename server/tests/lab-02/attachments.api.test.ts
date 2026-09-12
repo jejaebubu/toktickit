@@ -247,7 +247,7 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(removed).toBeTruthy();
 
     const res = await request(app)
-      .get(`/api/attachments/${removed.id}/download`)
+      .get(`/api/attachments/${removed!.id}/download`)
       .set("X-Requester-Id", String(owner.id));
 
     expect(res.status).toBe(400);
@@ -260,7 +260,7 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(removed).toBeTruthy();
 
     const res = await request(app)
-      .delete(`/api/attachments/${removed.id}`)
+      .delete(`/api/attachments/${removed!.id}`)
       .set("X-Requester-Id", String(owner.id))
       .send({ reason: "trying to remove again" });
 
