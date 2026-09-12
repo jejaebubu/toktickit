@@ -9,7 +9,7 @@
 ## 3. Scope (ขอบเขตระบบ)
 ### Included (สิ่งที่รวมในสปรินต์นี้)
 - หน้าสลับผู้ใช้จำลอง (Development Requester Selection Screen) และการจัดการ Context ผู้ใช้ที่เลือก
-- การสร้างตั๋วแจ้งเรื่อง (Create Ticket Screen) พร้อม Validation และการออกเลขตั๋ว `TKT-2025-XXXXXX`
+- การสร้างตั๋วแจ้งเรื่อง (Create Ticket Screen) พร้อม Validation และการออกเลขตั๋ว `TKT-2026-XXXXXX`
 - การแนบไฟล์หลักฐาน (JPG, PNG, WEBP, PDF ขนาด $\le 5\text{MB}$, สูงสุด 5 ไฟล์/ตั๋ว)
 - หน้าแสดงรายการตั๋วของฉัน (My Tickets Screen) พร้อมระบบค้นหา, กรอง, จัดเรียง, แบ่งหน้า (Pagination), Empty State และ No-Results State
 - หน้ารายละเอียดตั๋ว (Requester Ticket Detail Screen) แบบ Read-only
@@ -83,15 +83,15 @@
 - **AC-05**: Given ผู้ใช้กดลบไฟล์แนบและกรอกเหตุผลการลบ, When ยืนยันการลบ, Then สถานะไฟล์เปลี่ยนเป็น Soft-removed แสดงรายการ Metadata แต่บล็อกปุ่มดาวน์โหลด
 
 ## 10. Definition of Done (นิยามความสำเร็จของสปรินต์)
-- [ ] โค้ดทั้งหมดผ่านการตรวจสอบ Acceptance Criteria ทุกข้อ
-- [ ] ชุดทดสอบอัตโนมัติ (Unit, API, UI, E2E) รันผ่าน 100% บน branch `main`
-- [ ] เอกสารประกอบใน `docs/lab-02/` จัดทำสมบูรณ์ทุกไฟล์
-- [ ] มีการ Peer Review อนุมัติ (Approved) และ Merge ผ่าน Branch `lab2-staging` ตามกติกา
-- [ ] การแสดงผลบน Desktop, Tablet, Mobile ถูกต้องตามสเปก Zen Green Theme
-- [ ] รวบรวมเอกสารและรูปภาพหลักฐานจัดทำเป็นไฟล์ PDF 1 ไฟล์ตามรูปแบบการส่งงาน
+- [x] โค้ดทั้งหมดผ่านการตรวจสอบ Acceptance Criteria ทุกข้อ
+- [x] ชุดทดสอบอัตโนมัติ (Unit, API, UI, E2E) รันผ่าน 100% บน branch `main`
+- [x] เอกสารประกอบใน `docs/lab-02/` จัดทำสมบูรณ์ทุกไฟล์
+- [x] มีการ Peer Review อนุมัติ (Approved) และ Merge ผ่าน Branch `lab2-staging` ตามกติกา
+- [x] การแสดงผลบน Desktop, Tablet, Mobile ถูกต้องตามสเปก Zen Green Theme
+- [x] รวบรวมเอกสารและรูปภาพหลักฐานจัดทำเป็นไฟล์ PDF 1 ไฟล์ตามรูปแบบการส่งงาน
 
 ## 11. Assumptions and Decisions (ข้อสมมติฐานและการตัดสินใจ)
 - กำหนดให้การสลับ Requester ใช้ LocalStorage หรือ React Context ในการจำลองสภาวะการเข้าสู่ระบบ
-- กำหนดให้ระบบสุ่ม/สร้าง Ticket Number ใช้รูปแบบปี ค.ศ. ปัจจุบัน ตามด้วยตัวเลขรันอัตโนมัติ 6 หลัก เช่น `TKT-2025-000001`
+- กำหนดให้ระบบสุ่ม/สร้าง Ticket Number ใช้รูปแบบปี ค.ศ. ปัจจุบัน ตามด้วยตัวเลขรันอัตโนมัติ 6 หลัก เช่น `TKT-2026-000001`
 - ตัวกรองใน FR-07 จำกัดเฉพาะ Category, Requested Priority และ Status — ฟิลด์ `itPriority` ยังไม่ถูกนำมาใช้กรองใน Lab 2 เนื่องจากยังไม่มี IT Staff workflow (งาน Lab 3) ที่จะกำหนดค่า IT Priority ให้ตั๋ว
 - การจัดเก็บไฟล์แนบในสภาพแวดล้อมการพัฒนาใน Local ให้เก็บในโฟลเดอร์ `server/uploads/`

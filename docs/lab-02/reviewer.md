@@ -4,7 +4,7 @@
 
 **ผู้ตรวจ (Reviewers):**
 - @Suprawi5227 — ตรวจ PR docs (PR #11)
-- @titayaaa — ตรวจ PR implementation ทั้งหมด (PR #21–#32, #34–#35 และ PR release #33)
+- @titayaaa — ตรวจ PR implementation ทั้งหมด (PR #21–#32, #34–#37)
 
 ## Pull Requests สำหรับ Lab 2 (ทุก PR ตาม git log — Issue 1-11)
 
@@ -22,8 +22,10 @@
 | [#31](https://github.com/jejaebubu/toktickit/pull/31) | feature/lab02-10-e2e-visual-evidence | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ) | `93be330` |
 | [#32](https://github.com/jejaebubu/toktickit/pull/32) | feature/lab02-11-release-preparation | @titayaaa | Approved (คอมเมนต์ + ตอบกลับ — แก้ PATCH→DELETE ใน README) | `0897788` |
 | [#34](https://github.com/jejaebubu/toktickit/pull/34) | feature/lab02-11-polish-labsheet-conformance | @titayaaa | Approved (คอมเมนต์ 4 จุด → แก้ครบ + re-review) | `f576456` |
-| [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | (merge ผ่าน staging) |
-| [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | release commit |
+| [#35](https://github.com/jejaebubu/toktickit/pull/35) | feature/lab02-11-acceptance-checklist | @titayaaa | Approved | `8e9e69e` |
+| [#33](https://github.com/jejaebubu/toktickit/pull/33) | lab2-staging → main | @titayaaa | Approved (คอมเมนต์ 6 จุด → แก้ครบ + re-review) | `fac2f82` |
+| [#36](https://github.com/jejaebubu/toktickit/pull/36) | fix/lab02-missing-api-05f-test | @titayaaa | Approved (1 จุด → แก้ `if (!removed) return` → `expect(removed).toBeTruthy()` + API-05d) | `ebc6460` |
+| [#37](https://github.com/jejaebubu/toktickit/pull/37) | release/lab02-post-merge-verification → main | @titayaaa | Approved | release commit |
 
 ---
 
@@ -190,10 +192,30 @@
 
 → Approved และ merged ครับ
 
+### PR #36 — Missing API-05f test (@titayaaa, 1 จุด → Approved)
+
+**คอมเมนต์ผู้ตรวจ:**  
+"ตรงบรรทัด `if (!removed) return;` ใน API-05f ถ้ารันแยกเดี่ยวแล้วหาไฟล์ที่ลบไม่เจอ เทสจะ return จบเลย → Vitest นับ PASS ทั้งที่ไม่ได้รัน expect จริง (False Positive) เปลี่ยนเป็น `expect(removed).toBeTruthy();` ก่อนยิง API"
+
+**การตอบกลับ:**  
+เปลี่ยน `if (!removed) return;` → `expect(removed).toBeTruthy();` ใน API-05f และพบ pattern เดียวกันใน **API-05d** ด้วยจึงแก้ให้พร้อมกัน — `attachments.api.test.ts` 13/13 ผ่าน, server suite **41/41**
+
+→ Approved และ merged (`ebc6460`)
+
+### PR #37 — Post-merge Verification + Report Docs Final Sync (@titayaaa, 2 จุด → Approved)
+
+**คอมเมนต์ผู้ตรวจ:**  
+"1) หัวข้อผู้ตรวจ (Reviewers) บรรทัดของ @titayaaa ยังเขียนว่า (PR #21–#32, #34–#35 และ PR release #33) อยู่ — ให้ครอบคลุม PR #36 และ #37 ด้วย (แก้เป็น PR #21–#32, #34–#37) 2) ในตาราง แถว PR #37: ช่อง Branch เขียนว่า lab2-staging → main — ให้ตรงกับชื่อ Head branch จริงบน GitHub (release/lab02-post-merge-verification → main)"
+
+**การตอบกลับ:**  
+แก้ตามทั้ง 2 จุด: ขอบเขตผู้ตรวจเป็น `PR #21–#32, #34–#37` (ครอบคลุม #36/#37 แล้ว) และแถว PR #37 เปลี่ยน Branch เป็น `release/lab02-post-merge-verification → main` ตรงกับ Head branch จริง — `docs/lab-02/reviewer.md` update แล้ว (`0145fbd`)
+
+→ Approved และ merge เข้า `main` (release รอบสุดท้าย)
+
 ---
 
 ## สรุป (Summary)
 
-- ทั้ง 13 PR ผ่านการ peer review โดยเพื่อน (1–2 รอบ ผล final ทุกตัวเป็น **Approved**) ก่อน merge เข้า `lab2-staging` / `main`
+- ทุก PR ในตารางผ่านการ peer review โดยเพื่อน (1–2 รอบ ผล final ทุกตัวเป็น **Approved**) ก่อน merge เข้า `lab2-staging` / `main`
 - ทุก PR จับคู่ปิด Issue ของตัวเองผ่าน `Closes #N` และย้ายเป็น **Done** บน GitHub Project board หลังจาก verify จริง
-- Release ไป `main` ผ่าน PR release (#33) พร้อมกับงาน Issue 11
+- Release ไป `main` ผ่าน PR release (#33) พร้อมงาน Issue 11 และรอบยืนยัน final (**#36 → #37**) เพื่อให้ main ที่ส่งงานมีเทส 41/41 ตรงเอกสารทุกจุด
