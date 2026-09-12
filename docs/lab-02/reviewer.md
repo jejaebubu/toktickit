@@ -202,6 +202,16 @@
 
 → Approved และ merged (`ebc6460`)
 
+### PR #37 — Post-merge Verification + Report Docs Final Sync (@titayaaa, 2 จุด → Approved)
+
+**คอมเมนต์ผู้ตรวจ:**  
+"1) หัวข้อผู้ตรวจ (Reviewers) บรรทัดของ @titayaaa ยังเขียนว่า (PR #21–#32, #34–#35 และ PR release #33) อยู่ — ให้ครอบคลุม PR #36 และ #37 ด้วย (แก้เป็น PR #21–#32, #34–#37) 2) ในตาราง แถว PR #37: ช่อง Branch เขียนว่า lab2-staging → main — ให้ตรงกับชื่อ Head branch จริงบน GitHub (release/lab02-post-merge-verification → main)"
+
+**การตอบกลับ:**  
+แก้ตามทั้ง 2 จุด: ขอบเขตผู้ตรวจเป็น `PR #21–#32, #34–#37` (ครอบคลุม #36/#37 แล้ว) และแถว PR #37 เปลี่ยน Branch เป็น `release/lab02-post-merge-verification → main` ตรงกับ Head branch จริง — `docs/lab-02/reviewer.md` update แล้ว (`0145fbd`)
+
+→ Approved และ merge เข้า `main` (release รอบสุดท้าย)
+
 ---
 
 ## สรุป (Summary)
