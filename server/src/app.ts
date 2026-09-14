@@ -9,7 +9,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { getPrisma } from "./prisma.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "toktickit-lab3-jwt-secret-key-2026";
+const JWT_SECRET: string = (() => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("FATAL: JWT_SECRET environment variable is not defined.");
+  }
+  return secret;
+})();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 
 function validatePasswordComplexity(password: string): string | null {
@@ -200,53 +206,6 @@ export async function authenticateToken(
   try {
     const authHeader = req.headers.authorization;
     let token = authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : null;
-    const xRequesterId = req.headers["x-requester-id"] || req.query["X-Requester-Id"] || req.query["x-requester-id"];
-
-    // Support dev_requester_<id> Bearer header format from Lab 2 tests
-    if (token && token.startsWith("dev_requester_")) {
-      const reqId = parseInt(token.replace("dev_requester_", ""), 10);
-      if (!isNaN(reqId)) {
-        const user = await getPrisma().user.findUnique({ where: { id: reqId } });
-        if (user) {
-          if (!user.isActive) {
-            return res.status(400).json({ error: "Bad Request", message: "Selected requester is inactive." });
-          }
-          req.user = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            mustChangePassword: false,
-            isActive: user.isActive,
-          };
-          return next();
-        }
-      }
-      return res.status(400).json({ error: "Bad Request", message: "Invalid requester." });
-    }
-
-    // Support X-Requester-Id header/query from Lab 2 tests
-    if (!token && (xRequesterId as string | undefined)) {
-      const reqId = parseInt(xRequesterId as string, 10);
-      if (!isNaN(reqId)) {
-        const user = await getPrisma().user.findUnique({ where: { id: reqId } });
-        if (user) {
-          if (!user.isActive) {
-            return res.status(400).json({ error: "Bad Request", message: "Selected requester is inactive." });
-          }
-          req.user = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            mustChangePassword: false,
-            isActive: user.isActive,
-          };
-          return next();
-        }
-      }
-      return res.status(400).json({ error: "Bad Request", message: "Invalid requester header." });
-    }
 
     if (!token) {
       return res.status(401).json({ error: "Unauthorized", message: "Authentication required." });

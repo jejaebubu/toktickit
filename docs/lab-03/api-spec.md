@@ -9,6 +9,10 @@
 - มีตัวเลขหรือสัญลักษณ์พิเศษอย่างน้อย 1 ตัว
 - หากไม่ผ่านเกณฑ์ → ตอบกลับ `400 Bad Request` พร้อมข้อความแจ้งเกณฑ์ที่ละเมิด
 
+**JWT & Session Policy**:
+- Token อายุ **24 ชั่วโมง** (ค่า env `JWT_EXPIRES_IN`, default `24h`) — เมื่อหมดอายุ เซิร์ฟเวอร์ตอบ `401` ทันที
+- การ logout เป็น **stateless** (Client-side): เซิร์ฟเวอร์ไม่มี Token Blacklist หรือ Session Store — Client ลบ Token ออกจาก Browser เอง (ดู POST /logout)
+
 ---
 
 ## 2. Endpoints & Error Handling Details
@@ -43,7 +47,8 @@
   - `400 Bad Request`: รูปแบบข้อมูลไม่ถูกต้อง
 
 #### POST /api/auth/logout
-- **คำอธิบาย**: ออกจากระบบและยกเลิกเซสชัน
+- **คำอธิบาย**: ออกจากระบบแบบ **Stateless Client-side Logout** — เซิร์ฟเวอร์**ไม่เก็บ** Token Blacklist หรือ Session Store การ "logout" คือ Client ลบทิ้ง Token ออกจาก Browser/Storage ของฝั่งตัวเอง และหยุดส่ง Header `Authorization` ต่อไป ต่อให้มี Request ที่แนบ Token เดิมมาในภายหลัง จะใช้งานได้จนกว่า Token จะหมดอายุ (ไม่มีฝั่งเซิร์ฟเวอร์ให้ "เพิกถอน" ได้ทันที)
+- **อายุ Token (JWT Expiration)**: Token มีอายุ **24 ชั่วโมง** กำหนดผ่าน env `JWT_EXPIRES_IN="24h"` (ค่า default) เมื่อหมดอายุ เซิร์ฟเวอร์ตอบ `401 Unauthorized` และ Client ต้องล็อกอินใหม่
 - **Success Response (`200 OK`)**:
   ```json
   { "message": "Logged out successfully." }
