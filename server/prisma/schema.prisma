@@ -17,13 +17,20 @@ model Category {
   tickets   Ticket[]
 }
 
-model RequesterUser {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  tickets   Ticket[]
+model User {
+  id                 Int             @id @default(autoincrement())
+  name               String
+  email              String          @unique
+  passwordHash       String
+  role               String          @default("REQUESTER") // REQUESTER, IT_STAFF, ADMINISTRATOR
+  mustChangePassword Boolean         @default(true)
+  isActive           Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  requestedTickets   Ticket[]        @relation("TicketRequester")
+  ownedTickets       Ticket[]        @relation("TicketOwner")
+  publicComments     PublicComment[]
+  internalNotes      InternalNote[]
 }
 
 model RelatedSystem {
@@ -35,22 +42,26 @@ model RelatedSystem {
 }
 
 model Ticket {
-  id                Int           @id @default(autoincrement())
-  ticketNumber      String        @unique
+  id                Int             @id @default(autoincrement())
+  ticketNumber      String          @unique
   requesterId       Int
-  requester         RequesterUser @relation(fields: [requesterId], references: [id])
+  requester         User            @relation("TicketRequester", fields: [requesterId], references: [id])
+  ownerId           Int?
+  owner             User?           @relation("TicketOwner", fields: [ownerId], references: [id])
   categoryId        Int
-  category          Category      @relation(fields: [categoryId], references: [id])
+  category          Category        @relation(fields: [categoryId], references: [id])
   relatedSystemId   Int
-  relatedSystem     RelatedSystem @relation(fields: [relatedSystemId], references: [id])
+  relatedSystem     RelatedSystem   @relation(fields: [relatedSystemId], references: [id])
   summary           String
   description       String
   requestedPriority String
-  itPriority        String        @default("MEDIUM")
-  status            String        @default("New")
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  itPriority        String          @default("MEDIUM")
+  status            String          @default("New")
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
   attachments       Attachment[]
+  publicComments    PublicComment[]
+  internalNotes     InternalNote[]
 }
 
 model Attachment {
@@ -65,4 +76,24 @@ model Attachment {
   removeReason String?
   removedAt    DateTime?
   createdAt    DateTime  @default(now())
+}
+
+model PublicComment {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model InternalNote {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
 }
