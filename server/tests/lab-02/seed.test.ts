@@ -17,15 +17,16 @@ describe("Database Seed Data (Issue #14)", () => {
 
   it("should contain seeded active and inactive requesters", async () => {
     const prisma = getPrisma();
-    const requesters = await prisma.requesterUser.findMany({
+    const requesters = await prisma.user.findMany({
+      where: { role: "REQUESTER" },
       orderBy: { id: "asc" },
     });
     expect(requesters.length).toBeGreaterThanOrEqual(3);
 
-    const activeRequesters = requesters.filter((r) => r.isActive);
+    const activeRequesters = requesters.filter((r: any) => r.isActive);
     expect(activeRequesters.length).toBeGreaterThanOrEqual(3);
 
-    const inactiveRequesters = requesters.filter((r) => !r.isActive);
+    const inactiveRequesters = requesters.filter((r: any) => !r.isActive);
     expect(inactiveRequesters.length).toBeGreaterThanOrEqual(1);
   });
 

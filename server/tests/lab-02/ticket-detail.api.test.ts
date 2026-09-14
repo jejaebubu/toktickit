@@ -24,12 +24,12 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     if (!sys) sys = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     system = sys;
 
-    let a = await prisma.requesterUser.findUnique({ where: { email: OWNER_EMAIL } });
-    if (!a) a = await prisma.requesterUser.create({ data: { name: "Issue9 Owner", email: OWNER_EMAIL, isActive: true } });
+    let a = await prisma.user.findUnique({ where: { email: OWNER_EMAIL } });
+    if (!a) a = await prisma.user.create({ data: { name: "Issue9 Owner", email: OWNER_EMAIL, passwordHash: "dummy", role: "REQUESTER", isActive: true } });
     owner = a;
 
-    let b = await prisma.requesterUser.findUnique({ where: { email: OTHER_EMAIL } });
-    if (!b) b = await prisma.requesterUser.create({ data: { name: "Issue9 Other", email: OTHER_EMAIL, isActive: true } });
+    let b = await prisma.user.findUnique({ where: { email: OTHER_EMAIL } });
+    if (!b) b = await prisma.user.create({ data: { name: "Issue9 Other", email: OTHER_EMAIL, passwordHash: "dummy", role: "REQUESTER", isActive: true } });
     other = b;
 
     const t = await prisma.ticket.create({
@@ -50,7 +50,7 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     const prisma = getPrisma();
     await prisma.attachment.deleteMany({ where: { ticketId } });
     await prisma.ticket.deleteMany({ where: { id: ticketId } });
-    await prisma.requesterUser.deleteMany({
+    await prisma.user.deleteMany({
       where: { email: { in: [OWNER_EMAIL, OTHER_EMAIL] } },
     });
   });
