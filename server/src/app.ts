@@ -671,68 +671,173 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
 // Lab 2 (Issue 9) — Requester Ticket Detail REST API (Ownership Protected)
 // GET /api/tickets/:id
 // ---------------------------------------------------------------------------
-app.get("/api/tickets/:id", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  const buildError = (status: number, error: string, message: string) =>
-    res.status(status).json({ error, message });
-
+app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const requesterId = req.user!.id;
-
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
-      return buildError(404, "Not Found", `Ticket with ID ${req.params.id} not found.`);
+      return res.status(404).json({ error: "Not Found", message: "Invalid ticket ID." });
     }
 
-    const prisma = getPrisma();
-    const ticket = await prisma.ticket.findUnique({
+    const ticket = await getPrisma().ticket.findUnique({
       where: { id },
       include: {
-        requester: { select: { id: true, name: true, email: true } },
         category: { select: { id: true, name: true } },
         relatedSystem: { select: { id: true, name: true } },
-        attachments: {
+        requester: { select: { id: true, name: true, email: true } },
+        owner: { select: { id: true, name: true, email: true } },
+        attachments: true,
+        publicComments: {
           orderBy: { createdAt: "asc" },
-          select: {
-            id: true,
-            originalName: true,
-            filename: true,
-            mimeType: true,
-            size: true,
-            isRemoved: true,
-            removeReason: true,
-            removedAt: true,
-            createdAt: true,
-          },
+          include: { author: { select: { id: true, name: true, email: true, role: true } } },
         },
+        internalNotes: req.user!.role !== "REQUESTER" ? {
+          orderBy: { createdAt: "asc" },
+          include: { author: { select: { id: true, name: true, email: true, role: true } } },
+        } : false,
       },
     });
 
     if (!ticket) {
-      return buildError(404, "Not Found", `Ticket with ID ${id} not found.`);
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
     }
 
-    if (ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "Access denied. You do not have permission to view this ticket.");
+    // Ownership check for Requester
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(403).json({ error: "Forbidden", message: "You do not have permission to view this ticket." });
     }
 
-    return res.status(200).json({
-      id: ticket.id,
-      ticketNumber: ticket.ticketNumber,
-      summary: ticket.summary,
-      description: ticket.description,
-      requestedPriority: ticket.requestedPriority,
-      itPriority: ticket.itPriority,
-      status: ticket.status,
-      createdAt: ticket.createdAt,
-      updatedAt: ticket.updatedAt,
-      requester: ticket.requester,
-      category: ticket.category,
-      relatedSystem: ticket.relatedSystem,
-      attachments: ticket.attachments,
-    });
+    res.status(200).json(ticket);
   } catch (err: any) {
-    console.error("Error retrieving ticket detail:", err);
-    return buildError(500, "Internal Server Error", err?.message || "Failed to retrieve ticket details.");
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 3 (Issue 7) — IT Staff Ticket Operations
+// PATCH /api/tickets/:id (claim/assign owner, IT priority, status,
+// requester "Waiting for Requester" resolution indication)
+// ---------------------------------------------------------------------------
+app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid ticket ID" });
+    }
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id } });
+    if (!ticket) {
+      return res.status(404).json({ error: "Ticket not found" });
+    }
+
+    const { ownerId, itPriority, status, requesterResolution } = req.body;
+
+    // Requester special action: Indicate problem appears resolved
+    if (req.user!.role === "REQUESTER") {
+      if (ticket.requesterId !== req.user!.id) {
+        return res.status(403).json({ error: "Forbidden", message: "You do not have permission to update this ticket." });
+      }
+      if (requesterResolution === true || status === "Waiting for Requester") {
+        const updated = await getPrisma().ticket.update({
+          where: { id },
+          data: { status: "Waiting for Requester" },
+          include: {
+            category: true,
+            relatedSystem: true,
+            requester: { select: { id: true, name: true, email: true } },
+            owner: { select: { id: true, name: true, email: true } },
+          },
+        });
+        return res.status(200).json(updated);
+      }
+      return res.status(403).json({ error: "Forbidden", message: "Requesters cannot formally update ticket status or assignment." });
+    }
+
+    // IT Staff / Admin ticket workflow updates
+    const dataToUpdate: any = {};
+
+    if (ownerId !== undefined) {
+      dataToUpdate.ownerId = ownerId === null || ownerId === "unassigned" ? null : Number(ownerId);
+    }
+    if (itPriority !== undefined) {
+      dataToUpdate.itPriority = String(itPriority);
+    }
+    if (status !== undefined) {
+      dataToUpdate.status = String(status);
+    }
+
+    const updatedTicket = await getPrisma().ticket.update({
+      where: { id },
+      data: dataToUpdate,
+      include: {
+        category: true,
+        relatedSystem: true,
+        requester: { select: { id: true, name: true, email: true } },
+        owner: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    res.status(200).json(updatedTicket);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Public Comments & Internal Notes APIs
+// ---------------------------------------------------------------------------
+app.get("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    if (isNaN(ticketId)) return res.status(400).json({ error: "Invalid ticket ID" });
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const comments = await getPrisma().publicComment.findMany({
+      where: { ticketId },
+      orderBy: { createdAt: "asc" },
+      include: { author: { select: { id: true, name: true, email: true, role: true } } },
+    });
+
+    res.status(200).json(comments);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+app.post("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    if (isNaN(ticketId)) return res.status(400).json({ error: "Invalid ticket ID" });
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const { content } = req.body;
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ error: "Validation Error", message: "Comment content cannot be empty." });
+    }
+
+    const comment = await getPrisma().publicComment.create({
+      data: {
+        ticketId,
+        authorId: req.user!.id,
+        content: content.trim(),
+      },
+      include: { author: { select: { id: true, name: true, email: true, role: true } } },
+    });
+
+    res.status(201).json(comment);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
   }
 });
 
