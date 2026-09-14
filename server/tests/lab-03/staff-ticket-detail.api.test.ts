@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
@@ -9,7 +9,10 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
 
   beforeAll(async () => {
     const prisma = getPrisma();
-    await prisma.user.updateMany({ data: { mustChangePassword: false, isActive: true } });
+    await prisma.user.updateMany({
+      where: { email: { in: ["alex.it@toktickit.com", "kevin.it@toktickit.com", "emily.it@toktickit.com", "admin@toktickit.com"] } },
+      data: { mustChangePassword: false, isActive: true },
+    });
 
     let ticket = await prisma.ticket.findFirst();
     if (!ticket) {
@@ -57,5 +60,10 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
     expect(updateRes.status).toBe(200);
     expect(updateRes.body.itPriority).toBe("HIGH");
     expect(updateRes.body.status).toBe("In Progress");
+  });
+
+  afterAll(async () => {
+    const prisma = getPrisma();
+    await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-DETAIL-" } } });
   });
 });

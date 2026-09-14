@@ -10,6 +10,23 @@ import jwt from "jsonwebtoken";
 import { getPrisma } from "./prisma.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "toktickit-lab3-jwt-secret-key-2026";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
+
+function validatePasswordComplexity(password: string): string | null {
+  if (password.length < 8) {
+    return "New password must be at least 8 characters long.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "New password must contain at least one uppercase letter.";
+  }
+  if (!/[a-z]/.test(password)) {
+    return "New password must contain at least one lowercase letter.";
+  }
+  if (!/\d/.test(password) && !/[^A-Za-z0-9]/.test(password)) {
+    return "New password must contain at least one number or special symbol.";
+  }
+  return null;
+}
 
 export const app = express();
 
@@ -268,7 +285,7 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
         mustChangePassword: user.mustChangePassword,
       },
       JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"] }
     );
 
     res.status(200).json({
@@ -312,8 +329,9 @@ app.post("/api/auth/change-password", authenticateToken, async (req: Authenticat
       return res.status(400).json({ error: "Bad Request", message: "Current password is incorrect." });
     }
 
-    if (newPassword.length < 8) {
-      return res.status(400).json({ error: "Bad Request", message: "New password must be at least 8 characters long." });
+    const complexityError = validatePasswordComplexity(newPassword);
+    if (complexityError) {
+      return res.status(400).json({ error: "Bad Request", message: complexityError });
     }
 
     const newHash = await bcrypt.hash(newPassword, 10);
@@ -349,20 +367,22 @@ async function generateTicketNumber(): Promise<String> {
   const currentYear = new Date().getFullYear();
   const prefix = `TKT-${currentYear}-`;
 
-  const latestTicket = await getPrisma().ticket.findFirst({
+  const yearTickets = await getPrisma().ticket.findMany({
     where: { ticketNumber: { startsWith: prefix } },
-    orderBy: { ticketNumber: "desc" },
     select: { ticketNumber: true },
   });
 
-  let nextSequence = 1;
-  if (latestTicket?.ticketNumber) {
-    const parts = latestTicket.ticketNumber.split("-");
-    const num = parseInt(parts[parts.length - 1], 10);
-    if (!isNaN(num)) nextSequence = num + 1;
+  let maxSequence = 0;
+  const seqPattern = /^\d{6}$/;
+  for (const t of yearTickets) {
+    const lastPart = t.ticketNumber.split("-").pop();
+    if (lastPart && seqPattern.test(lastPart)) {
+      const seq = parseInt(lastPart, 10);
+      if (!isNaN(seq) && seq > maxSequence) maxSequence = seq;
+    }
   }
 
-  return `${prefix}${nextSequence.toString().padStart(6, "0")}`;
+  return `${prefix}${(maxSequence + 1).toString().padStart(6, "0")}`;
 }
 
 function formatTicket(t: any) {

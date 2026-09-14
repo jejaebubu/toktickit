@@ -1,7 +1,11 @@
 # Lab 3 REST API Specification (ข้อกำหนดการเชื่อมต่อ REST API)
 
 ## 1. Authentication & Security Policy
-ระบบใช้การพิสูจน์ตัวตนผ่าน HTTP-Only Session Cookie หรือ Bearer Token ที่สร้างขึ้นเมื่อล็อกอินสำเร็จ โดยในทุก Request เซิร์ฟเวอร์จะระบุตัวตนและบทบาท (`REQUESTER`, `IT_STAFF`, `ADMINISTRATOR`) จาก Credentials ที่ผ่านการยืนยันแล้ว
+ระบบใช้การพิสูจน์ตัวตนผ่าน **Bearer JWT Token** ที่สร้างขึ้นเมื่อล็อกอินสำเร็จ โดยไคลเอนต์ต้องส่ง Token ใน Header `Authorization: Bearer <token>` ทุกรายการที่ต้องยืนยันตัวตน เซิร์ฟเวอร์จะระบุตัวตนและบทบาท (`REQUESTER`, `IT_STAFF`, `ADMINISTRATOR`) จาก Credentials ที่ผ่านการยืนยันแล้ว
+
+- **Token คงอยู่ (Expiry)**: เริ่มต้น `24 ชั่วโมง` (สามารถปรับได้ผ่านตัวแปรสภาพแวดล้อม `JWT_EXPIRES_IN` เช่น `"8h"`)
+- **Secret**: กำหนดผ่านตัวแปรสภาพแวดล้อม `JWT_SECRET` (ค่าเริ่มต้นเฉพาะการพัฒนาท้องถิ่นใน `.env.example`)
+- **Global Requirement**: ทุก Endpoint ที่ต้องยืนยันตัวตนจะให้ `403 PasswordChangeRequired` หากผู้ใช้ยังไม่ได้เปลี่ยนรหัสผ่านครั้งแรก (`mustChangePassword = true`)
 
 ---
 
@@ -37,11 +41,13 @@
   - `400 Bad Request`: รูปแบบข้อมูลไม่ถูกต้อง
 
 #### POST /api/auth/logout
-- **คำอธิบาย**: ออกจากระบบและยกเลิกเซสชัน
+- **คำอธิบาย**: ออกจากระบบ (Stateless JWT — ไม่ได้เก็บ Session ฝั่งเซิร์ฟเวอร์) ไคลเอนต์ลบ Token ที่เก็บไว้ฝั่งตัวเองเพื่อจบเซสชัน
+- **Request Header**: `Authorization: Bearer <token>`
 - **Success Response (`200 OK`)**:
   ```json
   { "message": "Logged out successfully." }
   ```
+- **Error Response (`401 Unauthorized`)**: เมื่อไม่ได้ส่งหรือส่ง Token ที่ไม่ถูกต้อง
 
 #### GET /api/auth/me
 - **คำอธิบาย**: ดึงข้อมูลผู้ใช้ที่เข้าสู่ระบบปัจจุบัน
@@ -79,6 +85,9 @@
     }
   }
   ```
+- **Password Policy (BR-14)**: รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 8 ตัวอักษร, อย่างน้อย 1 ตัวพิมพ์ใหญ่, 1 ตัวพิมพ์เล็ก และ 1 ตัวเลข หรือสัญลักษณ์พิเศษ
+- **Error Responses**:
+  - `400 Bad Request`: รหัสผ่านปัจจุบันไม่ถูกต้อง หรือรหัสผ่านใหม่ไม่ผ่านข้อกำหนดด้านความซับซ้อน (ข้อความแจ้งเหตุผลชัดเจน)
 
 ---
 

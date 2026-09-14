@@ -121,4 +121,44 @@ describe("Lab 3 Auth API Suite (auth.api.test.ts)", () => {
     expect(reLogin.status).toBe(200);
     expect(reLogin.body.user.mustChangePassword).toBe(false);
   });
+
+  it("API-06: change-password enforces complexity rules (uppercase/lowercase/digit-or-symbol)", async () => {
+    const loginRes = await request(app)
+      .post("/api/auth/login")
+      .send({ email: "jennifer@toktickit.com", password: "Password123!" });
+
+    const token = loginRes.body.token;
+
+    const lowerOnly = await request(app)
+      .post("/api/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ currentPassword: "Password123!", newPassword: "weakpassword" });
+
+    expect(lowerOnly.status).toBe(400);
+    expect(lowerOnly.body.message).toContain("uppercase");
+
+    const upperOnly = await request(app)
+      .post("/api/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ currentPassword: "Password123!", newPassword: "ONLYUPPERCASE" });
+
+    expect(upperOnly.status).toBe(400);
+    expect(upperOnly.body.message).toContain("lowercase");
+
+    const noDigitOrSymbol = await request(app)
+      .post("/api/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ currentPassword: "Password123!", newPassword: "NoNumberHere" });
+
+    expect(noDigitOrSymbol.status).toBe(400);
+    expect(noDigitOrSymbol.body.message).toContain("number or special symbol");
+
+    const tooShort = await request(app)
+      .post("/api/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ currentPassword: "Password123!", newPassword: "A1b" });
+
+    expect(tooShort.status).toBe(400);
+    expect(tooShort.body.message).toContain("at least 8");
+  });
 });

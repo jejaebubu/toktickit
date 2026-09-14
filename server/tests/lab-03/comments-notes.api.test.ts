@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
@@ -10,7 +10,10 @@ describe("Lab 3 Comments & Internal Notes API Suite (comments-notes.api.test.ts)
 
   beforeAll(async () => {
     const prisma = getPrisma();
-    await prisma.user.updateMany({ data: { mustChangePassword: false, isActive: true } });
+    await prisma.user.updateMany({
+      where: { email: { in: ["alex.it@toktickit.com", "kevin.it@toktickit.com", "emily.it@toktickit.com", "admin@toktickit.com"] } },
+      data: { mustChangePassword: false, isActive: true },
+    });
 
     let reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER", email: "jennifer@toktickit.com" } });
     let ticket = await prisma.ticket.findFirst({ where: { requesterId: reqUser!.id } });
@@ -69,5 +72,10 @@ describe("Lab 3 Comments & Internal Notes API Suite (comments-notes.api.test.ts)
     expect(res.status).toBe(201);
     expect(res.body.content).toBe("Diagnostic check completed. Escalated to tier 2.");
     expect(res.body.author.role).toBe("IT_STAFF");
+  });
+
+  afterAll(async () => {
+    const prisma = getPrisma();
+    await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-COMM-" } } });
   });
 });

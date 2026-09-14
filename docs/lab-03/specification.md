@@ -54,6 +54,7 @@
 - **BR-11**: ตั๋ว 1 ใบอาจมี IT Staff หรือ Admin เป็น primary Ticket Owner ได้เพียง 1 คน (หรือว่างไว้ unassigned)
 - **BR-12**: IT Priority เริ่มต้นจะคัดลอกมาจาก Requested Priority และสามารถแก้ไขได้โดย IT Staff หรือ Admin เท่านั้น
 - **BR-13**: สถานะตั๋วที่อนุญาต ได้แก่ `New`, `Open`, `In Progress`, `Waiting for Requester`, `Resolved`, `Closed`, `Reopened`, `Cancelled`
+- **BR-14**: รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 8 ตัวอักษร, ตัวพิมพ์ใหญ่อย่างน้อย 1, ตัวพิมพ์เล็กอย่างน้อย 1 และตัวเลขหรือสัญลักษณ์พิเศษอย่างน้อย 1
 
 ## 6. UI Specification Summary (สรุปข้อกำหนด UI)
 - **Theme Palette**: Zen Green Theme (Primary `#006B3C`, Secondary `#0B7A46`, Light `#EAF6EF`, Background `#F5F7F6`, Dark Text `#1A202C`)
@@ -111,5 +112,5 @@
 
 ## 11. Assumptions and Decisions (ข้อสมมติฐานและการตัดสินใจ)
 - รหัสผ่านที่สร้างขึ้นใหม่หรือรีเซ็ตโดย Admin จะเข้ารหัสด้วย `bcrypt` ด้วย salt round = 10
-- เซสชันการล็อกอินใช้ Signed Cookie / HTTP-Only Cookie หรือ Bearer Token ที่ปลอดภัย
+- เซสชันการล็อกอินใช้ **Bearer JWT** (JSON Web Token) ที่ลงนามด้วย `JWT_SECRET` และมีอายุ 24 ชั่วโมง (หรือค่าที่กำหนดใน `JWT_EXPIRES_IN`)
 - เมื่อ Admin สั่งตั้งรหัสผ่านใหม่ ค่า `mustChangePassword` จะถูกปรับเป็น `true` โดยอัตโนมัติ

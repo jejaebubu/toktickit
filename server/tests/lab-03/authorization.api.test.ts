@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
@@ -12,6 +12,7 @@ describe("Lab 3 RBAC Authorization Matrix Suite (authorization.api.test.ts)", ()
   beforeAll(async () => {
     const prisma = getPrisma();
     await prisma.user.updateMany({
+      where: { email: { in: ["jennifer@toktickit.com", "alex.it@toktickit.com", "admin@toktickit.com"] } },
       data: { mustChangePassword: false, isActive: true },
     });
 
@@ -88,5 +89,10 @@ describe("Lab 3 RBAC Authorization Matrix Suite (authorization.api.test.ts)", ()
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  afterAll(async () => {
+    const prisma = getPrisma();
+    await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-AUTH-" } } });
   });
 });

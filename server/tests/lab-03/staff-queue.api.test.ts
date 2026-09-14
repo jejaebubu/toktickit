@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
@@ -8,7 +8,10 @@ describe("Lab 3 IT Staff Ticket Queue API Suite (staff-queue.api.test.ts)", () =
 
   beforeAll(async () => {
     const prisma = getPrisma();
-    await prisma.user.updateMany({ data: { mustChangePassword: false, isActive: true } });
+    await prisma.user.updateMany({
+      where: { email: { in: ["alex.it@toktickit.com", "kevin.it@toktickit.com", "emily.it@toktickit.com", "admin@toktickit.com"] } },
+      data: { mustChangePassword: false, isActive: true },
+    });
 
     let count = await prisma.ticket.count();
     if (count === 0) {
@@ -78,5 +81,10 @@ describe("Lab 3 IT Staff Ticket Queue API Suite (staff-queue.api.test.ts)", () =
 
     expect(res.status).toBe(200);
     expect(res.body.tickets.length).toBeGreaterThanOrEqual(1);
+  });
+
+  afterAll(async () => {
+    const prisma = getPrisma();
+    await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-QUEUE-" } } });
   });
 });
