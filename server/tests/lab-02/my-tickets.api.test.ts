@@ -31,12 +31,12 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
     if (!sys) sys = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     system = sys;
 
-    let a = await prisma.requesterUser.findUnique({ where: { email: "test.requester.a@example.com" } });
-    if (!a) a = await prisma.requesterUser.create({ data: { name: "Tester A", email: "test.requester.a@example.com", isActive: true } });
+    let a = await prisma.user.findUnique({ where: { email: "test.requester.a@example.com" } });
+    if (!a) a = await prisma.user.create({ data: { name: "Tester A", email: "test.requester.a@example.com", passwordHash: "dummy", isActive: true } });
     requesterA = a;
 
-    let b = await prisma.requesterUser.findUnique({ where: { email: "test.requester.b@example.com" } });
-    if (!b) b = await prisma.requesterUser.create({ data: { name: "Tester B", email: "test.requester.b@example.com", isActive: true } });
+    let b = await prisma.user.findUnique({ where: { email: "test.requester.b@example.com" } });
+    if (!b) b = await prisma.user.create({ data: { name: "Tester B", email: "test.requester.b@example.com", passwordHash: "dummy", isActive: true } });
     requesterB = b;
 
     const tickets = [
@@ -239,10 +239,10 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
 
   it("API-07i: Rejects inactive or missing requester with 400", async () => {
     const prisma = getPrisma();
-    let inactive = await prisma.requesterUser.findUnique({ where: { email: "test.requester.inactive@example.com" } });
+    let inactive = await prisma.user.findUnique({ where: { email: "test.requester.inactive@example.com" } });
     if (!inactive) {
-      inactive = await prisma.requesterUser.create({
-        data: { name: "Tester Inactive", email: "test.requester.inactive@example.com", isActive: false },
+      inactive = await prisma.user.create({
+        data: { name: "Tester Inactive", email: "test.requester.inactive@example.com", passwordHash: "dummy", isActive: false },
       });
     }
 
