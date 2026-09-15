@@ -67,6 +67,7 @@ describe("Lab 3 IT Staff Ticket Queue API Suite (staff-queue.api.test.ts)", () =
       .query({ itPriority: "MEDIUM", status: "In Progress" });
 
     expect(res.status).toBe(200);
+    expect(res.body.tickets.length).toBeGreaterThanOrEqual(1);
     res.body.tickets.forEach((t: any) => {
       expect(t.itPriority).toBe("MEDIUM");
       expect(t.status).toBe("In Progress");
@@ -81,6 +82,41 @@ describe("Lab 3 IT Staff Ticket Queue API Suite (staff-queue.api.test.ts)", () =
 
     expect(res.status).toBe(200);
     expect(res.body.tickets.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("API-07d: IT Staff filters queue by unassigned tickets (ownerId=unassigned)", async () => {
+    const res = await request(app)
+      .get("/api/tickets")
+      .set("Authorization", `Bearer ${staffToken}`)
+      .query({ ownerId: "unassigned" });
+
+    expect(res.status).toBe(200);
+    res.body.tickets.forEach((t: any) => {
+      expect(t.ownerId).toBeNull();
+    });
+  });
+
+  it("API-07e: Case-insensitive priority filter (lowercase input is uppercased before matching)", async () => {
+    const res = await request(app)
+      .get("/api/tickets")
+      .set("Authorization", `Bearer ${staffToken}`)
+      .query({ requestedPriority: "low", itPriority: "urgent" });
+
+    expect(res.status).toBe(200);
+    res.body.tickets.forEach((t: any) => {
+      expect(t.requestedPriority).toBe("LOW");
+      expect(t.itPriority).toBe("URGENT");
+    });
+  });
+
+  it("API-07f: Invalid ownerId returns 400 Bad Request instead of throwing 500", async () => {
+    const res = await request(app)
+      .get("/api/tickets")
+      .set("Authorization", `Bearer ${staffToken}`)
+      .query({ ownerId: "abc" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Bad Request");
   });
 
   afterAll(async () => {

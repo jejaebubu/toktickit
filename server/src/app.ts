@@ -495,6 +495,8 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
     const userRole = req.user!.role;
     const userId = req.user!.id;
     const VALID_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
+    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
+    const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
 
     // Requester query view (owned tickets only)
     if (userRole === "REQUESTER") {
@@ -507,7 +509,7 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
         return res.status(400).json({ error: "Bad Request", message: "Invalid limit parameter." });
       }
 
-      const validSortFields = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
+      const validSortFields = VALID_SORT_FIELDS;
       if (sort !== undefined && !validSortFields.includes(String(sort))) {
         return res.status(400).json({ error: "Bad Request", message: "Invalid sort parameter." });
       }
@@ -515,12 +517,11 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
         return res.status(400).json({ error: "Bad Request", message: "Invalid order parameter." });
       }
 
-      if (priority !== undefined && !VALID_PRIORITIES.includes(String(priority).toUpperCase())) {
+      if (priority !== undefined && priority !== "" && !VALID_PRIORITIES.includes(String(priority).toUpperCase())) {
         return res.status(400).json({ error: "Bad Request", message: "Invalid priority parameter." });
       }
 
-      const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
-      if (status !== undefined && !VALID_STATUSES.includes(String(status).toUpperCase())) {
+      if (status !== undefined && status !== "" && !VALID_STATUSES.includes(String(status).toUpperCase())) {
         return res.status(400).json({ error: "Bad Request", message: "Invalid status parameter." });
       }
 
@@ -531,9 +532,15 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
           { summary: { contains: String(search), mode: "insensitive" } },
         ];
       }
-      if (category) where.categoryId = Number(category);
-      if (priority) where.requestedPriority = String(priority);
-      if (status) where.status = { equals: String(status), mode: "insensitive" };
+      if (category !== undefined && category !== "") {
+        const categoryId = Number(category);
+        if (isNaN(categoryId)) {
+          return res.status(400).json({ error: "Bad Request", message: "Invalid category parameter." });
+        }
+        where.categoryId = categoryId;
+      }
+      if (priority && priority !== "") where.requestedPriority = String(priority).toUpperCase();
+      if (status && status !== "") where.status = { equals: String(status), mode: "insensitive" };
 
       const pageNum = Math.max(1, parseInt(String(page || 1), 10));
       const limitNum = Math.max(1, parseInt(String(limit || 10), 10));
@@ -570,6 +577,19 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
     // IT Staff & Administrator Queue view
     const { search, category, status, requestedPriority, itPriority, ownerId, sort, order, page, limit } = req.query;
 
+    if (page !== undefined && (isNaN(Number(page)) || Number(page) < 1)) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid page parameter." });
+    }
+    if (limit !== undefined && (isNaN(Number(limit)) || Number(limit) < 1 || Number(limit) > 100)) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid limit parameter." });
+    }
+    if (sort !== undefined && !VALID_SORT_FIELDS.includes(String(sort))) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid sort parameter." });
+    }
+    if (order !== undefined && !["asc", "desc"].includes(String(order).toLowerCase())) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid order parameter." });
+    }
+
     const where: any = {};
     if (search) {
       where.OR = [
@@ -578,16 +598,44 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
         { description: { contains: String(search), mode: "insensitive" } },
       ];
     }
-    if (category) where.categoryId = Number(category);
-    if (status) where.status = { equals: String(status), mode: "insensitive" };
-    if (requestedPriority) where.requestedPriority = String(requestedPriority);
-    if (itPriority) where.itPriority = String(itPriority);
+    if (category !== undefined && category !== "") {
+      const categoryId = Number(category);
+      if (isNaN(categoryId)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid category parameter." });
+      }
+      where.categoryId = categoryId;
+    }
+    if (status !== undefined && status !== "") {
+      const s = String(status).toUpperCase();
+      if (!VALID_STATUSES.includes(s)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid status parameter." });
+      }
+      where.status = { equals: String(status), mode: "insensitive" };
+    }
+    if (requestedPriority !== undefined && requestedPriority !== "") {
+      const p = String(requestedPriority).toUpperCase();
+      if (!VALID_PRIORITIES.includes(p)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid requestedPriority parameter." });
+      }
+      where.requestedPriority = p;
+    }
+    if (itPriority !== undefined && itPriority !== "") {
+      const p = String(itPriority).toUpperCase();
+      if (!VALID_PRIORITIES.includes(p)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid itPriority parameter." });
+      }
+      where.itPriority = p;
+    }
 
     if (ownerId !== undefined && ownerId !== "") {
       if (ownerId === "unassigned" || ownerId === "null") {
         where.ownerId = null;
       } else {
-        where.ownerId = Number(ownerId);
+        const ownerIdNum = Number(ownerId);
+        if (isNaN(ownerIdNum)) {
+          return res.status(400).json({ error: "Bad Request", message: "Invalid ownerId parameter." });
+        }
+        where.ownerId = ownerIdNum;
       }
     }
 
@@ -595,8 +643,7 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
     const limitNum = Math.max(1, parseInt(String(limit || 10), 10));
     const skip = (pageNum - 1) * limitNum;
 
-    const validSortFields = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
-    const sortField = validSortFields.includes(String(sort)) ? String(sort) : "createdAt";
+    const sortField = String(sort || "createdAt");
     const sortOrder = String(order || "desc").toLowerCase() === "asc" ? "asc" : "desc";
 
     const [tickets, total] = await Promise.all([
