@@ -163,10 +163,10 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
     expect(beyond.body.tickets).toHaveLength(0);
   });
 
-  it("API-07g: Rejects missing requester header with 400", async () => {
+  it("API-07g: Missing credentials header returns 401 Unauthorized", async () => {
     const res = await request(app).get("/api/tickets");
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("Bad Request");
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("Unauthorized");
   });
 
   it("API-07h: Rejects invalid query parameters with 400", async () => {

@@ -96,7 +96,7 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
     expect(resNoSummary.body.error).toBe("Bad Request");
     expect(resNoSummary.body.message).toBe("Validation failed: 'summary' is required.");
 
-    // Missing X-Requester-Id / Authorization header
+    // Missing X-Requester-Id / Authorization header — now 401 (auth foundation, spec §6.2)
     const resNoHeader = await request(app)
       .post("/api/tickets")
       .send({
@@ -107,8 +107,8 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
         requestedPriority: "HIGH",
       });
 
-    expect(resNoHeader.status).toBe(400);
-    expect(resNoHeader.body.error).toBe("Bad Request");
+    expect(resNoHeader.status).toBe(401);
+    expect(resNoHeader.body.error).toBe("Unauthorized");
 
     // Invalid priority
     const resInvalidPriority = await request(app)

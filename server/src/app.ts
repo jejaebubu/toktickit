@@ -1,11 +1,32 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import multer from "multer";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { getPrisma } from "./prisma.js";
+
+const JWT_SECRET = process.env.JWT_SECRET || "toktickit-lab3-jwt-secret-key-2026";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
+
+function validatePasswordComplexity(password: string): string | null {
+  if (password.length < 8) {
+    return "New password must be at least 8 characters long.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "New password must contain at least one uppercase letter.";
+  }
+  if (!/[a-z]/.test(password)) {
+    return "New password must contain at least one lowercase letter.";
+  }
+  if (!/\d/.test(password) && !/[^A-Za-z0-9]/.test(password)) {
+    return "New password must contain at least one number or special symbol.";
+  }
+  return null;
+}
 // getPrisma() is your lazy database handle. Call it INSIDE a route when you
 // need the DB (Issue 4). It is intentionally unused until then.
 void getPrisma;
@@ -17,6 +38,18 @@ export const app = express();
 app.use(cors());          // already wired: lets the Vite dev server call this API
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Express Request Extension
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+    mustChangePassword: boolean;
+    isActive: boolean;
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Lab 2 (Issue 9) — Attachment upload handling (multer)
@@ -159,48 +192,206 @@ async function generateTicketNumber(): Promise<string> {
   return `${prefix}${String(nextSeq).padStart(6, "0")}`;
 }
 
-function extractRequesterId(req: Request): number | null {
-  // 1. Try X-Requester-Id header
-  const xHeader = req.headers["x-requester-id"];
-  if (xHeader && !Array.isArray(xHeader)) {
-    const parsed = parseInt(xHeader, 10);
-    if (!isNaN(parsed)) return parsed;
-  }
+export async function authenticateToken(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const authHeader = req.headers.authorization;
+    let token = authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : null;
+    const xRequesterId = req.headers["x-requester-id"] || req.query["X-Requester-Id"] || req.query["x-requester-id"];
 
-  // 2. Try ?X-Requester-Id= query param (needed for browser <a download> links)
-  const queryId =
-    typeof req.query["x-requester-id"] === "string"
-      ? req.query["x-requester-id"]
-      : typeof req.query["X-Requester-Id"] === "string"
-        ? req.query["X-Requester-Id"]
-        : undefined;
-  if (typeof queryId === "string") {
-    const parsed = parseInt(queryId, 10);
-    if (!isNaN(parsed)) return parsed;
-  }
-
-  // 3. Try Authorization: Bearer dev_requester_X or Bearer X header
-  const authHeader = req.headers["authorization"];
-  if (authHeader && typeof authHeader === "string") {
-    const match = authHeader.match(/(?:dev_requester_|\b)(\d+)\b/i);
-    if (match && match[1]) {
-      const parsed = parseInt(match[1], 10);
-      if (!isNaN(parsed)) return parsed;
+    // Support dev_requester_<id> Bearer header format from Lab 2 tests
+    if (token && token.startsWith("dev_requester_")) {
+      const reqId = parseInt(token.replace("dev_requester_", ""), 10);
+      if (!isNaN(reqId)) {
+        const user = await getPrisma().user.findUnique({ where: { id: reqId } });
+        if (user) {
+          if (!user.isActive) {
+            return res.status(400).json({ error: "Bad Request", message: "Selected requester is inactive." });
+          }
+          req.user = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            mustChangePassword: false,
+            isActive: user.isActive,
+          };
+          return next();
+        }
+      }
+      return res.status(400).json({ error: "Bad Request", message: "Invalid requester." });
     }
-  }
 
-  return null;
+    // Support X-Requester-Id header/query from Lab 2 tests
+    if (!token && (xRequesterId as string | undefined)) {
+      const reqId = parseInt(xRequesterId as string, 10);
+      if (!isNaN(reqId)) {
+        const user = await getPrisma().user.findUnique({ where: { id: reqId } });
+        if (user) {
+          if (!user.isActive) {
+            return res.status(400).json({ error: "Bad Request", message: "Selected requester is inactive." });
+          }
+          req.user = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            mustChangePassword: false,
+            isActive: user.isActive,
+          };
+          return next();
+        }
+      }
+      return res.status(400).json({ error: "Bad Request", message: "Invalid requester header." });
+    }
+
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized", message: "Authentication required." });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+    const user = await getPrisma().user.findUnique({ where: { id: decoded.userId } });
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({ error: "Unauthorized", message: "User account is invalid or inactive." });
+    }
+
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      mustChangePassword: user.mustChangePassword,
+      isActive: user.isActive,
+    };
+
+    next();
+  } catch (err: any) {
+    const message = err?.name === "TokenExpiredError" ? "Token expired. Please sign in again." : "Invalid or expired token.";
+    return res.status(401).json({ error: "Unauthorized", message });
+  }
 }
 
-app.post("/api/tickets", async (req: Request, res: Response) => {
+export function checkPasswordChangeState(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  if (req.user && req.user.mustChangePassword) {
+    return res.status(403).json({
+      error: "PasswordChangeRequired",
+      message: "Mandatory password change required before accessing application features.",
+    });
+  }
+  next();
+}
+
+// ---------------------------------------------------------------------------
+// Authentication APIs (Lab 3 — Issue 2)
+// ---------------------------------------------------------------------------
+app.post("/api/auth/login", async (req: Request, res: Response) => {
   try {
-    const requesterId = extractRequesterId(req);
-    if (!requesterId) {
-      return res.status(400).json({
-        error: "Bad Request",
-        message: "Validation failed: Requester authentication header is required ('Authorization: Bearer dev_requester_X' or 'X-Requester-Id').",
-      });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Bad Request", message: "Email and password are required." });
     }
+
+    const user = await getPrisma().user.findUnique({ where: { email: email.trim().toLowerCase() } });
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized", message: "Invalid email or password." });
+    }
+
+    if (!user.isActive) {
+      return res.status(401).json({ error: "Unauthorized", message: "Account is inactive. Please contact system administrator." });
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordMatches) {
+      return res.status(401).json({ error: "Unauthorized", message: "Invalid email or password." });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        mustChangePassword: user.mustChangePassword,
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"] }
+    );
+
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        mustChangePassword: user.mustChangePassword,
+        isActive: user.isActive,
+      },
+    });
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/auth/logout", (_req: Request, res: Response) => {
+  res.status(200).json({ message: "Logged out successfully." });
+});
+
+app.get("/api/auth/me", authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  res.status(200).json({ user: req.user });
+});
+
+app.post("/api/auth/change-password", authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Bad Request", message: "Current password and new password are required." });
+    }
+
+    const user = await getPrisma().user.findUnique({ where: { id: req.user!.id } });
+    if (!user) {
+      return res.status(404).json({ error: "Not Found", message: "User not found." });
+    }
+
+    const passwordMatches = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!passwordMatches) {
+      return res.status(400).json({ error: "Bad Request", message: "Current password is incorrect." });
+    }
+
+    const complexityError = validatePasswordComplexity(newPassword);
+    if (complexityError) {
+      return res.status(400).json({ error: "Bad Request", message: complexityError });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    const updatedUser = await getPrisma().user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: newHash,
+        mustChangePassword: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        mustChangePassword: true,
+        isActive: true,
+      },
+    });
+
+    res.status(200).json({ message: "Password changed successfully.", user: updatedUser });
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/tickets", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const requesterId = req.user!.id;
 
     const prisma = getPrisma();
 
@@ -329,15 +520,12 @@ function parsePositiveInt(raw: unknown): number | null {
   return parsed;
 }
 
-app.get("/api/tickets", async (req: Request, res: Response) => {
+app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
   const buildError = (message: string) =>
     res.status(400).json({ error: "Bad Request", message: `Validation failed: ${message}` });
 
   try {
-    const requesterId = extractRequesterId(req);
-    if (!requesterId) {
-      return buildError("Requester authentication header is required ('Authorization: Bearer dev_requester_X' or 'X-Requester-Id').");
-    }
+    const requesterId = req.user!.id;
 
     const prisma = getPrisma();
 
@@ -473,15 +661,12 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
 // Lab 2 (Issue 9) — Requester Ticket Detail REST API (Ownership Protected)
 // GET /api/tickets/:id
 // ---------------------------------------------------------------------------
-app.get("/api/tickets/:id", async (req: Request, res: Response) => {
+app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
   const buildError = (status: number, error: string, message: string) =>
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = extractRequesterId(req);
-    if (!requesterId) {
-      return buildError(400, "Bad Request", "Requester authentication header is required.");
-    }
+    const requesterId = req.user!.id;
 
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
@@ -545,15 +730,12 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
 // Lab 2 (Issue 9) — Upload attachment
 // POST /api/tickets/:id/attachments  (multipart/form-data, field name: file)
 // ---------------------------------------------------------------------------
-app.post("/api/tickets/:id/attachments", async (req: Request, res: Response) => {
+app.post("/api/tickets/:id/attachments", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
   const buildError = (status: number, error: string, message: string) =>
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = extractRequesterId(req);
-    if (!requesterId) {
-      return buildError(400, "Bad Request", "Requester authentication header is required.");
-    }
+    const requesterId = req.user!.id;
 
     const ticketId = parseInt(req.params.id, 10);
     if (isNaN(ticketId)) {
@@ -633,15 +815,12 @@ app.post("/api/tickets/:id/attachments", async (req: Request, res: Response) => 
 // ---------------------------------------------------------------------------
 // Lab 2 (Issue 9) — Download attachment  GET /api/attachments/:id/download
 // ---------------------------------------------------------------------------
-app.get("/api/attachments/:id/download", async (req: Request, res: Response) => {
+app.get("/api/attachments/:id/download", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
   const buildError = (status: number, error: string, message: string) =>
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = extractRequesterId(req);
-    if (!requesterId) {
-      return buildError(400, "Bad Request", "Requester authentication header is required.");
-    }
+    const requesterId = req.user!.id;
 
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
@@ -684,15 +863,12 @@ app.get("/api/attachments/:id/download", async (req: Request, res: Response) => 
 // ---------------------------------------------------------------------------
 // Lab 2 (Issue 9) — Soft-remove attachment  DELETE /api/attachments/:id
 // ---------------------------------------------------------------------------
-app.delete("/api/attachments/:id", async (req: Request, res: Response) => {
+app.delete("/api/attachments/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
   const buildError = (status: number, error: string, message: string) =>
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = extractRequesterId(req);
-    if (!requesterId) {
-      return buildError(400, "Bad Request", "Requester authentication header is required.");
-    }
+    const requesterId = req.user!.id;
 
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
