@@ -96,6 +96,12 @@ export interface TicketResponse {
   requesterId: number;
 }
 
+export interface QueueUserRef {
+  id: number;
+  name: string;
+  email: string;
+}
+
 export interface TicketListItem {
   id: number;
   ticketNumber: string;
@@ -108,6 +114,11 @@ export interface TicketListItem {
   categoryName: string;
   relatedSystemId: number;
   relatedSystemName: string;
+  description?: string;
+  itPriority?: string;
+  requester?: QueueUserRef;
+  owner?: QueueUserRef | null;
+  requesterIndicatedResolved?: boolean;
 }
 
 export interface TicketsMeta {
@@ -127,6 +138,19 @@ export interface MyTicketsQuery {
   category?: number;
   priority?: string;
   status?: string;
+  sort?: string;
+  order?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+}
+
+export interface StaffQueueQuery {
+  search?: string;
+  category?: number;
+  status?: string;
+  requestedPriority?: string;
+  itPriority?: string;
+  ownerId?: string;
   sort?: string;
   order?: "asc" | "desc";
   page?: number;
@@ -223,6 +247,31 @@ export async function fetchMyTickets(query: MyTicketsQuery): Promise<TicketsPage
   return res.json();
 }
 
+export async function fetchTicketQueue(query: StaffQueueQuery): Promise<TicketsPage> {
+  const params = new URLSearchParams();
+  if (query.search && query.search.trim() !== "") params.set("search", query.search.trim());
+  if (query.category) params.set("category", String(query.category));
+  if (query.status) params.set("status", query.status);
+  if (query.requestedPriority) params.set("requestedPriority", query.requestedPriority);
+  if (query.itPriority) params.set("itPriority", query.itPriority);
+  if (query.ownerId) params.set("ownerId", query.ownerId);
+  if (query.sort) params.set("sort", query.sort);
+  if (query.order) params.set("order", query.order);
+  if (query.page) params.set("page", String(query.page));
+  if (query.limit) params.set("limit", String(query.limit));
+
+  const res = await fetch(`${API_URL}/api/tickets?${params.toString()}`, {
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to fetch ticket queue");
+  }
+
+  return res.json();
+}
+
 export interface Attachment {
   id: number;
   originalName: string;
@@ -235,6 +284,13 @@ export interface Attachment {
   createdAt: string;
 }
 
+export interface ConversationEntry {
+  id: number;
+  content: string;
+  createdAt: string;
+  author: { id: number; name: string; email: string; role: string };
+}
+
 export interface TicketDetail {
   id: number;
   ticketNumber: string;
@@ -245,10 +301,15 @@ export interface TicketDetail {
   status: string;
   createdAt: string;
   updatedAt: string;
+  requesterId: number;
+  requesterIndicatedResolved: boolean;
   requester: { id: number; name: string; email: string };
+  owner: { id: number; name: string; email: string } | null;
   category: { id: number; name: string };
   relatedSystem: { id: number; name: string };
   attachments: Attachment[];
+  publicComments?: ConversationEntry[];
+  internalNotes?: ConversationEntry[];
 }
 
 export interface RemoveAttachmentResult {
@@ -326,5 +387,151 @@ export async function createTicket(payload: CreateTicketPayload): Promise<Ticket
     throw new Error(errorData.message || "Failed to create ticket");
   }
 
+  return res.json();
+}
+
+export interface TicketUpdatePayload {
+  ownerId?: number | "unassigned" | null;
+  itPriority?: string;
+  status?: string;
+}
+
+export async function updateTicket(ticketId: number, payload: TicketUpdatePayload): Promise<TicketDetail> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}`, {
+    method: "PATCH",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || `Failed to update ticket ${ticketId}`);
+  }
+  return res.json();
+}
+
+export async function fetchTicketComments(ticketId: number): Promise<ConversationEntry[]> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/comments`, { headers: authHeaders() });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to fetch comments");
+  }
+  return res.json();
+}
+
+export async function postTicketComment(ticketId: number, content: string): Promise<ConversationEntry> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/comments`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ content }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to post comment");
+  }
+  return res.json();
+}
+
+export async function fetchInternalNotes(ticketId: number): Promise<ConversationEntry[]> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/internal-notes`, { headers: authHeaders() });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to fetch internal notes");
+  }
+  return res.json();
+}
+
+export async function postInternalNote(ticketId: number, content: string): Promise<ConversationEntry> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/internal-notes`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ content }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to post internal note");
+  }
+  return res.json();
+}
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: "REQUESTER" | "IT_STAFF" | "ADMINISTRATOR";
+  isActive: boolean;
+  mustChangePassword: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminUserQuery {
+  search?: string;
+  role?: string;
+}
+
+export async function fetchUsers(query: AdminUserQuery = {}): Promise<AdminUser[]> {
+  const params = new URLSearchParams();
+  if (query.search && query.search.trim() !== "") params.set("search", query.search.trim());
+  if (query.role && query.role !== "ALL") params.set("role", query.role);
+
+  const res = await fetch(`${API_URL}/api/users?${params.toString()}`, { headers: authHeaders() });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to fetch users");
+  }
+  return res.json();
+}
+
+export interface CreateUserPayload {
+  name: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  initialPassword: string;
+}
+
+export async function createUser(payload: CreateUserPayload): Promise<AdminUser> {
+  const res = await fetch(`${API_URL}/api/users`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to create user");
+  }
+  return res.json();
+}
+
+export interface UpdateUserPayload {
+  name?: string;
+  email?: string;
+  role?: string;
+  isActive?: boolean;
+}
+
+export async function updateUser(id: number, payload: UpdateUserPayload): Promise<AdminUser> {
+  const res = await fetch(`${API_URL}/api/users/${id}`, {
+    method: "PATCH",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to update user");
+  }
+  return res.json();
+}
+
+export async function resetUserPassword(id: number, initialPassword: string): Promise<{ message: string }> {
+  const res = await fetch(`${API_URL}/api/users/${id}/reset-password`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ initialPassword }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || "Failed to reset password");
+  }
   return res.json();
 }

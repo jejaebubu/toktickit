@@ -17,7 +17,10 @@ const detailData: TicketDetailData = {
   status: "New",
   createdAt: "2026-09-01T10:00:00.000Z",
   updatedAt: "2026-09-02T10:00:00.000Z",
+  requesterId: 1,
+  requesterIndicatedResolved: false,
   requester: { id: 1, name: "Jennifer Anderson", email: "jennifer@example.com" },
+  owner: { id: 2, name: "Sam Patel", email: "sam@example.com" },
   category: { id: 1, name: "Network" },
   relatedSystem: { id: 2, name: "Campus Wi-Fi" },
   attachments: [

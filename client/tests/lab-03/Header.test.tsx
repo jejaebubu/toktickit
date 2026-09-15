@@ -87,10 +87,10 @@ describe("Auth-03: Header, Navigation & Logout", () => {
     expect(screen.queryByTestId("header-nav-my-tickets")).not.toBeInTheDocument();
     expect(screen.queryByTestId("header-nav-create-ticket")).not.toBeInTheDocument();
     expect(screen.queryByTestId("header-nav-user-management")).not.toBeInTheDocument();
-    expect(screen.getByTestId("ticket-queue-coming-soon")).toBeInTheDocument();
+    expect(screen.getByTestId("staff-queue-card")).toBeInTheDocument();
   });
 
-  it("Auth-03d: Admin shell shows User Management nav only and admin spotlight", async () => {
+  it("Auth-03d: Admin shell shows User Management nav only and admin screen", async () => {
     await waitForShell({ role: "ADMINISTRATOR" });
 
     expect(screen.getByTestId("header-role-badge")).toHaveTextContent("Admin");
@@ -98,7 +98,7 @@ describe("Auth-03: Header, Navigation & Logout", () => {
     expect(screen.queryByTestId("header-nav-my-tickets")).not.toBeInTheDocument();
     expect(screen.queryByTestId("header-nav-create-ticket")).not.toBeInTheDocument();
     expect(screen.queryByTestId("header-nav-ticket-queue")).not.toBeInTheDocument();
-    expect(screen.getByTestId("user-management-coming-soon")).toBeInTheDocument();
+    expect(screen.getByTestId("user-mgmt-card")).toBeInTheDocument();
   });
 
   it("Auth-03e: Change Password from user menu opens the embedded change password form", async () => {
