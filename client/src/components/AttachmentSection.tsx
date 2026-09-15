@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import {
   Attachment,
-  getAttachmentDownloadUrl,
+  downloadAttachment,
   removeAttachment,
   uploadAttachment,
 } from "../api.js";
 
 interface AttachmentSectionProps {
   ticketId: number;
-  requesterId: number;
   attachments: Attachment[];
   onAttachmentsChange: (attachments: Attachment[]) => void;
   onError: (message: string | null) => void;
@@ -26,7 +25,6 @@ function formatSize(bytes: number): string {
 
 export const AttachmentSection: React.FC<AttachmentSectionProps> = ({
   ticketId,
-  requesterId,
   attachments,
   onAttachmentsChange,
   onError,
@@ -62,7 +60,7 @@ export const AttachmentSection: React.FC<AttachmentSectionProps> = ({
 
     setIsUploading(true);
     try {
-      const created = await uploadAttachment(ticketId, file, requesterId);
+      const created = await uploadAttachment(ticketId, file);
       onAttachmentsChange([...attachments, created]);
       onSuccess?.(`"${created.originalName}" uploaded successfully.`);
     } catch (err: any) {
@@ -82,7 +80,7 @@ export const AttachmentSection: React.FC<AttachmentSectionProps> = ({
     }
     setRemovingId(pendingRemoveId);
     try {
-      const updated = await removeAttachment(pendingRemoveId, removeReason.trim(), requesterId);
+      const updated = await removeAttachment(pendingRemoveId, removeReason.trim());
       onAttachmentsChange(
         attachments.map((a) => (a.id === updated.id ? { ...a, ...updated } : a))
       );
@@ -149,14 +147,17 @@ export const AttachmentSection: React.FC<AttachmentSectionProps> = ({
                 </span>
               ) : (
                 <div className="d-flex align-items-center gap-2">
-                  <a
+                  <button
+                    type="button"
                     className="btn btn-sm btn-outline-success fw-semibold"
-                    href={getAttachmentDownloadUrl(att.id, requesterId)}
-                    download
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void downloadAttachment(att.id, att.originalName);
+                    }}
                     data-testid={`attachment-download-${att.id}`}
                   >
                     Download
-                  </a>
+                  </button>
                   <button
                     type="button"
                     className="btn btn-sm btn-outline-danger fw-semibold"
