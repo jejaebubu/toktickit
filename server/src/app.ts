@@ -17,6 +17,17 @@ const JWT_SECRET: string = (() => {
   return secret;
 })();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
+const TICKET_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
+const TICKET_STATUSES: Record<string, string> = {
+  NEW: "New",
+  OPEN: "Open",
+  "IN PROGRESS": "In Progress",
+  "WAITING FOR REQUESTER": "Waiting for Requester",
+  RESOLVED: "Resolved",
+  CLOSED: "Closed",
+  REOPENED: "Reopened",
+  CANCELLED: "Cancelled",
+};
 
 function validatePasswordComplexity(password: string): string | null {
   if (password.length < 8) {
@@ -763,13 +774,36 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
     const dataToUpdate: any = {};
 
     if (ownerId !== undefined) {
-      dataToUpdate.ownerId = ownerId === null || ownerId === "unassigned" ? null : Number(ownerId);
+      if (ownerId === null || ownerId === "unassigned") {
+        dataToUpdate.ownerId = null;
+      } else {
+        const ownerIdNum = Number(ownerId);
+        if (isNaN(ownerIdNum)) {
+          return res.status(400).json({ error: "Bad Request", message: "Invalid ownerId parameter." });
+        }
+        const ownerUser = await getPrisma().user.findUnique({ where: { id: ownerIdNum } });
+        if (!ownerUser || !ownerUser.isActive || (ownerUser.role !== "IT_STAFF" && ownerUser.role !== "ADMINISTRATOR")) {
+          return res.status(400).json({ error: "Bad Request", message: "Owner must be an active IT Staff or Administrator." });
+        }
+        dataToUpdate.ownerId = ownerIdNum;
+      }
     }
     if (itPriority !== undefined) {
-      dataToUpdate.itPriority = String(itPriority);
+      const p = String(itPriority).toUpperCase();
+      if (!TICKET_PRIORITIES.includes(p as typeof TICKET_PRIORITIES[number])) {
+        return res.status(400).json({ error: "Bad Request", message: `Invalid itPriority. Allowed: ${TICKET_PRIORITIES.join(", ")}` });
+      }
+      dataToUpdate.itPriority = p;
     }
     if (status !== undefined) {
-      dataToUpdate.status = String(status);
+      const s = String(status).toUpperCase();
+      const canonicalStatus = TICKET_STATUSES[s];
+      if (!canonicalStatus) {
+        return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${Object.values(TICKET_STATUSES).join(", ")}` });
+      }
+      dataToUpdate.status = canonicalStatus;
+      // Staff-initiated status change clears any stale requester resolution intent
+      dataToUpdate.requesterIndicatedResolved = false;
     }
 
     const updatedTicket = await getPrisma().ticket.update({
@@ -831,6 +865,9 @@ app.post("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeStat
     const { content } = req.body;
     if (!content || content.trim().length === 0) {
       return res.status(400).json({ error: "Validation Error", message: "Comment content cannot be empty." });
+    }
+    if (content.trim().length > 1000) {
+      return res.status(400).json({ error: "Validation Error", message: "Comment content must not exceed 1000 characters." });
     }
 
     const comment = await getPrisma().publicComment.create({

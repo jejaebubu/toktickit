@@ -127,8 +127,73 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
     expect(patchRes.status).toBe(404);
   });
 
+  it("API-12: IT Staff PATCH rejects invalid ownerId (nonexistent / requester / non-numeric) with 400", async () => {
+    const missing = await request(app)
+      .patch(`/api/tickets/${targetTicketId}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ ownerId: 999999 });
+    expect(missing.status).toBe(400);
+
+    const prisma = getPrisma();
+    const aRequester = await prisma.user.findFirst({ where: { role: "REQUESTER" } });
+    const requesterAsOwner = await request(app)
+      .patch(`/api/tickets/${targetTicketId}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ ownerId: aRequester!.id });
+    expect(requesterAsOwner.status).toBe(400);
+
+    const nonNumeric = await request(app)
+      .patch(`/api/tickets/${targetTicketId}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ ownerId: "abc" });
+    expect(nonNumeric.status).toBe(400);
+  });
+
+  it("API-13: IT Staff PATCH rejects invalid itPriority / status with 400 (BR-13)", async () => {
+    const badPriority = await request(app)
+      .patch(`/api/tickets/${targetTicketId}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ itPriority: "BOGUS" });
+    expect(badPriority.status).toBe(400);
+
+    const badStatus = await request(app)
+      .patch(`/api/tickets/${targetTicketId}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ status: "BogusState" });
+    expect(badStatus.status).toBe(400);
+  });
+
+  it("API-14: Staff status change clears stale requesterIndicatedResolved flag", async () => {
+    const prisma = getPrisma();
+    let cat = await prisma.category.findFirst() || await prisma.category.create({ data: { name: "Hardware" } });
+    let sys = await prisma.relatedSystem.findFirst() || await prisma.relatedSystem.create({ data: { name: "Corporate Laptop", isActive: true } });
+    const flagged = await prisma.ticket.create({
+      data: {
+        ticketNumber: `TKT-2026-FLAG-${Date.now()}`,
+        requesterId: (await prisma.user.findFirst({ where: { role: "REQUESTER" } }))!.id,
+        categoryId: cat.id,
+        relatedSystemId: sys.id,
+        summary: "Flag reset test ticket",
+        description: "Flag reset description",
+        requestedPriority: "MEDIUM",
+        status: "Waiting for Requester",
+        requesterIndicatedResolved: true,
+      },
+    });
+
+    const res = await request(app)
+      .patch(`/api/tickets/${flagged.id}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ status: "In Progress" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.requesterIndicatedResolved).toBe(false);
+    expect(res.body.status).toBe("In Progress");
+  });
+
   afterAll(async () => {
     const prisma = getPrisma();
+    await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-FLAG-" } } });
     await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-NOLEAK-" } } });
     await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-RESOLVE-" } } });
     await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-DETAIL-" } } });

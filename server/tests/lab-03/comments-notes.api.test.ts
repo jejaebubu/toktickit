@@ -63,6 +63,15 @@ describe("Lab 3 Comments & Internal Notes API Suite (comments-notes.api.test.ts)
     expect(res.status).toBe(400);
   });
 
+  it("API-10b2: Overlong Public Comment content (>1000 chars) is rejected with 400 Bad Request", async () => {
+    const res = await request(app)
+      .post(`/api/tickets/${targetTicketId}/comments`)
+      .set("Authorization", `Bearer ${requesterToken}`)
+      .send({ content: "x".repeat(1001) });
+
+    expect(res.status).toBe(400);
+  });
+
   it("API-10c: IT Staff posts an Internal Note successfully", async () => {
     const res = await request(app)
       .post(`/api/tickets/${targetTicketId}/internal-notes`)
