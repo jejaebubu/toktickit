@@ -155,14 +155,14 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(res.body.message).toContain("File size");
   });
 
-  it("API-04d: Upload to another requester's ticket returns 403 Forbidden", async () => {
+  it("API-04d: Upload to another requester's ticket returns 404 Not Found (§6.2 no data leakage)", async () => {
     const res = await request(app)
       .post(`/api/tickets/${ticketId}/attachments`)
       .set("Authorization", `Bearer ${otherToken}`)
       .attach("file", Buffer.from("hack attempt"), { filename: "hack.pdf", contentType: "application/pdf" });
 
-    expect(res.status).toBe(403);
-    expect(res.body.error).toBe("Forbidden");
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("Not Found");
   });
 
   it("API-04e: Max 5 active attachments enforced — 6th upload returns 400", async () => {
@@ -279,7 +279,7 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     expect(res.body.message).toContain("already been removed");
   });
 
-  it("API-05e: Another requester cannot download, remove, or upload attachments (403)", async () => {
+  it("API-05e: Another requester cannot download, remove, or upload attachments (404 §6.2)", async () => {
     const prisma = getPrisma();
     const att = await prisma.attachment.findFirst({ where: { ticketId } });
     expect(att).toBeTruthy();
@@ -287,12 +287,12 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     const dl = await request(app)
       .get(`/api/attachments/${att!.id}/download`)
       .set("Authorization", `Bearer ${otherToken}`);
-    expect(dl.status).toBe(403);
+    expect(dl.status).toBe(404);
 
     const del = await request(app)
       .delete(`/api/attachments/${att!.id}`)
       .set("Authorization", `Bearer ${otherToken}`)
       .send({ reason: "theft" });
-    expect(del.status).toBe(403);
+    expect(del.status).toBe(404);
   });
 });

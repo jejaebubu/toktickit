@@ -17,6 +17,17 @@ const JWT_SECRET: string = (() => {
   return secret;
 })();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
+const TICKET_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
+const TICKET_STATUSES: Record<string, string> = {
+  NEW: "New",
+  OPEN: "Open",
+  "IN PROGRESS": "In Progress",
+  "WAITING FOR REQUESTER": "Waiting for Requester",
+  RESOLVED: "Resolved",
+  CLOSED: "Closed",
+  REOPENED: "Reopened",
+  CANCELLED: "Cancelled",
+};
 
 function validatePasswordComplexity(password: string): string | null {
   if (password.length < 8) {
@@ -679,67 +690,198 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
 // GET /api/tickets/:id
 // ---------------------------------------------------------------------------
 app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
-  const buildError = (status: number, error: string, message: string) =>
-    res.status(status).json({ error, message });
-
   try {
-    const requesterId = req.user!.id;
-
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
-      return buildError(404, "Not Found", `Ticket with ID ${req.params.id} not found.`);
+      return res.status(404).json({ error: "Not Found", message: "Invalid ticket ID." });
     }
 
-    const prisma = getPrisma();
-    const ticket = await prisma.ticket.findUnique({
+    const ticket = await getPrisma().ticket.findUnique({
       where: { id },
       include: {
-        requester: { select: { id: true, name: true, email: true } },
         category: { select: { id: true, name: true } },
         relatedSystem: { select: { id: true, name: true } },
-        attachments: {
+        requester: { select: { id: true, name: true, email: true } },
+        owner: { select: { id: true, name: true, email: true } },
+        attachments: true,
+        publicComments: {
           orderBy: { createdAt: "asc" },
-          select: {
-            id: true,
-            originalName: true,
-            filename: true,
-            mimeType: true,
-            size: true,
-            isRemoved: true,
-            removeReason: true,
-            removedAt: true,
-            createdAt: true,
-          },
+          include: { author: { select: { id: true, name: true, email: true, role: true } } },
         },
+        internalNotes: req.user!.role !== "REQUESTER" ? {
+          orderBy: { createdAt: "asc" },
+          include: { author: { select: { id: true, name: true, email: true, role: true } } },
+        } : false,
       },
     });
 
     if (!ticket) {
-      return buildError(404, "Not Found", `Ticket with ID ${id} not found.`);
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
     }
 
-    if (ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "Access denied. You do not have permission to view this ticket.");
+    // Ownership check for Requester
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
     }
 
-    return res.status(200).json({
-      id: ticket.id,
-      ticketNumber: ticket.ticketNumber,
-      summary: ticket.summary,
-      description: ticket.description,
-      requestedPriority: ticket.requestedPriority,
-      itPriority: ticket.itPriority,
-      status: ticket.status,
-      createdAt: ticket.createdAt,
-      updatedAt: ticket.updatedAt,
-      requester: ticket.requester,
-      category: ticket.category,
-      relatedSystem: ticket.relatedSystem,
-      attachments: ticket.attachments,
-    });
+    res.status(200).json(ticket);
   } catch (err: any) {
-    console.error("Error retrieving ticket detail:", err);
-    return buildError(500, "Internal Server Error", err?.message || "Failed to retrieve ticket details.");
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 3 (Issue 7) — IT Staff Ticket Operations
+// PATCH /api/tickets/:id (claim/assign owner, IT priority, status,
+// requester "Waiting for Requester" resolution indication)
+// ---------------------------------------------------------------------------
+app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid ticket ID" });
+    }
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id } });
+    if (!ticket) {
+      return res.status(404).json({ error: "Ticket not found" });
+    }
+
+    const { ownerId, itPriority, status, requesterIndicatedResolved } = req.body;
+
+    // Requester special action: Indicate problem appears resolved (AC-08, FR-09)
+    if (req.user!.role === "REQUESTER") {
+      if (ticket.requesterId !== req.user!.id) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+      if (requesterIndicatedResolved === true) {
+        const updated = await getPrisma().ticket.update({
+          where: { id },
+          data: { requesterIndicatedResolved: true, status: "Waiting for Requester" },
+          include: {
+            category: true,
+            relatedSystem: true,
+            requester: { select: { id: true, name: true, email: true } },
+            owner: { select: { id: true, name: true, email: true } },
+          },
+        });
+        return res.status(200).json(updated);
+      }
+      return res.status(403).json({ error: "Forbidden", message: "Requesters cannot formally update ticket status or assignment." });
+    }
+
+    // IT Staff / Admin ticket workflow updates
+    const dataToUpdate: any = {};
+
+    if (ownerId !== undefined) {
+      if (ownerId === null || ownerId === "unassigned") {
+        dataToUpdate.ownerId = null;
+      } else {
+        const ownerIdNum = Number(ownerId);
+        if (isNaN(ownerIdNum)) {
+          return res.status(400).json({ error: "Bad Request", message: "Invalid ownerId parameter." });
+        }
+        const ownerUser = await getPrisma().user.findUnique({ where: { id: ownerIdNum } });
+        if (!ownerUser || !ownerUser.isActive || (ownerUser.role !== "IT_STAFF" && ownerUser.role !== "ADMINISTRATOR")) {
+          return res.status(400).json({ error: "Bad Request", message: "Owner must be an active IT Staff or Administrator." });
+        }
+        dataToUpdate.ownerId = ownerIdNum;
+      }
+    }
+    if (itPriority !== undefined) {
+      const p = String(itPriority).toUpperCase();
+      if (!TICKET_PRIORITIES.includes(p as typeof TICKET_PRIORITIES[number])) {
+        return res.status(400).json({ error: "Bad Request", message: `Invalid itPriority. Allowed: ${TICKET_PRIORITIES.join(", ")}` });
+      }
+      dataToUpdate.itPriority = p;
+    }
+    if (status !== undefined) {
+      const s = String(status).toUpperCase();
+      const canonicalStatus = TICKET_STATUSES[s];
+      if (!canonicalStatus) {
+        return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${Object.values(TICKET_STATUSES).join(", ")}` });
+      }
+      dataToUpdate.status = canonicalStatus;
+      // Staff-initiated status change clears any stale requester resolution intent
+      dataToUpdate.requesterIndicatedResolved = false;
+    }
+
+    const updatedTicket = await getPrisma().ticket.update({
+      where: { id },
+      data: dataToUpdate,
+      include: {
+        category: true,
+        relatedSystem: true,
+        requester: { select: { id: true, name: true, email: true } },
+        owner: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    res.status(200).json(updatedTicket);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Public Comments & Internal Notes APIs
+// ---------------------------------------------------------------------------
+app.get("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    if (isNaN(ticketId)) return res.status(400).json({ error: "Invalid ticket ID" });
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+
+    const comments = await getPrisma().publicComment.findMany({
+      where: { ticketId },
+      orderBy: { createdAt: "asc" },
+      include: { author: { select: { id: true, name: true, email: true, role: true } } },
+    });
+
+    res.status(200).json(comments);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+app.post("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    if (isNaN(ticketId)) return res.status(400).json({ error: "Invalid ticket ID" });
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+
+    const { content } = req.body;
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ error: "Validation Error", message: "Comment content cannot be empty." });
+    }
+    if (content.trim().length > 1000) {
+      return res.status(400).json({ error: "Validation Error", message: "Comment content must not exceed 1000 characters." });
+    }
+
+    const comment = await getPrisma().publicComment.create({
+      data: {
+        ticketId,
+        authorId: req.user!.id,
+        content: content.trim(),
+      },
+      include: { author: { select: { id: true, name: true, email: true, role: true } } },
+    });
+
+    res.status(201).json(comment);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
   }
 });
 
@@ -752,8 +894,6 @@ app.post("/api/tickets/:id/attachments", authenticateToken, checkPasswordChangeS
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = req.user!.id;
-
     const ticketId = parseInt(req.params.id, 10);
     if (isNaN(ticketId)) {
       return buildError(404, "Not Found", `Ticket with ID ${req.params.id} not found.`);
@@ -768,8 +908,8 @@ app.post("/api/tickets/:id/attachments", authenticateToken, checkPasswordChangeS
     if (!ticket) {
       return buildError(404, "Not Found", `Ticket with ID ${ticketId} not found.`);
     }
-    if (ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "You cannot add attachments to this ticket.");
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return buildError(404, "Not Found", `Ticket with ID ${ticketId} not found.`);
     }
 
     const uploadErr = await processUpload(req, res);
@@ -837,8 +977,6 @@ app.get("/api/attachments/:id/download", authenticateToken, checkPasswordChangeS
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = req.user!.id;
-
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return buildError(404, "Not Found", `Attachment with ID ${req.params.id} not found.`);
@@ -853,8 +991,8 @@ app.get("/api/attachments/:id/download", authenticateToken, checkPasswordChangeS
     if (!attachment) {
       return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
-    if (attachment.ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "You do not have permission to download this attachment.");
+    if (req.user!.role === "REQUESTER" && attachment.ticket.requesterId !== req.user!.id) {
+      return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
     if (attachment.isRemoved) {
       return buildError(400, "Bad Request", "Attachment has been removed and cannot be downloaded.");
@@ -885,8 +1023,6 @@ app.delete("/api/attachments/:id", authenticateToken, checkPasswordChangeState, 
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = req.user!.id;
-
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return buildError(404, "Not Found", `Attachment with ID ${req.params.id} not found.`);
@@ -906,8 +1042,8 @@ app.delete("/api/attachments/:id", authenticateToken, checkPasswordChangeState, 
     if (!attachment) {
       return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
-    if (attachment.ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "You do not have permission to remove this attachment.");
+    if (req.user!.role === "REQUESTER" && attachment.ticket.requesterId !== req.user!.id) {
+      return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
     if (attachment.isRemoved) {
       return buildError(400, "Bad Request", "Attachment has already been removed.");
