@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor, within, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MyTicketsList } from "../../src/components/MyTicketsList.js";
-import { RequesterProvider } from "../../src/context/RequesterContext.js";
+import { AuthProvider } from "../../src/context/AuthContext.js";
 import { TicketsPage } from "../../src/api.js";
 
 const mockRequester = { id: 1, name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true };
@@ -31,7 +31,7 @@ function okRes(data: unknown) {
 
 describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
   beforeEach(() => {
-    localStorage.setItem("toktickit_requester", JSON.stringify(mockRequester));
+    localStorage.setItem("toktickit_token", "test-token");
 
     ticketsPage = {
       tickets: [makeTicket(1), makeTicket(2), makeTicket(3)],
@@ -39,6 +39,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     };
 
     fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) {
+        return okRes({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } });
+      }
       if (url.includes("/api/requesters")) return okRes([mockRequester]);
       if (url.includes("/api/categories")) {
         return okRes([
@@ -65,9 +68,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
 
   it("UI-05: Renders My Tickets table with ticket rows, badges, and total count", async () => {
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const table = await screen.findByTestId("my-tickets-table");
@@ -87,9 +90,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
 
   it("UI-06: Search and filter dropdowns send correct query params to the API", async () => {
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     // Wait for initial load
@@ -139,9 +142,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     };
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await screen.findByTestId("my-tickets-table");
@@ -173,9 +176,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     };
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -195,9 +198,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
 
   it("UI-09: Sort select and Ascending/Descending toggle send sort & order params", async () => {
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await screen.findByTestId("my-tickets-table");
@@ -221,6 +224,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
 
   it("UI-10: Shows red error alert when the API fails (e.g. 500)", async () => {
     fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) {
+        return okRes({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } });
+      }
       if (url.includes("/api/requesters")) return okRes([mockRequester]);
       if (url.includes("/api/categories")) {
         return okRes([
@@ -244,9 +250,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -264,9 +270,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     };
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await screen.findByTestId("my-tickets-table");
@@ -298,6 +304,9 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     });
 
     fetchMock.mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) {
+        return okRes({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } });
+      }
       if (url.includes("/api/requesters")) return okRes([mockRequester]);
       if (url.includes("/api/categories")) return okRes([{ id: 1, name: "Network" }]);
       if (url.includes("/api/tickets")) return pending;
@@ -305,12 +314,12 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
     });
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
-    const loading = screen.getByTestId("my-tickets-loading");
+    const loading = await screen.findByTestId("my-tickets-loading");
     expect(loading).toBeInTheDocument();
     expect(loading).toHaveTextContent("Loading your tickets...");
 
@@ -325,18 +334,18 @@ describe("UI-05..UI-09: My Tickets List Screen (FR-05..FR-08)", () => {
 
   it("UI-26: Changing refreshKey refetches the ticket list (auto-refresh after create)", async () => {
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await screen.findByTestId("my-tickets-table");
     expect(ticketUrls()).toHaveLength(1);
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <MyTicketsList refreshKey={1} />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {

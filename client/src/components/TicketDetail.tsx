@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ApiError, TicketDetail as TicketDetailData, fetchTicketDetail } from "../api.js";
-import { useRequester } from "../context/RequesterContext.js";
+import { useAuth } from "../context/AuthContext.js";
 import { AttachmentSection } from "./AttachmentSection.js";
 
 interface TicketDetailProps {
@@ -30,7 +30,7 @@ function statusColor(status: string): string {
 }
 
 export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) => {
-  const { selectedRequester } = useRequester();
+  const { user } = useAuth();
   const [ticket, setTicket] = useState<TicketDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,18 +38,18 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   useEffect(() => {
-    if (!selectedRequester) return;
+    if (!user) return;
     let cancelled = false;
     setIsLoading(true);
     setError(null);
-    fetchTicketDetail(ticketId, selectedRequester.id)
+    fetchTicketDetail(ticketId)
       .then((data) => {
         if (!cancelled) setTicket(data);
       })
       .catch((err: any) => {
         if (!cancelled) {
           setError(err?.message || "Failed to load ticket details.");
-          setIsUnauthorized(err instanceof ApiError && err.status === 403);
+          setIsUnauthorized(err instanceof ApiError && (err.status === 401 || err.status === 403));
         }
       })
       .finally(() => {
@@ -58,9 +58,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
     return () => {
       cancelled = true;
     };
-  }, [ticketId, selectedRequester?.id]);
-
-  if (!selectedRequester) return null;
+  }, [ticketId, user]);
 
   return (
     <div className="card border-0 shadow-sm p-4 mb-4" style={{ borderRadius: "16px", backgroundColor: "#FFFFFF" }}>
@@ -179,7 +177,6 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <h3 className="h5 fw-bold text-dark mb-3">Attachments</h3>
           <AttachmentSection
             ticketId={ticket.id}
-            requesterId={ticket.requester.id}
             attachments={ticket.attachments}
             onAttachmentsChange={(atts) => setTicket((prev) => (prev ? { ...prev, attachments: atts } : prev))}
             onError={(msg) => {
