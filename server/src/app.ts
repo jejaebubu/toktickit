@@ -710,7 +710,7 @@ app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (
 
     // Ownership check for Requester
     if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
-      return res.status(403).json({ error: "Forbidden", message: "You do not have permission to view this ticket." });
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
     }
 
     res.status(200).json(ticket);
@@ -736,17 +736,17 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
       return res.status(404).json({ error: "Ticket not found" });
     }
 
-    const { ownerId, itPriority, status, requesterResolution } = req.body;
+    const { ownerId, itPriority, status, requesterIndicatedResolved } = req.body;
 
-    // Requester special action: Indicate problem appears resolved
+    // Requester special action: Indicate problem appears resolved (AC-08, FR-09)
     if (req.user!.role === "REQUESTER") {
       if (ticket.requesterId !== req.user!.id) {
-        return res.status(403).json({ error: "Forbidden", message: "You do not have permission to update this ticket." });
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
       }
-      if (requesterResolution === true || status === "Waiting for Requester") {
+      if (requesterIndicatedResolved === true) {
         const updated = await getPrisma().ticket.update({
           where: { id },
-          data: { status: "Waiting for Requester" },
+          data: { requesterIndicatedResolved: true, status: "Waiting for Requester" },
           include: {
             category: true,
             relatedSystem: true,
@@ -801,7 +801,7 @@ app.get("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeState
     if (!ticket) return res.status(404).json({ error: "Ticket not found" });
 
     if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
     }
 
     const comments = await getPrisma().publicComment.findMany({
@@ -825,7 +825,7 @@ app.post("/api/tickets/:id/comments", authenticateToken, checkPasswordChangeStat
     if (!ticket) return res.status(404).json({ error: "Ticket not found" });
 
     if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
     }
 
     const { content } = req.body;
@@ -857,8 +857,6 @@ app.post("/api/tickets/:id/attachments", authenticateToken, checkPasswordChangeS
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = req.user!.id;
-
     const ticketId = parseInt(req.params.id, 10);
     if (isNaN(ticketId)) {
       return buildError(404, "Not Found", `Ticket with ID ${req.params.id} not found.`);
@@ -873,8 +871,8 @@ app.post("/api/tickets/:id/attachments", authenticateToken, checkPasswordChangeS
     if (!ticket) {
       return buildError(404, "Not Found", `Ticket with ID ${ticketId} not found.`);
     }
-    if (ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "You cannot add attachments to this ticket.");
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return buildError(404, "Not Found", `Ticket with ID ${ticketId} not found.`);
     }
 
     const uploadErr = await processUpload(req, res);
@@ -942,8 +940,6 @@ app.get("/api/attachments/:id/download", authenticateToken, checkPasswordChangeS
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = req.user!.id;
-
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return buildError(404, "Not Found", `Attachment with ID ${req.params.id} not found.`);
@@ -958,8 +954,8 @@ app.get("/api/attachments/:id/download", authenticateToken, checkPasswordChangeS
     if (!attachment) {
       return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
-    if (attachment.ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "You do not have permission to download this attachment.");
+    if (req.user!.role === "REQUESTER" && attachment.ticket.requesterId !== req.user!.id) {
+      return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
     if (attachment.isRemoved) {
       return buildError(400, "Bad Request", "Attachment has been removed and cannot be downloaded.");
@@ -990,8 +986,6 @@ app.delete("/api/attachments/:id", authenticateToken, checkPasswordChangeState, 
     res.status(status).json({ error, message });
 
   try {
-    const requesterId = req.user!.id;
-
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return buildError(404, "Not Found", `Attachment with ID ${req.params.id} not found.`);
@@ -1011,8 +1005,8 @@ app.delete("/api/attachments/:id", authenticateToken, checkPasswordChangeState, 
     if (!attachment) {
       return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
-    if (attachment.ticket.requesterId !== requesterId) {
-      return buildError(403, "Forbidden", "You do not have permission to remove this attachment.");
+    if (req.user!.role === "REQUESTER" && attachment.ticket.requesterId !== req.user!.id) {
+      return buildError(404, "Not Found", `Attachment with ID ${id} not found.`);
     }
     if (attachment.isRemoved) {
       return buildError(400, "Bad Request", "Attachment has already been removed.");

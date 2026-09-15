@@ -84,15 +84,15 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     expect(res.body).toHaveProperty("updatedAt");
   });
 
-  it("API-03b: Another requester gets 403 Forbidden (Ownership Protection)", async () => {
+  it("API-03b: Another requester gets 404 Not Found for others' tickets (§6.2 no data leakage)", async () => {
     const token = await loginAs(OTHER_EMAIL);
     const res = await request(app)
       .get(`/api/tickets/${ticketId}`)
       .set("Authorization", `Bearer ${token}`);
 
-    expect(res.status).toBe(403);
-    expect(res.body.error).toBe("Forbidden");
-    expect(res.body.message).toContain("permission");
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("Not Found");
+    expect(res.body.message).toContain("not found");
   });
 
   it("API-03c: Nonexistent or malformed ticket ID returns 404 Not Found", async () => {
