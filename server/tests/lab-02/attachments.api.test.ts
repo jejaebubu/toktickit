@@ -26,12 +26,12 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     let sys = await prisma.relatedSystem.findFirst({ where: { isActive: true } });
     if (!sys) sys = await prisma.relatedSystem.create({ data: { name: "ERP System", isActive: true } });
 
-    let a = await prisma.requesterUser.findUnique({ where: { email: OWNER_EMAIL } });
-    if (!a) a = await prisma.requesterUser.create({ data: { name: "Attachment Owner", email: OWNER_EMAIL, isActive: true } });
+    let a = await prisma.user.findUnique({ where: { email: OWNER_EMAIL } });
+    if (!a) a = await prisma.user.create({ data: { name: "Attachment Owner", email: OWNER_EMAIL, passwordHash: "dummy", isActive: true } });
     owner = a;
 
-    let b = await prisma.requesterUser.findUnique({ where: { email: OTHER_EMAIL } });
-    if (!b) b = await prisma.requesterUser.create({ data: { name: "Attachment Other", email: OTHER_EMAIL, isActive: true } });
+    let b = await prisma.user.findUnique({ where: { email: OTHER_EMAIL } });
+    if (!b) b = await prisma.user.create({ data: { name: "Attachment Other", email: OTHER_EMAIL, passwordHash: "dummy", isActive: true } });
     other = b;
 
     const t = await prisma.ticket.create({
@@ -58,7 +58,7 @@ describe("Attachment API (Issue 9 - Upload / Download / Soft-Remove)", () => {
     }
     await prisma.attachment.deleteMany({ where: { ticketId } });
     await prisma.ticket.deleteMany({ where: { id: ticketId } });
-    await prisma.requesterUser.deleteMany({ where: { email: { in: [OWNER_EMAIL, OTHER_EMAIL] } } });
+    await prisma.user.deleteMany({ where: { email: { in: [OWNER_EMAIL, OTHER_EMAIL] } } });
   });
 
   it("API-04a: Upload valid PDF attachment successfully (201)", async () => {

@@ -88,7 +88,7 @@ app.get("/api/categories", async (_req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 app.get("/api/requesters", async (_req: Request, res: Response) => {
   try {
-    const requesters = await getPrisma().requesterUser.findMany({
+    const requesters = await getPrisma().user.findMany({
       where: { isActive: true },
       orderBy: { id: "asc" },
       select: {
@@ -205,7 +205,7 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
     const prisma = getPrisma();
 
     // Verify requester exists and is active
-    const requester = await prisma.requesterUser.findUnique({
+    const requester = await prisma.user.findUnique({
       where: { id: requesterId },
     });
     if (!requester || !requester.isActive) {
@@ -341,7 +341,7 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
 
     const prisma = getPrisma();
 
-    const requester = await prisma.requesterUser.findUnique({
+    const requester = await prisma.user.findUnique({
       where: { id: requesterId },
     });
     if (!requester || !requester.isActive) {

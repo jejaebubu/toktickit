@@ -23,10 +23,10 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
       system = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     }
 
-    let requester = await prisma.requesterUser.findFirst({ where: { isActive: true } });
+    let requester = await prisma.user.findFirst({ where: { isActive: true } });
     if (!requester) {
-      requester = await prisma.requesterUser.create({
-        data: { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true },
+      requester = await prisma.user.create({
+        data: { name: "Jennifer Anderson", email: "jennifer@example.com", passwordHash: "dummy", isActive: true },
       });
     }
 
