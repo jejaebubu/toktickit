@@ -475,156 +475,202 @@ app.post("/api/tickets", authenticateToken, checkPasswordChangeState, async (req
   }
 });
 
-// ---------------------------------------------------------------------------
-// Lab 2 (Issue 7) — My Tickets List REST API (Search, Filter, Sort, Page)
-// GET /api/tickets?search=&category=&priority=&status=&sort=&order=&page=&limit=
-// ---------------------------------------------------------------------------
-const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "summary", "requestedPriority", "status"];
-const VALID_STATUS = ["New", "In Progress", "Resolved", "Closed", "Rejected"];
-const DEFAULT_PAGE_SIZE = 10;
-const MAX_PAGE_SIZE = 50;
-
-function parsePositiveInt(raw: unknown): number | null {
-  if (typeof raw !== "string" || raw.trim() === "") return null;
-  const parsed = Number.parseInt(raw, 10);
-  if (Number.isNaN(parsed) || parsed < 1) return null;
-  return parsed;
+function formatTicket(t: any) {
+  if (!t) return t;
+  return {
+    ...t,
+    categoryName: t.category?.name,
+    relatedSystemName: t.relatedSystem?.name,
+  };
 }
 
+// ---------------------------------------------------------------------------
+// Lab 3 (Issue 6) — IT Staff Ticket Queue & Requester My Tickets
+// GET /api/tickets (role-aware requester queue / staff queue with
+// search, category, status, requestedPriority, itPriority, ownerId filters,
+// sorting, pagination with meta + pagination metadata)
+// ---------------------------------------------------------------------------
 app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
-  const buildError = (message: string) =>
-    res.status(400).json({ error: "Bad Request", message: `Validation failed: ${message}` });
-
   try {
-    const requesterId = req.user!.id;
+    const userRole = req.user!.role;
+    const userId = req.user!.id;
+    const VALID_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
+    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
+    const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
 
-    const prisma = getPrisma();
+    // Requester query view (owned tickets only)
+    if (userRole === "REQUESTER") {
+      const { search, category, priority, status, sort, order, page, limit } = req.query;
 
-    const requester = await prisma.user.findUnique({
-      where: { id: requesterId },
-    });
-    if (!requester || !requester.isActive) {
-      return buildError("Requester not found or inactive.");
+      if (page !== undefined && (isNaN(Number(page)) || Number(page) < 1)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid page parameter." });
+      }
+      if (limit !== undefined && (isNaN(Number(limit)) || Number(limit) < 1 || Number(limit) > 100)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid limit parameter." });
+      }
+
+      const validSortFields = VALID_SORT_FIELDS;
+      if (sort !== undefined && !validSortFields.includes(String(sort))) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid sort parameter." });
+      }
+      if (order !== undefined && !["asc", "desc"].includes(String(order).toLowerCase())) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid order parameter." });
+      }
+
+      if (priority !== undefined && priority !== "" && !VALID_PRIORITIES.includes(String(priority).toUpperCase())) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid priority parameter." });
+      }
+
+      if (status !== undefined && status !== "" && !VALID_STATUSES.includes(String(status).toUpperCase())) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid status parameter." });
+      }
+
+      const where: any = { requesterId: userId };
+      if (search) {
+        where.OR = [
+          { ticketNumber: { contains: String(search), mode: "insensitive" } },
+          { summary: { contains: String(search), mode: "insensitive" } },
+        ];
+      }
+      if (category !== undefined && category !== "") {
+        const categoryId = Number(category);
+        if (isNaN(categoryId)) {
+          return res.status(400).json({ error: "Bad Request", message: "Invalid category parameter." });
+        }
+        where.categoryId = categoryId;
+      }
+      if (priority && priority !== "") where.requestedPriority = String(priority).toUpperCase();
+      if (status && status !== "") where.status = { equals: String(status), mode: "insensitive" };
+
+      const pageNum = Math.max(1, parseInt(String(page || 1), 10));
+      const limitNum = Math.max(1, parseInt(String(limit || 10), 10));
+      const skip = (pageNum - 1) * limitNum;
+
+      const sortField = String(sort || "createdAt");
+      const sortOrder = String(order || "desc").toLowerCase() === "asc" ? "asc" : "desc";
+
+      const [tickets, total] = await Promise.all([
+        getPrisma().ticket.findMany({
+          where,
+          orderBy: { [sortField]: sortOrder },
+          skip,
+          take: limitNum,
+          include: {
+            category: true,
+            relatedSystem: true,
+            requester: { select: { id: true, name: true, email: true } },
+            owner: { select: { id: true, name: true, email: true } },
+            attachments: { where: { isRemoved: false } },
+          },
+        }),
+        getPrisma().ticket.count({ where }),
+      ]);
+
+      const metaObj = { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) };
+      return res.status(200).json({
+        tickets: tickets.map(formatTicket),
+        meta: metaObj,
+        pagination: metaObj,
+      });
     }
 
-    const pageRaw = typeof req.query.page === "string" ? req.query.page.trim() : "";
-    let page = 1;
-    if (pageRaw !== "") {
-      const p = parsePositiveInt(pageRaw);
-      if (p === null) return buildError("'page' must be a positive integer.");
-      page = p;
+    // IT Staff & Administrator Queue view
+    const { search, category, status, requestedPriority, itPriority, ownerId, sort, order, page, limit } = req.query;
+
+    if (page !== undefined && (isNaN(Number(page)) || Number(page) < 1)) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid page parameter." });
+    }
+    if (limit !== undefined && (isNaN(Number(limit)) || Number(limit) < 1 || Number(limit) > 100)) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid limit parameter." });
+    }
+    if (sort !== undefined && !VALID_SORT_FIELDS.includes(String(sort))) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid sort parameter." });
+    }
+    if (order !== undefined && !["asc", "desc"].includes(String(order).toLowerCase())) {
+      return res.status(400).json({ error: "Bad Request", message: "Invalid order parameter." });
     }
 
-    const limitRaw = typeof req.query.limit === "string" ? req.query.limit.trim() : "";
-    let limit = DEFAULT_PAGE_SIZE;
-    if (limitRaw !== "") {
-      const l = parsePositiveInt(limitRaw);
-      if (l === null) return buildError("'limit' must be a positive integer between 1 and 50.");
-      if (l > MAX_PAGE_SIZE) return buildError(`'limit' must be between 1 and ${MAX_PAGE_SIZE}.`);
-      limit = l;
-    }
-
-    const sort = typeof req.query.sort === "string" && VALID_SORT_FIELDS.includes(req.query.sort)
-      ? req.query.sort
-      : null;
-    if (typeof req.query.sort === "string" && req.query.sort !== "" && !sort) {
-      return buildError(`'sort' must be one of ${VALID_SORT_FIELDS.join(", ")}.`);
-    }
-
-    const order = req.query.order === "asc" ? "asc" : req.query.order === "desc" ? "desc" : null;
-    if (typeof req.query.order === "string" && req.query.order !== "" && !order) {
-      return buildError("'order' must be 'asc' or 'desc'.");
-    }
-
-    const categoryRaw = typeof req.query.category === "string" ? req.query.category.trim() : "";
-    let categoryId: number | undefined;
-    if (categoryRaw !== "") {
-      const c = parsePositiveInt(categoryRaw);
-      if (c === null) return buildError("'category' must be a positive integer.");
-      categoryId = c;
-    }
-
-    const priority = typeof req.query.priority === "string" ? req.query.priority : undefined;
-    if (priority !== undefined && priority !== "" && !VALID_PRIORITIES.includes(priority)) {
-      return buildError(`'priority' must be one of ${VALID_PRIORITIES.join(", ")}.`);
-    }
-
-    const rawStatus = typeof req.query.status === "string" && req.query.status.trim() !== ""
-      ? req.query.status.trim()
-      : undefined;
-    // Normalize case-insensitively (e.g. ?status=new matches "New") and use the canonical value
-    const status = rawStatus
-      ? VALID_STATUS.find((s) => s.toUpperCase() === rawStatus.toUpperCase())
-      : undefined;
-    if (rawStatus !== undefined && !status) {
-      return buildError(`'status' must be one of ${VALID_STATUS.join(", ")}.`);
-    }
-
-    const search = typeof req.query.search === "string" && req.query.search.trim() !== ""
-      ? req.query.search.trim()
-      : undefined;
-
-    const where: any = { requesterId };
-    if (categoryId) where.categoryId = categoryId;
-    if (priority) where.requestedPriority = priority;
-    if (status) where.status = status;
+    const where: any = {};
     if (search) {
       where.OR = [
-        { ticketNumber: { contains: search, mode: "insensitive" } },
-        { summary: { contains: search, mode: "insensitive" } },
+        { ticketNumber: { contains: String(search), mode: "insensitive" } },
+        { summary: { contains: String(search), mode: "insensitive" } },
+        { description: { contains: String(search), mode: "insensitive" } },
       ];
     }
+    if (category !== undefined && category !== "") {
+      const categoryId = Number(category);
+      if (isNaN(categoryId)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid category parameter." });
+      }
+      where.categoryId = categoryId;
+    }
+    if (status !== undefined && status !== "") {
+      const s = String(status).toUpperCase();
+      if (!VALID_STATUSES.includes(s)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid status parameter." });
+      }
+      where.status = { equals: String(status), mode: "insensitive" };
+    }
+    if (requestedPriority !== undefined && requestedPriority !== "") {
+      const p = String(requestedPriority).toUpperCase();
+      if (!VALID_PRIORITIES.includes(p)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid requestedPriority parameter." });
+      }
+      where.requestedPriority = p;
+    }
+    if (itPriority !== undefined && itPriority !== "") {
+      const p = String(itPriority).toUpperCase();
+      if (!VALID_PRIORITIES.includes(p)) {
+        return res.status(400).json({ error: "Bad Request", message: "Invalid itPriority parameter." });
+      }
+      where.itPriority = p;
+    }
+
+    if (ownerId !== undefined && ownerId !== "") {
+      if (ownerId === "unassigned" || ownerId === "null") {
+        where.ownerId = null;
+      } else {
+        const ownerIdNum = Number(ownerId);
+        if (isNaN(ownerIdNum)) {
+          return res.status(400).json({ error: "Bad Request", message: "Invalid ownerId parameter." });
+        }
+        where.ownerId = ownerIdNum;
+      }
+    }
+
+    const pageNum = Math.max(1, parseInt(String(page || 1), 10));
+    const limitNum = Math.max(1, parseInt(String(limit || 10), 10));
+    const skip = (pageNum - 1) * limitNum;
+
+    const sortField = String(sort || "createdAt");
+    const sortOrder = String(order || "desc").toLowerCase() === "asc" ? "asc" : "desc";
 
     const [tickets, total] = await Promise.all([
-      prisma.ticket.findMany({
+      getPrisma().ticket.findMany({
         where,
-        orderBy: [{ [sort ?? "createdAt"]: order ?? "desc" }, { id: "desc" }],
-        skip: (page - 1) * limit,
-        take: limit,
-        select: {
-          id: true,
-          ticketNumber: true,
-          summary: true,
-          requestedPriority: true,
-          status: true,
-          createdAt: true,
-          updatedAt: true,
-          categoryId: true,
-          category: { select: { name: true } },
-          relatedSystemId: true,
-          relatedSystem: { select: { name: true } },
+        orderBy: { [sortField]: sortOrder },
+        skip,
+        take: limitNum,
+        include: {
+          category: { select: { id: true, name: true } },
+          relatedSystem: { select: { id: true, name: true } },
+          requester: { select: { id: true, name: true, email: true } },
+          owner: { select: { id: true, name: true, email: true } },
+          attachments: { where: { isRemoved: false } },
         },
       }),
-      prisma.ticket.count({ where }),
+      getPrisma().ticket.count({ where }),
     ]);
 
-    return res.status(200).json({
-      tickets: tickets.map((t) => ({
-        id: t.id,
-        ticketNumber: t.ticketNumber,
-        summary: t.summary,
-        requestedPriority: t.requestedPriority,
-        status: t.status,
-        createdAt: t.createdAt,
-        updatedAt: t.updatedAt,
-        categoryId: t.categoryId,
-        categoryName: t.category.name,
-        relatedSystemId: t.relatedSystemId,
-        relatedSystemName: t.relatedSystem.name,
-      })),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+    const metaObj = { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) };
+    res.status(200).json({
+      tickets: tickets.map(formatTicket),
+      meta: metaObj,
+      pagination: metaObj,
     });
   } catch (err: any) {
-    console.error("Error listing tickets:", err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-      message: err?.message || "Failed to retrieve tickets.",
-    });
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
   }
 });
 
