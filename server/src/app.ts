@@ -285,6 +285,18 @@ export function checkPasswordChangeState(req: AuthenticatedRequest, res: Respons
   next();
 }
 
+export function requireRole(...allowedRoles: string[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized", message: "Authentication required." });
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: "Forbidden", message: "You do not have permission to perform this action." });
+    }
+    next();
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Authentication APIs (Lab 3 — Issue 2)
 // ---------------------------------------------------------------------------
@@ -912,6 +924,81 @@ app.delete("/api/attachments/:id", authenticateToken, checkPasswordChangeState, 
   } catch (err: any) {
     console.error("Error removing attachment:", err);
     return buildError(500, "Internal Server Error", err?.message || "Failed to soft-remove attachment.");
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 3 — Internal Notes (IT_STAFF / ADMINISTRATOR only)
+// ---------------------------------------------------------------------------
+app.get("/api/tickets/:id/internal-notes", authenticateToken, checkPasswordChangeState, requireRole("IT_STAFF", "ADMINISTRATOR"), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    if (isNaN(ticketId)) return res.status(400).json({ error: "Invalid ticket ID" });
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    const notes = await getPrisma().internalNote.findMany({
+      where: { ticketId },
+      orderBy: { createdAt: "asc" },
+      include: { author: { select: { id: true, name: true, email: true, role: true } } },
+    });
+
+    res.status(200).json(notes);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+app.post("/api/tickets/:id/internal-notes", authenticateToken, checkPasswordChangeState, requireRole("IT_STAFF", "ADMINISTRATOR"), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    if (isNaN(ticketId)) return res.status(400).json({ error: "Invalid ticket ID" });
+
+    const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    const { content } = req.body;
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ error: "Validation Error", message: "Internal note content cannot be empty." });
+    }
+
+    const note = await getPrisma().internalNote.create({
+      data: {
+        ticketId,
+        authorId: req.user!.id,
+        content: content.trim(),
+      },
+      include: { author: { select: { id: true, name: true, email: true, role: true } } },
+    });
+
+    res.status(201).json(note);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 3 — Administrator User Management (ADMINISTRATOR only)
+// ---------------------------------------------------------------------------
+app.get("/api/users", authenticateToken, checkPasswordChangeState, requireRole("ADMINISTRATOR"), async (req: Request, res: Response) => {
+  try {
+    const users = await getPrisma().user.findMany({
+      orderBy: { id: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        mustChangePassword: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    res.status(200).json(users);
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
