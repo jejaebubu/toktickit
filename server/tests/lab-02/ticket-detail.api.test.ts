@@ -99,9 +99,9 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     expect(malformed.body.error).toBe("Not Found");
   });
 
-  it("API-03d: Missing requester header returns 400 Bad Request", async () => {
+  it("API-03d: Missing credentials header returns 401 Unauthorized", async () => {
     const res = await request(app).get(`/api/tickets/${ticketId}`);
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("Bad Request");
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("Unauthorized");
   });
 });
