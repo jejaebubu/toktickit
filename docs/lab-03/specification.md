@@ -16,7 +16,7 @@
 - ปุ่มแสดงเจตนา "Problem Appears Resolved" สำหรับ Requester
 - หน้าจอบริหารจัดการผู้ใช้สำหรับ Administrator (User List, ค้นหา/กรอง, สร้างผู้ใช้ใหม่พร้อม 1 บทบาท, แก้ไขข้อมูลพื้นฐาน, เปิด/ปิดใช้งานบัญชี, ตั้งรหัสผ่านเริ่มต้นใหม่)
 - กฎความปลอดภัยของ Admin: ห้ามปิดใช้งานบัญชีตนเอง, ห้ามระบบขาด Active Admin, ห้ามใช้อีเมลซ้ำ
-- ข้อมูล Seed Data แบบ Idempotent สำหรับการทดสอบครบถ้วนทุกบทบาท
+- ข้อมูล Seed Data แบบ Idempotent สำหรับการทดสอบครบถ้วนทุกบทบาท ตามจำนวนขั้นต่ำของ Handout §5.3: Requester แบบ Active 4 บัญชี + Inactive 1 บัญชี, IT Staff แบบ Active 3 บัญชี + Inactive 1 บัญชี, Administrator แบบ Active 1 บัญชี
 - สไตล์ Zen Green Theme และ Responsive Layout (Desktop, Tablet, Mobile)
 
 ### Excluded (สิ่งที่ยังไม่รวมในสปรินต์นี้)
@@ -55,6 +55,23 @@
 - **BR-12**: IT Priority เริ่มต้นจะคัดลอกมาจาก Requested Priority และสามารถแก้ไขได้โดย IT Staff หรือ Admin เท่านั้น
 - **BR-13**: สถานะตั๋วที่อนุญาต ได้แก่ `New`, `Open`, `In Progress`, `Waiting for Requester`, `Resolved`, `Closed`, `Reopened`, `Cancelled`
 
+### Authorization Matrix (ตารางสิทธิ์การเข้าถึงตามบทบาท)
+| ฟังก์ชัน / การทำงาน | REQUESTER | IT_STAFF | ADMINISTRATOR |
+| :--- | :---: | :---: | :---: |
+| ล็อกอิน / ล็อกเอาต์ / เปลี่ยนรหัสผ่านตนเอง | ✓ | ✓ | ✓ |
+| สร้างตั๋ว, ดู "My Tickets", แนบไฟล์ (Regression Lab 2) | ✓ | ✗ | ✗ |
+| ดูรายละเอียดตั๋วของตนเอง | ✓ | ✓ | ✓ |
+| ดู Ticket Detail / Ticket Queue ของทุกตั๋ว | ✗ (ตอบ `404` สำหรับตั๋วของผู้อื่น) | ✓ | ✓ |
+| โพสต์ / ดู Public Comment | ✓ (เฉพาะตั๋วตนเอง) | ✓ | ✓ |
+| ดู / โพสต์ Internal Note | ✗ (`403`) | ✓ | ✓ |
+| Claim ตั๋ว (รับเป็น Owner) | ✗ | ✓ | ✓ |
+| Assign / Reassign เจ้าของตั๋ว | ✗ | ✓ | ✓ |
+| ตั้ง / เปลี่ยน IT Priority | ✗ | ✓ | ✓ |
+| เปลี่ยนสถานะตั๋วตาม Workflow (ยกเว้นระบุเจตนา) | ✗ (`403`) | ✓ | ✓ |
+| ระบุเจตนา "Problem Appears Resolved" (`requesterIndicatedResolved`) | ✓ (เฉพาะตั๋วตนเอง) | ✗ | ✗ |
+| ดูรายชื่อผู้ใช้ (User Management) | ✗ | ✗ | ✓ |
+| สร้าง / แก้ไข / ปิดใช้งาน / รีเซ็ตรหัสผ่านผู้ใช้ | ✗ | ✗ | ✓ |
+
 ## 6. UI Specification Summary (สรุปข้อกำหนด UI)
 - **Theme Palette**: Zen Green Theme (Primary `#006B3C`, Secondary `#0B7A46`, Light `#EAF6EF`, Background `#F5F7F6`, Dark Text `#1A202C`)
 - **Application Shell**:
@@ -70,6 +87,7 @@
 - ปรับปรุงโมเดล `Ticket`:
   - เปลี่ยน `requesterId` ให้เชื่อมกับ `User.id`
   - เพิ่ม `ownerId` (Int?, Foreign Key ถึง `User.id`)
+- เพิ่ม `requesterIndicatedResolved` (Boolean, `@default(false)`) สำหรับบันทึกเจตนา "Problem Appears Resolved" ของ Requester (FR-09/BR-05)
 - เพิ่มโมเดล `PublicComment`:
   - `id`, `ticketId`, `authorId`, `content`, `createdAt`
 - เพิ่มโมเดล `InternalNote`:
@@ -82,7 +100,7 @@
 - `POST /api/auth/change-password`: เปลี่ยนรหัสผ่านบังคับ/ทั่วไป
 - `GET /api/tickets`: ดึงรายการตั๋ว (Requester ได้เฉพาะตั๋วตนเอง; IT Staff/Admin ได้ Ticket Queue พร้อม search/filter/sort/paginate)
 - `GET /api/tickets/:id`: ดึงรายละเอียดตั๋ว (เช็คสิทธิ์อ่าน)
-- `PATCH /api/tickets/:id`: อัปเดตตั๋ว (Claim, Assign Owner, IT Priority, Status)
+- `PATCH /api/tickets/:id`: อัปเดตตั๋ว (Claim, Assign Owner, IT Priority, Status) — และให้ Requester เจ้าของตั๋วส่ง `requesterIndicatedResolved` เพื่อระบุเจตนา "Problem Appears Resolved" (FR-09)
 - `POST /api/tickets/:id/comments`: โพสต์ Public Comment
 - `GET /api/tickets/:id/comments`: ดึง Public Comments
 - `POST /api/tickets/:id/internal-notes`: โพสต์ Internal Note (เฉพาะ IT Staff/Admin)
@@ -100,16 +118,19 @@
 - **AC-05**: Given IT Staff กด Claim ตั๋ว, When ยืนยันการรับเรื่อง, Then ระบบบันทึก IT Staff คนนั้นเป็น ownerId ของตั๋ว
 - **AC-06**: Given Administrator พยายามปิดใช้งานบัญชีตนเอง, When บันทึกการแก้ไข, Then ระบบปฏิเสธพร้อมแสดงข้อความแจ้งเตือนข้อผิดพลาด
 - **AC-07**: Given Administrator พยายามปิดใช้งาน Admin คนสุดท้ายในระบบ, When บันทึกการแก้ไข, Then ระบบปฏิเสธการทำรายการ
+- **AC-08**: Given Requester เป็นเจ้าของตั๋วที่ยังไม่ Resolved, When Requester ส่ง `requesterIndicatedResolved: true`, Then ระบบบันทึกเจตนา เปลี่ยนสถานะเป็น `Waiting for Requester` และไม่ให้ Requester เปลี่ยนสถานะเองโดยตรง (FR-09/BR-05)
+- **AC-09**: Given Requester ล็อกอินอยู่แล้ว, When ส่ง `requesterId`/identity ปลอมมากับ Request, Then เซิร์ฟเวอร์เพิกเฉยและตัดสินความเป็นเจ้าของจาก Authenticated Token เท่านั้น (FR-04/BR-03)
+- **AC-10**: Given ผู้ใช้ส่งรหัสผ่านใหม่, When รหัสผ่านไม่ผ่าน Password Policy (ความยาว/พิมพ์ใหญ่-เล็ก/ตัวเลขหรือสัญลักษณ์), Then เซิร์ฟเวอร์ปฏิเสธด้วย `400 Bad Request` พร้อมแจ้งเกณฑ์ที่ละเมิด
 
 ## 10. Definition of Done (นิยามความสำเร็จของสปรินต์)
-- [x] โค้ดทั้งหมดผ่านการตรวจสอบ Acceptance Criteria ทุกข้อ
-- [x] ชุดทดสอบอัตโนมัติ (Unit, API, UI, E2E) รันผ่าน 100% บน branch `main`
-- [x] เอกสารประกอบใน `docs/lab-03/` จัดทำสมบูรณ์ทุกไฟล์
-- [x] มีการ Peer Review อนุมัติ (Approved) และ Merge ผ่าน Branch `lab3-staging` ตามกติกา
-- [x] การแสดงผลบน Desktop, Tablet, Mobile ถูกต้องตามสเปก Zen Green Theme
-- [x] รวบรวมเอกสารและรูปภาพหลักฐานจัดทำเป็นไฟล์ PDF 1 ไฟล์ตามรูปแบบการส่งงาน
+- [ ] โค้ดทั้งหมดผ่านการตรวจสอบ Acceptance Criteria ทุกข้อ
+- [ ] ชุดทดสอบอัตโนมัติ (Unit, API, UI, E2E) รันผ่าน 100% บน branch `main`
+- [ ] เอกสารประกอบใน `docs/lab-03/` จัดทำสมบูรณ์ทุกไฟล์
+- [ ] มีการ Peer Review อนุมัติ (Approved) และ Merge ผ่าน Branch `lab3-staging` ตามกติกา
+- [ ] การแสดงผลบน Desktop, Tablet, Mobile ถูกต้องตามสเปก Zen Green Theme
+- [ ] รวบรวมเอกสารและรูปภาพหลักฐานจัดทำเป็นไฟล์ PDF 1 ไฟล์ตามรูปแบบการส่งงาน
 
 ## 11. Assumptions and Decisions (ข้อสมมติฐานและการตัดสินใจ)
 - รหัสผ่านที่สร้างขึ้นใหม่หรือรีเซ็ตโดย Admin จะเข้ารหัสด้วย `bcrypt` ด้วย salt round = 10
-- เซสชันการล็อกอินใช้ Signed Cookie / HTTP-Only Cookie หรือ Bearer Token ที่ปลอดภัย
+- กลไกการยืนยันตัวตนใช้ **Bearer Token (JWT)** เพียงกลไกเดียว ผ่าน HTTP Header `Authorization: Bearer <token>` (ไม่ใช้ HTTP-Only Session Cookie)
 - เมื่อ Admin สั่งตั้งรหัสผ่านใหม่ ค่า `mustChangePassword` จะถูกปรับเป็น `true` โดยอัตโนมัติ

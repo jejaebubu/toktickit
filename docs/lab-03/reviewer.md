@@ -3,11 +3,13 @@
 ## 1. Review Summary
 เอกสารบันทึกกระบวนการ Peer Review และการรวมโค้ดผ่านสาขาพัฒนา (Staging Branch) สำหรับ Lab 3 (TokTickIT Users, Roles, IT Staff Ticketing, and Admin Screens)
 
+> **บันทึกนี้จะถูกอัปเดตตาม PR ที่ตรวจจริงทีละฉบับ (ทำตามกติกา 1 PR : 1 Issue) โดยบันทึกเฉพาะ PR ที่เกิดขึ้นจริงเท่านั้น** — ไม่ลงผลล่วงหน้าก่อนเริ่มเขียนโค้ด
+
 ---
 
 ## 2. Reviewer Information & Approvals
 
-- **Reviewer Identity**: Peer Review Team / Lead Software Engineer
+- **Reviewer Identity**: Peer Review (Partner) / Lead Software Engineer
 - **Staging Branch**: `lab3-staging`
 - **Target Branch**: `main`
 
@@ -15,9 +17,6 @@
 
 | PR ID | Title / Feature Scope | Branch Source | Target Branch | Reviewer Status | Comments / Resolution |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **PR-01** | Specification & Engineering Contract for Lab 3 | `feature/lab3-spec` | `lab3-staging` | **APPROVED** | Verified requirements, BR-01..13, AC-01..07, API spec, and UI spec. |
-| **PR-02** | Database Schema Evolution & User Migration | `feature/lab3-db-auth` | `lab3-staging` | **APPROVED** | Verified `User` model, bcrypt hashing, `Ticket.ownerId`, comments & internal notes models, and idempotent seed script. |
-| **PR-03** | Auth APIs & Mandatory Password Change | `feature/lab3-auth-api` | `lab3-staging` | **APPROVED** | Verified login, logout, me, change-password APIs, token handling, and first-login enforcement. |
-| **PR-04** | IT Staff Ticket Queue & Ticket Detail Operations | `feature/lab3-staff-queue` | `lab3-staging` | **APPROVED** | Verified search, filters, pagination, claim/reassign, IT priority, status changes, Public Comments, and Internal Notes. |
-| **PR-05** | Administrator User Management & Safety Controls | `feature/lab3-user-admin` | `lab3-staging` | **APPROVED** | Verified user listing, search/filter, create user, edit user, reset password, self-deactivation block, and last-admin check. |
-| **PR-06** | Automated Tests & Release Integration | `lab3-staging` | `main` | **APPROVED** | Verified 100% test pass across unit, API, UI, and Playwright E2E suites. |
+| **PR-01 (GitHub #52)** | Specification & Engineering Contract for Lab 3 (Spec DD: specification, api-spec, ui-spec, tests, reviewer, ai-use) | `feature/lab03-issue1-specs` | `lab3-staging` | **IN REVIEW — Request Changes** | Review 2026-09-15: ต้องเพิ่ม Authorization Matrix, ฟีลด์ + API สำหรับเจตนา "Problem Appears Resolved", เปลี่ยน `403` → `404` (Data Leakage §6.2), ปรับ DoD/Test/Reviewer ให้ไม่บันทึกผลล่วงหน้า, เพิ่มเคสทดสอบ requesterId-override / password-boundary / resolved-intent → อัปเดตเอกสารทั้งหมดแล้ว รอ re-review |
+
+> **หมายเหตุ**: PR-02 ขึ้นไปจะถูกเพิ่มในตารางนี้เมื่อแต่ละ PR ถูกตรวจสอบและ merge จริง โดยใช้หมายเลข GitHub PR จริง (ยังไม่มีการบันทึกผลล่วงหน้า)

@@ -18,6 +18,7 @@
   - `Resolved`: Green (`#C6F6D5`, Text `#22543D`)
   - `Closed`: Gray (`#EDF2F7`, Text `#4A5568`)
   - `Reopened`: Red (`#FED7D7`, Text `#9B2C2C`)
+  - `Cancelled`: ส้มอิฐ / Rust (`#FFF2E5`, Text `#C2410C`)
 
 ---
 
@@ -66,9 +67,9 @@
 ---
 
 ## 3. Screenshots Evidence Checklist for Lab 3 PDF
-- [x] Login Screen (Normal, Busy, Invalid Credentials, Inactive Account)
-- [x] Mandatory First-Login Change Password Screen
-- [x] Application Shell (Requester, IT Staff, Admin navigation)
-- [x] IT Staff Ticket Queue (Desktop Table & Mobile Responsive Cards)
-- [x] IT Staff Ticket Detail (Operational controls, Public Comments, Internal Notes)
-- [x] Administrator User Management Screen (User list, Search/Filter, Create User, Edit User, Reset Password)
+- [ ] Login Screen (Normal, Busy, Invalid Credentials, Inactive Account)
+- [ ] Mandatory First-Login Change Password Screen
+- [ ] Application Shell (Requester, IT Staff, Admin navigation)
+- [ ] IT Staff Ticket Queue (Desktop Table & Mobile Responsive Cards)
+- [ ] IT Staff Ticket Detail (Operational controls, Public Comments, Internal Notes)
+- [ ] Administrator User Management Screen (User list, Search/Filter, Create User, Edit User, Reset Password)

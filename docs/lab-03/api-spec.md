@@ -1,7 +1,13 @@
 # Lab 3 REST API Specification (ข้อกำหนดการเชื่อมต่อ REST API)
 
 ## 1. Authentication & Security Policy
-ระบบใช้การพิสูจน์ตัวตนผ่าน HTTP-Only Session Cookie หรือ Bearer Token ที่สร้างขึ้นเมื่อล็อกอินสำเร็จ โดยในทุก Request เซิร์ฟเวอร์จะระบุตัวตนและบทบาท (`REQUESTER`, `IT_STAFF`, `ADMINISTRATOR`) จาก Credentials ที่ผ่านการยืนยันแล้ว
+ระบบใช้การพิสูจน์ตัวตนผ่าน **Bearer Token (JWT)** เพียงกลไกเดียว — Client ต้องแนบ Header `Authorization: Bearer <token>` ในทุก Request (ยกเว้น `POST /api/auth/login`) โดย Token สร้างขึ้นเมื่อล็อกอินสำเร็จ เซิร์ฟเวอร์ระบุตัวตนและบทบาท (`REQUESTER`, `IT_STAFF`, `ADMINISTRATOR`) จาก Token ที่ผ่านการยืนยันแล้วเท่านั้น และ **เพิกเฉยข้อมูลระบุตัวตนที่ส่งมากับ payload/query/header** เช่น `requesterId` เสมอ (ดู BR-03)
+
+**Password Policy (ตรวจสอบฝั่งเซิร์ฟเวอร์ทุก Endpoint ที่ตั้งหรือเปลี่ยนรหัสผ่าน)**:
+- ความยาวอย่างน้อย 8 ตัวอักษร
+- มีอักษรพิมพ์ใหญ่และพิมพ์เล็กอย่างน้อย 1 ตัว
+- มีตัวเลขหรือสัญลักษณ์พิเศษอย่างน้อย 1 ตัว
+- หากไม่ผ่านเกณฑ์ → ตอบกลับ `400 Bad Request` พร้อมข้อความแจ้งเกณฑ์ที่ละเมิด
 
 ---
 
@@ -79,6 +85,9 @@
     }
   }
   ```
+- **Error Responses**:
+  - `400 Bad Request`: รหัสผ่านใหม่ไม่ผ่าน Password Policy หรือรหัสผ่านปัจจุบันไม่ถูกต้อง
+  - `401 Unauthorized`: ไม่ได้ล็อกอิน
 
 ---
 
@@ -104,6 +113,7 @@
         "status": "In Progress",
         "requester": { "id": 1, "name": "Jennifer Anderson", "email": "jennifer@toktickit.com" },
         "owner": { "id": 5, "name": "Michael Brown", "email": "michael@toktickit.com" },
+        "requesterIndicatedResolved": false,
         "createdAt": "2026-05-12T09:14:00Z",
         "updatedAt": "2026-05-13T10:30:00Z"
       }
@@ -114,14 +124,16 @@
 
 #### GET /api/tickets/:id
 - **คำอธิบาย**: ดึงรายละเอียดตั๋วรายใบ
-- **Success Response (`200 OK`)**: ตั๋วพร้อมรายละเอียด Attachments, Public Comments, และ Internal Notes (ถ้ามีสิทธิ์)
+- **Success Response (`200 OK`)**: ตั๋วพร้อม `requesterIndicatedResolved`, รายละเอียด Attachments, Public Comments, และ Internal Notes (ถ้ามีสิทธิ์)
 - **Error Responses**:
-  - `403 Forbidden`: พยายามเข้าถึงตั๋วของผู้อื่น (สำหรับ Requester)
-  - `404 Not Found`: ไม่พบตั๋ว
+  - `404 Not Found`: ไม่พบตั๋ว **หรือ** Requester พยายามเปิดตั๋วของผู้อื่น — ตอบ `404` เหมือนกันทั้งคู่ เพื่อไม่เปิดเผยให้ผู้อื่นรู้ว่าตั๋วนั้นมีอยู่จริง (Handout §6.2 Data Leakage Prevention)
+  - `401 Unauthorized`: ไม่ได้ล็อกอิน
 
 #### PATCH /api/tickets/:id
-- **คำอธิบาย**: อัปเดตตั๋ว (Claim ownership, Reassign owner, IT Priority, Status Change)
-- **Request Body**:
+- **คำอธิบาย**: อัปเดตตั๋ว
+  - **IT Staff / Admin** (สิทธิ์เต็ม): Claim/Reassign Owner (`ownerId`), IT Priority (`itPriority`), Status Change (`status`)
+  - **Requester** (เฉพาะเจ้าของตั๋ว): ระบุเจตนา "Problem Appears Resolved" โดยส่ง `requesterIndicatedResolved: true` (หรือ `false` เพื่อยกเลิก) → เซิร์ฟเวอร์บันทึกค่าและเปลี่ยนสถานะเป็น `Waiting for Requester` เพื่อให้ IT Staff/Admin ตรวจสอบ (BR-05)
+- **Request Body (Staff / Admin)**:
   ```json
   {
     "ownerId": 5,
@@ -129,7 +141,18 @@
     "status": "In Progress"
   }
   ```
-- **Success Response (`200 OK`)**: วัตถุ Ticket ที่อัปเดตแล้ว
+- **Request Body (Requester)**:
+  ```json
+  {
+    "requesterIndicatedResolved": true
+  }
+  ```
+- **Success Response (`200 OK`)**: วัตถุ Ticket ที่อัปเดตแล้ว (รวม `requesterIndicatedResolved` และ `status` ล่าสุด)
+- **Error Responses**:
+  - `404 Not Found`: ตั๋วไม่มี หรือ Requester ไม่ใช่เจ้าของตั๋ว (ไม่เปิดเผยการมีอยู่)
+  - `403 Forbidden`: Requester พยายามแก้ไข `ownerId`/`itPriority`/`status` โดยตรง — อนุญาตส่งได้เฉพาะ `requesterIndicatedResolved`
+  - `400 Bad Request`: ค่าที่ส่งไม่ถูกต้อง (เช่น `status`/`itPriority` ไม่อยู่ในชุดที่อนุญาต, `ownerId` ไม่ใช่ IT Staff/Admin)
+  - `401 Unauthorized`: ไม่ได้ล็อกอิน
 
 ---
 
@@ -148,6 +171,7 @@
     }
   ]
   ```
+- **Error Response (`404 Not Found`)**: ตั๋วไม่มี หรือ Requester ไม่ใช่เจ้าของตั๋ว (ไม่เปิดเผยการมีอยู่)
 
 #### POST /api/tickets/:id/comments
 - **คำอธิบาย**: โพสต์ Public Comment ใหม่
@@ -156,6 +180,7 @@
   { "content": "We are investigating the issue on your device." }
   ```
 - **Success Response (`201 Created`)**
+- **Error Response (`404 Not Found`)**: ตั๋วไม่มี หรือ Requester ไม่ใช่เจ้าของตั๋ว (ไม่เปิดเผยการมีอยู่)
 
 #### GET /api/tickets/:id/internal-notes
 - **คำอธิบาย**: ดึง Internal Notes ของตั๋ว (เฉพาะ IT Staff และ Admin)
@@ -204,7 +229,9 @@
   }
   ```
 - **Success Response (`201 Created`)**
-- **Error Response (`409 Conflict`)**: เมื่ออีเมลซ้ำในระบบ
+- **Error Responses**:
+  - `409 Conflict`: อีเมลซ้ำในระบบ
+  - `400 Bad Request`: `role` ไม่อยู่ในชุดที่อนุญาต หรือรหัสผ่านเริ่มต้นไม่ผ่าน Password Policy
 
 #### PATCH /api/users/:id
 - **คำอธิบาย**: แก้ไขข้อมูลผู้ใช้ (ชื่อ, อีเมล, บทบาท, สถานะการใช้งาน) ( Admin เท่านั้น )
@@ -228,3 +255,4 @@
   { "initialPassword": "NewInitialPass123!" }
   ```
 - **Success Response (`200 OK`)**
+- **Error Response (`400 Bad Request`)**: รหัสผ่านเริ่มต้นใหม่ไม่ผ่าน Password Policy
