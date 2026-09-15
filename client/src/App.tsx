@@ -4,6 +4,9 @@ import { Header, ViewId } from "./components/Header.js";
 import { CreateTicketForm } from "./components/CreateTicketForm.js";
 import { MyTicketsList } from "./components/MyTicketsList.js";
 import { TicketDetail } from "./components/TicketDetail.js";
+import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
+import { StaffTicketDetail } from "./components/StaffTicketDetail.js";
+import { UserManagement } from "./components/UserManagement.js";
 import { LoginScreen } from "./screens/LoginScreen.js";
 import { ChangePasswordScreen } from "./screens/ChangePasswordScreen.js";
 import { checkSystem, Category } from "./api.js";
@@ -100,27 +103,17 @@ function RequesterViews({ activeView, onNavigate }: RequesterViewsProps): React.
 }
 
 function TicketQueueSpotlight(): React.ReactElement {
-  return (
-    <div className="card border-0 shadow-sm p-5 mb-4 text-center" style={{ borderRadius: "16px", backgroundColor: "#FFFFFF" }}>
-      <div className="display-6 mb-3" style={{ color: "#006B3C" }}>🗂️</div>
-      <h2 className="h4 fw-bold text-dark mb-2">IT Staff Ticket Queue</h2>
-      <p className="text-muted mb-0" data-testid="ticket-queue-coming-soon">
-        The role-aware staff ticket queue screen ships in the next issue.
-      </p>
-    </div>
-  );
+  const [openTicketId, setOpenTicketId] = useState<number | null>(null);
+
+  if (openTicketId !== null) {
+    return <StaffTicketDetail ticketId={openTicketId} onBack={() => setOpenTicketId(null)} />;
+  }
+
+  return <StaffTicketQueue onOpenTicket={setOpenTicketId} />;
 }
 
 function UserManagementSpotlight(): React.ReactElement {
-  return (
-    <div className="card border-0 shadow-sm p-5 mb-4 text-center" style={{ borderRadius: "16px", backgroundColor: "#FFFFFF" }}>
-      <div className="display-6 mb-3" style={{ color: "#006B3C" }}>👥</div>
-      <h2 className="h4 fw-bold text-dark mb-2">Administrator User Management</h2>
-      <p className="text-muted mb-0" data-testid="user-management-coming-soon">
-        The administrator user management screen ships in the next issue.
-      </p>
-    </div>
-  );
+  return <UserManagement />;
 }
 
 function Shell(): React.ReactElement {

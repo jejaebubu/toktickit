@@ -100,6 +100,8 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
             className="btn btn-sm btn-light bg-opacity-10 rounded-pill px-3 py-1 text-white border border-white border-opacity-25 d-flex align-items-center gap-2"
             style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
             onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
             data-testid="header-user-menu"
           >
             <span className="small">👤</span>
@@ -119,6 +121,8 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
             <div
               className="position-absolute end-0 mt-2 border rounded-3 shadow-lg overflow-hidden"
               style={{ backgroundColor: "#FFFFFF", minWidth: 180, zIndex: 1000 }}
+              role="menu"
+              aria-label="User menu"
               data-testid="header-user-dropdown"
             >
               <button
