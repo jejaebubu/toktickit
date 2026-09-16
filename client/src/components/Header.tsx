@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.js";
 
 function roleBadgeStyle(role: string): { backgroundColor: string; color: string } {
@@ -49,6 +49,17 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setNavOpen(false);
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   if (!user) return null;
 
@@ -104,6 +115,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
             aria-haspopup="menu"
             onClick={() => setNavOpen((o) => !o)}
             data-testid="header-nav-toggle"
+            style={{ minHeight: 44, minWidth: 44 }}
           >
             ☰ Menu
           </button>

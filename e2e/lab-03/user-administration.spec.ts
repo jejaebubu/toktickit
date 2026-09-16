@@ -33,14 +33,19 @@ test.describe("E2E-04: Admin user creation, search, & password reset (AC-06)", (
     await expect(page.getByTestId("header-role-badge")).toContainText(/Admin/);
 
     // --- 2. Search the user list (server-backed query) ---
-    const findUser = (email: string) =>
+    const userLocator = (email: string) =>
       page
         .locator(isMobile ? '[data-testid^="user-card-"]' : '[data-testid^="user-row-"]')
         .filter({ hasText: email })
         .first();
-    await page.getByTestId("user-search-input").fill("jennifer");
-    await page.getByTestId("user-search-btn").click();
-    const jenniferRow = findUser("jennifer@toktickit.com");
+    // Always type the query and click search first: keeps rows deterministic
+    // (server-backed result) instead of guessing which page they appear on.
+    const searchAndFind = async (email: string) => {
+      await page.getByTestId("user-search-input").fill(email);
+      await page.getByTestId("user-search-btn").click();
+      return userLocator(email);
+    };
+    const jenniferRow = await searchAndFind("jennifer@toktickit.com");
     await expect(jenniferRow).toBeVisible({ timeout: 15_000 });
     await page.screenshot({ path: shot(project, "user-admin", "user-search"), fullPage: true });
     await page.getByTestId("user-clear-filters").click();
@@ -59,9 +64,7 @@ test.describe("E2E-04: Admin user creation, search, & password reset (AC-06)", (
     await expect(page.getByTestId("user-mgmt-notice")).toContainText(/created successfully/i);
 
     // New user appears after search
-    await page.getByTestId("user-search-input").fill(email);
-    await page.getByTestId("user-search-btn").click();
-    const createdRow = findUser(email);
+    const createdRow = await searchAndFind(email);
     await expect(createdRow).toBeVisible({ timeout: 15_000 });
     await page.getByTestId("user-clear-filters").click();
 
@@ -76,15 +79,15 @@ test.describe("E2E-04: Admin user creation, search, & password reset (AC-06)", (
     await page.getByTestId("user-modal-cancel").click();
 
     // --- 5. Self-deactivation is blocked server-side ---
-    const adminRow = findUser("admin@toktickit.com");
+    const adminRow = await searchAndFind("admin@toktickit.com");
     await adminRow.getByTestId(/user-toggle/).click();
     await expect(page.getByTestId("user-mgmt-error")).toContainText(/cannot deactivate their own account/i);
 
     // --- 6. Reset the newly created user's initial password ---
     // The self-deactivation failure replaces the list with an error banner;
-    // clear the filters to reload the full list before targeting the created user.
+    // clear the filters to reload the list before targeting the created user.
     await page.getByTestId("user-clear-filters").click();
-    const resetTarget = findUser(email);
+    const resetTarget = await searchAndFind(email);
     await expect(resetTarget).toBeVisible({ timeout: 15_000 });
     await resetTarget.getByTestId(/user-reset/).click();
     await expect(page.getByTestId("user-reset-modal")).toBeVisible();

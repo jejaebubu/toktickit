@@ -87,6 +87,9 @@ test.describe("E2E-02: Initial password login & mandatory password change (AC-02
     // --- 0. As Administrator, reset newuser's initial password so the flow below is deterministic ---
     await login(page, "admin@toktickit.com", "Password123!");
     await expect(page.getByTestId("user-mgmt-card")).toBeVisible();
+    // Type the query first so the row is a deterministic server-backed search result (no pagination guesswork).
+    await page.getByTestId("user-search-input").fill("newuser@toktickit.com");
+    await page.getByTestId("user-search-btn").click();
     await findUser("newuser@toktickit.com").getByTestId(/user-reset/).click();
     await expect(page.getByTestId("user-reset-modal")).toBeVisible();
     await page.getByTestId("user-reset-password-input").fill("Password123!");

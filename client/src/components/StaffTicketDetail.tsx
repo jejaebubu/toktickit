@@ -64,6 +64,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [notice, setNotice] = useState<string | null>(null);
   const [isPostingComment, setIsPostingComment] = useState(false);
   const [isPostingNote, setIsPostingNote] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isAdmin = user?.role === "ADMINISTRATOR";
 
   const load = () => {
@@ -120,15 +121,19 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const patchTicket = async (payload: { ownerId?: number | "unassigned" | null; itPriority?: string; status?: string }) => {
     setNotice(null);
     setActionError(null);
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const updated = await updateTicket(ticketId, payload);
       // The PATCH response omits attachments/conversation lists; merge it into the
       // current ticket so those collections are preserved instead of wiped to undefined.
-      setTicket((prev) => (prev ? { ...prev, ...updated } : updated));
+      setTicket((prev) => (prev ? { ...prev, ...updated, attachments: prev.attachments ?? [] } : { ...updated }));
       notify("Ticket updated successfully.");
       await refreshConversation();
     } catch (err: any) {
       notify(err instanceof ApiError ? err.message : "Failed to update ticket.", true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -275,6 +280,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   patchTicket({ ownerId: v === "" ? null : Number(v) });
                 }}
                 data-testid="detail-owner-select"
+                disabled={isSubmitting}
                 style={{ minHeight: 44 }}
               >
                 <option value="">Unassigned</option>
@@ -287,7 +293,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   className="btn fw-semibold"
                   style={{ backgroundColor: isOwner ? "#0B7A46" : "#FFFFFF", color: isOwner ? "#FFFFFF" : "#006B3C", border: "1px solid #0B7A46", minHeight: 44 }}
                   onClick={() => patchTicket({ ownerId: user!.id })}
-                  disabled={isOwner}
+                  disabled={isOwner || isSubmitting}
                   data-testid="detail-claim"
                 >
                   {isOwner ? "✓ Claimed by you" : "Claim this ticket"}
@@ -296,7 +302,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   type="button"
                   className="btn btn-outline-secondary fw-semibold"
                   onClick={() => patchTicket({ ownerId: "unassigned" })}
-                  disabled={!ticket.owner}
+                  disabled={!ticket.owner || isSubmitting}
                   data-testid="detail-unassign"
                   style={{ minHeight: 44 }}
                 >
@@ -314,6 +320,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               value={ticket.itPriority}
               onChange={(e) => patchTicket({ itPriority: e.target.value })}
               data-testid="detail-priority-select"
+              disabled={isSubmitting}
               style={{ minHeight: 44 }}
             >
               {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
@@ -328,6 +335,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               value={ticket.status}
               onChange={(e) => patchTicket({ status: e.target.value })}
               data-testid="detail-status-select"
+              disabled={isSubmitting}
               style={{ minHeight: 44 }}
             >
               {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
