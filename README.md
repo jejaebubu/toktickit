@@ -62,7 +62,7 @@ npm run dev          # รัน server (http://localhost:3000) + client (http:/
 ### 4. การรันชุดทดสอบอัตโนมัติ (Unit + API + UI)
 
 ```bash
-npm test            # รัน test ทั้งหมด (server 76 tests + client 79 tests)
+npm test            # รัน test ทั้งหมด (server 76 tests + client 79 tests) — ยืนยันผลรันจริง 2026-09-16: server 76/76, client 79/79 (9 test files)
 ```
 
 หรือรันแยก:

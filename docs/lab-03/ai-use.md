@@ -35,6 +35,9 @@
 9. **Prompt 9 (Real Web App Release Integration)**:
    > "รวม feature branches ทั้งหมดผ่าน lab3-staging ไป main (Section 11.1): reset DB, รันชุดทดสอบทั้งหมด (client Vitest, server Vitest, Playwright E2E) บน staging ให้ผ่าน 100% แล้วสร้าง Release PR พร้อมย้ายทุก GitHub issue ไป Done และอัปเดต reviewer.md / ai-use.md เป็นเวอร์ชันสุดท้าย"
 
+10. **Prompt 10 (Re-review & Blocking Fixes — PR #72)**:
+    > "ตอบกลับรีวิวของ Reviewer ที่ขอ Request Changes ใน PR #72 จำนวน 3 จุด Blocking แล้วแก้ไขโค้ดให้ตรงจุด: (1) StaffTicketDetail.tsx — เพิ่ม state `isSubmitting` + `if (isSubmitting) return` + `disabled={isSubmitting}` บนทุกตัวควบคุม เพื่อป้องกัน Race Condition จากการกด PATCH ซ้ำซ้อน และ merge response แบบ null-safe ให้ `attachments` คงอยู่เสมอ (2) Header.tsx — เพิ่ม `style={{ minHeight: 44, minWidth: 44 }}` ให้ `header-nav-toggle` ผ่านเกณฑ์ STYLE-03 (touch target ≥44px) พร้อมเพิ่ม `keydown` Escape listener เพื่อปิดทั้ง mobile nav และ user menu (3) E2E specs — เปลี่ยนฟังก์ชัน `findUser` เป็น `searchAndFind(email)` ที่พิมพ์คำค้นหาและกด search ก่อน locate row ทุกครั้ง เพื่อตัดปัญหา Flakiness จาก Pagination แล้วรันยืนยัน client Vitest 79/79 และ Playwright E2E Lab 03 12/12 (3 viewports) ก่อนส่ง Re-review"
+
 ---
 
 ## 3. Reflection (บทสรุปและการสะท้อนความคิด)

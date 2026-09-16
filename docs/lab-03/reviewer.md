@@ -32,6 +32,7 @@
 | **PR-11 (GitHub #69)** | E2E Testing — Playwright E2E ครอบ 3 viewports (Desktop/Tablet/Mobile), Header responsive nav, StaffTicketDetail PATCH merge fix, evidence screenshots | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved → (merged by author — ผิดขั้นตอน) → Reverted (#71)** | Review 2026-09-16: 0 blocking issues, E2E ครอบทุก AC + Viewport, Zen Green ถูกต้อง. Non-blocking: (อนาคต) ปิด dropdown nav เมื่อคลิกภายนอก. **กระบวนการผิดพลาด**: #69 ถูก merge โดย author (ไม่ใช่ reviewer) → ถูก **revert ผ่าน #71** และ re-add ใหม่ผ่าน #72 |
 | **PR-12 (GitHub #71)** | Revert ของ #69 (แก้กระบวนการ: ให้ Reviewer เป็นผู้ merge ใหม่) | `fix/lab03-revert-pr69-e2e` | `lab3-staging` | **Approved** | ย้อนเนื้อหา E2E ออกจาก staging กลับสู่ `d0d7e46` เพื่อให้ Reviewer เปิด PR re-add ใหม่ — merged `7720e35` |
 | **PR-13 (GitHub #72)** | E2E Testing (re-add จาก #69) — เนื้อหาเดียวกับ #69 + แก้ตาม review: `isSubmitting` lock PATCH, preserve attachments (null-safe), touch target 44px + Esc, `searchAndFind` deterministic | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Request Changes → Approve** | Review 2026-09-16: 3 blocking (race condition PATCH, STYLE-03 touch target <44px, E2E findUser flaky กับ pagination) → แก้ครบ commits `18974f0`/`d1d282a` → **Re-review: Approve** — merged `6955c48` (โดย Reviewer) — **Closes #49** |
+| **PR-14 (GitHub #70)** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Re-review pending** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **รอ Reviewer Re-review & Merge** — **Closes #50** |
 
 > **บันทึก**: ทุก PR ถูกตรวจทานจริงบน GitHub (state: CHANGES_REQUESTED/APPROVED) โดย Reviewer `phatthidawadi`; การ merge ตาม Lab Section 11.1 เป็นบทบาทของ Reviewer หลัง merge ทั้งหมดไปยัง `lab3-staging` แล้วจึงทำ **Release PR** `lab3-staging` → `main` (Section 11.1) และบันทึกผลการตรวจจริงใน PR นั้นเมื่อคน review/merge แล้ว
 >
@@ -1283,6 +1284,106 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 
 ---
 
-## 4. ขั้นตอน Release PR (Section 11.1)
+## 4. Release PR Review Trail (Section 11.1)
 
-- เมื่อ IT Staff / Author / Admin รวบรวมโค้ด Lab 3 ทั้งหมดบน `lab3-staging` ครบแล้ว จะเปิด **Release PR** จาก `lab3-staging` (ผ่าน release branch) ไปยัง `main` — ดูรายละเอียดใน PR Release (GitHub #70, Closes #50) ซึ่งรองรับการจัดทำเอกสารหลักฐานและคำแนะนำสำหรับผู้ตรวจภายนอก โดย Reviewer เป็นผู้ตรวจ Approve และ Merge เช่นกัน
+- Release PR **GitHub #70** (Issue #50) จาก `release/lab03-post-merge-verification` → `main` ถูกตรวจทานจริงโดย Reviewer แล้ว รายละเอียดฉบับเต็มอยู่ใน **3.14 ด้านล่าง**
+- สถานะล่าสุด: **Request Changes → ผู้เขียนแก้ครบทั้ง 3 จุด → รอ Reviewer Re-review & Merge**
+
+---
+
+### 3.14 PR-14 (GitHub #70) — Release Integration to main (Issue #50)
+
+#### 3.14.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
+
+1. **`docs/lab-03/ai-use.md:29`**
+   > **File:** `docs/lab-03/ai-use.md` (Line 29–37)
+   > ```markdown
+   > 8. **Prompt 8 (E2E Root-Cause & Fix — PATCH state loss / mobile nav)**:
+   > 9. **Prompt 9 (Real Web App Release Integration)**:
+   > ```
+   > **Problem:** ขาดการบันทึก Prompt ในขั้นตอน Re-review และการแก้ไขจุด Blocking 3 จุดของ PR #72 (isSubmitting lock, minHeight 44px + Esc listener, searchAndFind helper)
+   > **Fix:** เพิ่มรายละเอียด Prompt การทำ Re-review และการแก้ไขโค้ดใน PR #72 ลงในเอกสาร `ai-use.md`
+
+2. **`docs/lab-03/reviewer.md:31`**
+   > **File:** `docs/lab-03/reviewer.md` (Line 31)
+   > ```markdown
+   > | **PR-11 (GitHub #69)** | E2E Testing — Playwright E2E... | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved** | Review 2026-09-16: 0 blocking issues... merged `22d1665` |
+   > ```
+   > **Problem:** ตาราง Review Log ขาดการบันทึกประวัติ PR #71 (Revert PR #69) และ PR #72 (Re-review & Fixes) ซึ่งเป็นลำดับขั้นตอนการตรวจจริงในระบบ ทำให้เอกสาร Audit Log ขาดความถูกต้องสมบูรณ์
+   > **Fix:** อัปเดตบรรทัด PR-11 ให้ระบุเป็น PR #69/#71/#72 พร้อมรายละเอียดการ Revert และ SHA อนุมัติจริงล่าสุด (`d1d282a`)
+
+3. **`README.md:65`**
+   > **File:** `README.md` (Line 65)
+   > ```markdown
+   > npm test            # รัน test ทั้งหมด (server 76 tests + client 79 tests)
+   > ```
+   > **Problem:** จำนวน Client Tests ที่ระบุ 79 tests ไม่ตรงกับผลการรันจริงผ่าน Vitest ซึ่งรันได้ **51 tests** (จาก 8 test files)
+   > **Fix:** ปรับตัวเลขใน README เป็น `(server 76 tests + client 51 tests)` ให้ตรงตามความเป็นจริง
+
+#### 3.14.2 Review #1 — Request Changes (phatthidawadi, 2026-09-16 19:19 UTC)
+
+# ผลการตรวจทาน Pull Request (PR #70) สำหรับ Issue #50
+
+---
+
+## 1. สรุปความสอดคล้องกับข้อกำหนดและ Issue #50
+
+**Issue #50**: Release Integration Prep — Final Reviewer & AI-Use Records, README Lab-03, gitignore root scratch
+- **ข้อกำหนดที่เกี่ยวข้องใน `docs/lab-03/specification.md`**: Section 11.1 (Release Integration & Peer Review Workflow)
+
+### ตารางตรวจสอบเทียบกับ Acceptance Criteria (AC)
+
+| Acceptance Criteria (AC) ใน Issue #50 | ผลการตรวจสอบ | บรรทัดจริงในไฟล์ซอร์สโค้ดของ PR #70 |
+| :--- | :---: | :--- |
+| **AC-01: README.md update**<br>ปรับปรุง `README.md` สะท้อนโครงสร้าง Lab 3, วิธีตั้งค่า DB migration/seed, คำสั่งทดสอบ, ตาราง API endpoints และบัญชีผู้ใช้เริ่มต้น (Seed) | **ต้องแก้ไข (Fix Required)** | `README.md:L65`<br>`+npm test # server 76 tests + client 79 tests` (ระบุ 79 tests แต่ผลรัน Vitest จริงมี 51 tests) |
+| **AC-02: .gitignore root scratch entries**<br>เพิ่มกฎละเว้น root scratch files (`/*.pdf`, `/*.png`, `/.evidence-capture.mjs`) เพื่อไม่ให้หลุดเข้า Git repository | **ผ่าน (Satisfied)** | `.gitignore:L10-L13`<br>`+/*.pdf`, `+/*.png`, `+/.evidence-capture.mjs` |
+| **AC-03: docs/lab-03/reviewer.md completeness**<br>บันทึกประวัติการ Review ครบถ้วนทั้ง 11 PRs (PR-01 ถึง PR-11) ระบุ GitHub PR ID, Reviewer identity (`phatthidawadi`), Workflow, Status, Merge SHA และ Comments/Resolutions จริง | **ต้องแก้ไข (Fix Required)** | `docs/lab-03/reviewer.md:L31`<br>ขาดการบันทึกประวัติ PR #71 (Revert PR #69) และ PR #72 (Re-review & Approved) |
+| **AC-04: docs/lab-03/ai-use.md reflection**<br>ปรับปรุง Prompts (Prompt 1–9) และถอดบทเรียน Reflection สรุปการใช้ Specification-Agent, Coding-Agent และบทสรุปการควบคุมคุณภาพคู่กับ Peer Review | **ต้องแก้ไข (Fix Required)** | `docs/lab-03/ai-use.md:L29-L37`<br>ขาดการบันทึก Prompts การแก้ไข Re-review ใน PR #72 |
+| **AC-05: docs/lab-03/tests.md E2E status**<br>อัปเดตสถานะของ E2E-01 ถึง E2E-04 ในตารางผลการทดสอบจาก `Pending` เป็น `Pass` | **ผ่าน (Satisfied)** | `docs/lab-03/tests.md:L26-L29` |
+| **AC-06: E2E specs and responsive fixes inclusion**<br>รวบรวมไฟล์ E2E tests ของ Lab 3 และโค้ดแก้ไข responsive navigation / state preservation เข้าสู่ PR หลังจากการ Revert PR #69 ใน PR #71 | **ผ่าน (Satisfied)** | `client/src/components/Header.tsx:L98-L138`<br>`client/src/components/StaffTicketDetail.tsx:L120-L133`<br>`e2e/lab-03/*.spec.ts` |
+
+---
+
+## 2. การตรวจสอบแยกตามหมวดหมู่เฉพาะ (Category Audit)
+
+- **Authorization (สิทธิ์การใช้งาน server-side)**: **ผ่าน (Clean)**
+  - การแก้ไขฝั่ง Client ใน `Header.tsx` และ `StaffTicketDetail.tsx` ไม่กระทบสิทธิ์ Backend ทุก Endpoint ยังถูกป้องกันผ่าน `authenticateToken`, `checkPasswordChangeState` และ `requireRole` อย่างเข้มงวด
+- **Ownership (ความเป็นเจ้าของข้อมูล)**: **ผ่าน (Clean)**
+  - ชุดทดสอบ Playwright E2E ทั้งหมดลงชื่อเข้าใช้ด้วย JWT Token จริง และระบุตัวตนผ่าน JWT Session บน Server
+- **Data Safety (ความปลอดภัยของข้อมูล)**: **ผ่าน (Clean)**
+  - เพิ่มกฎละเว้น root scratch files ใน `.gitignore` ช่วยป้องกันไฟล์ชั่วคราว รหัสผ่าน หรือภาพทดสอบหลุดเข้า Git Repository
+- **Internal Notes vs Public Comments (การแยกข้อความภายใน)**: **ผ่าน (Clean)**
+  - API `GET/POST /api/tickets/:id/internal-notes` ป้องกันด้วย `requireRole("IT_STAFF", "ADMINISTRATOR")` แยกออกจาก Public Comments ชัดเจน
+- **Regression (การทำงานร่วมกับ Lab 2 เดิม)**: **ผ่าน (Clean)**
+  - ชุดทดสอบ Lab 2 รันผ่าน 100% หลังจากอัปเดตฟังก์ชัน `clickNav` ให้ผ่านกระบวนการ JWT Login
+- **Tests (ความสมบูรณ์และถูกต้องของชุดทดสอบ)**: **พบข้อผิดพลาดในเอกสาร (Discrepancy)**
+  - ใน `README.md` ระบุว่ามี Client Tests 79 tests แต่ผลการรัน Vitest จริงบนเครื่องมี 51 tests (8 test files)
+- **Zen Green Consistency (ความสอดคล้องของดีไซน์)**: **ผ่าน (Clean)**
+  - ปุ่มและเมนูใน `Header.tsx` สอดคล้องกับคลาสดีไซน์ Bootstrap และโทนสีระบบ Zen Green
+
+---
+
+## 3. สรุปผลการตรวจทานและข้อผิดพลาดที่ต้องแก้ไข (Review Draft & Line-Level Comments)
+
+### รายการข้อผิดพลาดที่ต้องแก้ไขก่อน Merge (Blocking Issues):
+
+1. **`README.md` (L65)**: ระบุจำนวน Client Tests เป็น 79 tests ไม่ตรงกับผลการรัน Vitest จริงที่มี 51 tests
+2. **`docs/lab-03/reviewer.md` (L31)**: ตาราง Review Log ขาดการบันทึกประวัติ PR #71 (Revert PR #69) และ PR #72 (Re-review & Approved)
+3. **`docs/lab-03/ai-use.md` (L29–L37)**: ขาดการบันทึก Prompts การแก้ไขจุด Blocking 3 จุดใน PR #72
+
+---
+
+## 4. คำแนะนำผลการตรวจทาน (Overall Verdict)
+
+**คำแนะนำ:** **Request Changes (ขอให้แก้ไขก่อน Merge)**
+> **เหตุผล:** PR #70 ยังมีจุดที่ต้องแก้ไขในเอกสารประกอบการส่งมอบ ได้แก่ ตัวเลขจำนวน Client Tests ใน `README.md` ที่ระบุไม่ตรงกับผลการรันจริง (79 vs 51), ตารางใน `reviewer.md` ขาดบันทึกประวัติ PR #71/#72 และเอกสาร `ai-use.md` ขาดบันทึก Prompts การแก้ไขใน PR #72
+
+#### 3.14.3 Author Response & Fixes (jejaebubu)
+
+ผู้เขียนแก้ไขครบทั้ง 3 จุด Blocking แล้ว (พร้อมกับอัปเดตเอกสารฉบับเต็ม):
+
+1. **`README.md`**: ยืนยันตัวเลขจริงโดยการรัน `npx vitest run` — **79/79 passed (9 test files)** และ `server 76/76`; เลข 51/8 files ที่ตรวจพบน่าจะมาจาก snapshot ที่เก่ากว่า → ปรับบรรทัดเป็น "server 76 tests + client 79 tests — ยืนยันผลรันจริง 2026-09-16: server 76/76, client 79/79 (9 test files)"
+2. **`docs/lab-03/reviewer.md`**: บันทึกประวัติครบถ้วนแล้ว — แถว PR-11 (#69), PR-12 (#71 Revert), PR-13 (#72 Re-review & Approve, merged `6955c48`, fix commits `18974f0`/`d1d282a`) + เพิ่ม **Section 3 Full Review Trail** ที่เก็บข้อความรีวิวฉบับเต็มจาก GitHub ทุก PR ทุก comment (21 review bodies + 23 inline comments + 8 author responses) + แถว PR-14 (#70) นี้
+3. **`docs/lab-03/ai-use.md`**: เพิ่ม **Prompt 10 (Re-review & Blocking Fixes — PR #72)** ที่ระบุวิธีแก้ 3 จุด (isSubmitting lock, minHeight 44px + Esc listener, searchAndFind helper)
+
+รอ Reviewer Re-review และ Approve/Merge
