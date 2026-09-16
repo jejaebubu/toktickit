@@ -54,7 +54,7 @@ test.describe("E2E-01: Login & Logout full flow (AC-01)", () => {
       await expect(page.getByTestId("header-mobile-nav-user-management")).toBeVisible();
       await page.getByTestId("header-nav-toggle").click();
     }
-    await page.screenshot({ path: shot(project, "auth", "logged-in-dashboard"), fullPage: true });
+    await page.screenshot({ path: shot(project, "authentication", "logged-in-dashboard"), fullPage: true });
     await expectNoHorizontalOverflow(page);
 
     // --- 4. Logout via the user menu ---
@@ -101,7 +101,7 @@ test.describe("E2E-02: Initial password login & mandatory password change (AC-02
     await expect(page.getByTestId("change-password-card")).toBeVisible();
     await expect(page.getByTestId("change-password-warning")).toBeVisible();
     await expect(page.getByTestId("change-password-logout")).toBeVisible();
-    await page.screenshot({ path: shot(project, "auth", "mandatory-change"), fullPage: true });
+    await page.screenshot({ path: shot(project, "authentication", "mandatory-change"), fullPage: true });
     await expectNoHorizontalOverflow(page);
 
     // --- 2. Submit is disabled until a strong new password + matching confirmation ---
@@ -126,7 +126,7 @@ test.describe("E2E-02: Initial password login & mandatory password change (AC-02
     await expect(page.getByTestId("header-role-badge")).toBeVisible();
     await expect(page.getByTestId("header-user-name")).toHaveText("New User (First Login)");
     await expect(page.getByTestId("change-password-card")).not.toBeVisible();
-    await page.screenshot({ path: shot(project, "auth", "relogin-with-new-password"), fullPage: true });
+    await page.screenshot({ path: shot(project, "authentication", "relogin-with-new-password"), fullPage: true });
     await expectNoHorizontalOverflow(page);
   });
 });

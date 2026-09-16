@@ -19,20 +19,20 @@
 
 | PR ID | Title / Feature Scope | Branch Source | Target Branch | Reviewer Status | Comments / Resolution (Merge SHA) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **PR-01 (GitHub #52)** | Specification & Engineering Contract for Lab 3 (Spec DD: specification, api-spec, ui-spec, tests, reviewer, ai-use) | `feature/lab03-issue1-specs` | `lab3-staging` | **Request Changes → Approved** | Review 2026-09-15: ขอเพิ่ม Authorization Matrix, ฟีลด์ + API สำหรับเจตนา "Problem Appears Resolved", เปลี่ยน `403` → `404` (Data Leakage §6.2), ปรับ DoD/Test/Reviewer ไม่บันทึกผลล่วงหน้า, เพิ่มเคส requesterId-override / password-boundary / resolved-intent → ผู้เขียนแก้ครบตามข้อ 1–4 → Reviewer ตรวจซ้ำแล้ว **Approve** (verify: เอกสาร Spec DD ครบถ้วนตาม Handout, BR-01..14 และ AC) — merged `076f0f1` |
-| **PR-02 (GitHub #60)** | Lab 3 database migration — ยกระดับ User model (roles: REQUESTER/IT_STAFF/ADMINISTRATOR, mustChangePassword, ownerId, PublicComment, InternalNote) + seed | `feature/lab03-issue2-migration` | `lab3-staging` | **Request Changes → Approved** | Review: SQL Migration เปลี่ยนเป็น RENAME TABLE เพื่อรักษาข้อมูล Lab 2 เดิมอย่างปลอดภัย (non-destructive); ตรวจ schema/migration/seed จริงแล้ว → **Approve** — merged `529865e` |
-| **PR-03 (GitHub #61)** | JWT Authentication API — login/logout/me/change-password, mandatory password change enforcement | `feature/lab03-issue3-auth` | `lab3-staging` | **Request Changes → Approved** | Review: ตรวจ middleware เพิ่ม `checkPasswordChangeState` ครอบ Protected Route ทุกเส้น + ปรับ response ไม่แนบ Token → แก้ครบ → **Approve** — merged `4d83b71` |
-| **PR-04 (GitHub #62)** | RBAC `requireRole` guard + protected internal-notes & user-management routes | `feature/lab03-issue4-rbac` | `lab3-staging` | **Approved** | Review: `requireRole` ทำงานร่วมกับ `authenticateToken`/`checkPasswordChangeState` ถูกต้อง, Requester เข้า Internal Notes/User APIs ไม่ได้ → **Approve** — merged `a47cee5` |
-| **PR-05 (GitHub #63)** | Requester regression — ย้าย Lab 2 tests ไปใช้ JWT flow จริง, ลบ impersonation fallback | `feature/lab03-issue5-requester-regression` | `lab3-staging` | **Request Changes → Approved** | Review: 2 จุดต้องแก้ (ความปลอดภัย/เอกสาร) → แก้ครบ → **Approve** — merged `f77c715` |
-| **PR-06 (GitHub #64)** | Role-aware Ticket Queue — staff search/filter/sort + pagination | `feature/lab03-issue6-staff-queue` | `lab3-staging` | **Request Changes → Approved** | Review: filter case-insensitive, validate ownerId/query params → 400, เพิ่ม unassigned-owner filter tests → แก้ครบ → **Approve** — merged `a131898` |
-| **PR-07 (GitHub #65)** | IT Staff ticket operations — claim/assign, itPriority, status, comments/notes, requesterIndicatedResolved (AC-08) & 404 no-leak | `feature/lab03-issue7-staff-operations` | `lab3-staging` | **Request Changes → Approved** | Review: validate ownerId (BR-11), itPriority & status enums (BR-13), cap comment length, staff status change clears resolution flag → แก้ครบ → **Approve** — merged `2935ad2` |
-| **PR-08 (GitHub #67)** | Client Authentication UI — Login, mandatory password change & role-aware app shell (JWT) | `feature/lab03-issue8-client-auth` | `lab3-staging` | **Approved** | Review (ฉบับสมบูรณ์): ตรวจ client auth flow, token storage, route guard และ role-aware shell ครบ → **Approve** — merged `8593a12` |
-| **PR-09 (GitHub #66)** | Administrator User Management — CRUD, reset-password, safety rules (self-deactivate block, duplicate email 409) | `feature/lab03-issue9-admin-user-management` | `lab3-staging` | **Approved** | Review: ตรวจรหัสผ่านหลักฐานบรรทัดต่อบรรทัด — safety rules & RBAC ครบถ้วน → **Approve** — merged `dd8656d` |
-| **PR-10 (GitHub #68)** | Zen Green UI — Ticket Queue, Staff Detail, User Management screens + UI-Style/Responsive tests | `feature/lab03-issue10-ui-style-responsive` | `lab3-staging` | **Request Changes → Approved** | Review: search input state mismatch → แก้ + เพิ่ม Clear Filters + `fetchUsers` error alert → ตรวจซ้ำ **Approve** — merged `d0d7e46` |
-| **PR-11 (GitHub #69)** | E2E Testing — Playwright E2E ครอบ 3 viewports (Desktop/Tablet/Mobile), Header responsive nav, StaffTicketDetail PATCH merge fix, evidence screenshots | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved → (merged by author — ผิดขั้นตอน) → Reverted (#71)** | Review 2026-09-16: 0 blocking issues, E2E ครอบทุก AC + Viewport, Zen Green ถูกต้อง. Non-blocking: (อนาคต) ปิด dropdown nav เมื่อคลิกภายนอก. **กระบวนการผิดพลาด**: #69 ถูก merge โดย author (ไม่ใช่ reviewer) → ถูก **revert ผ่าน #71** และ re-add ใหม่ผ่าน #72 |
-| **PR-12 (GitHub #71)** | Revert ของ #69 (แก้กระบวนการ: ให้ Reviewer เป็นผู้ merge ใหม่) | `fix/lab03-revert-pr69-e2e` | `lab3-staging` | **Approved** | ย้อนเนื้อหา E2E ออกจาก staging กลับสู่ `d0d7e46` เพื่อให้ Reviewer เปิด PR re-add ใหม่ — merged `7720e35` |
-| **PR-13 (GitHub #72)** | E2E Testing (re-add จาก #69) — เนื้อหาเดียวกับ #69 + แก้ตาม review: `isSubmitting` lock PATCH, preserve attachments (null-safe), touch target 44px + Esc, `searchAndFind` deterministic | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Request Changes → Approve** | Review 2026-09-16: 3 blocking (race condition PATCH, STYLE-03 touch target <44px, E2E findUser flaky กับ pagination) → แก้ครบ commits `18974f0`/`d1d282a` → **Re-review: Approve** — merged `6955c48` (โดย Reviewer) — **Closes #49** |
-| **PR-14 (GitHub #70)** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Approved (Re-review)** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **Re-review (2026-09-16 19:42 UTC): APPROVED — AC-01..AC-06 ผ่านครบ** → **รอ Reviewer กด Merge เข้า `main`** — **Closes #50** |
+| **PR-01 ([GitHub #52](https://github.com/jejaebubu/toktickit/pull/52))** | Specification & Engineering Contract for Lab 3 (Spec DD: specification, api-spec, ui-spec, tests, reviewer, ai-use) | `feature/lab03-issue1-specs` | `lab3-staging` | **Request Changes → Approved** | Review 2026-09-15: ขอเพิ่ม Authorization Matrix, ฟีลด์ + API สำหรับเจตนา "Problem Appears Resolved", เปลี่ยน `403` → `404` (Data Leakage §6.2), ปรับ DoD/Test/Reviewer ไม่บันทึกผลล่วงหน้า, เพิ่มเคส requesterId-override / password-boundary / resolved-intent → ผู้เขียนแก้ครบตามข้อ 1–4 → Reviewer ตรวจซ้ำแล้ว **Approve** (verify: เอกสาร Spec DD ครบถ้วนตาม Handout, BR-01..14 และ AC) — merged `076f0f1` |
+| **PR-02 ([GitHub #60](https://github.com/jejaebubu/toktickit/pull/60))** | Lab 3 database migration — ยกระดับ User model (roles: REQUESTER/IT_STAFF/ADMINISTRATOR, mustChangePassword, ownerId, PublicComment, InternalNote) + seed | `feature/lab03-issue2-migration` | `lab3-staging` | **Request Changes → Approved** | Review: SQL Migration เปลี่ยนเป็น RENAME TABLE เพื่อรักษาข้อมูล Lab 2 เดิมอย่างปลอดภัย (non-destructive); ตรวจ schema/migration/seed จริงแล้ว → **Approve** — merged `529865e` |
+| **PR-03 ([GitHub #61](https://github.com/jejaebubu/toktickit/pull/61))** | JWT Authentication API — login/logout/me/change-password, mandatory password change enforcement | `feature/lab03-issue3-auth` | `lab3-staging` | **Request Changes → Approved** | Review: ตรวจ middleware เพิ่ม `checkPasswordChangeState` ครอบ Protected Route ทุกเส้น + ปรับ response ไม่แนบ Token → แก้ครบ → **Approve** — merged `4d83b71` |
+| **PR-04 ([GitHub #62](https://github.com/jejaebubu/toktickit/pull/62))** | RBAC `requireRole` guard + protected internal-notes & user-management routes | `feature/lab03-issue4-rbac` | `lab3-staging` | **Approved** | Review: `requireRole` ทำงานร่วมกับ `authenticateToken`/`checkPasswordChangeState` ถูกต้อง, Requester เข้า Internal Notes/User APIs ไม่ได้ → **Approve** — merged `a47cee5` |
+| **PR-05 ([GitHub #63](https://github.com/jejaebubu/toktickit/pull/63))** | Requester regression — ย้าย Lab 2 tests ไปใช้ JWT flow จริง, ลบ impersonation fallback | `feature/lab03-issue5-requester-regression` | `lab3-staging` | **Request Changes → Approved** | Review: 2 จุดต้องแก้ (ความปลอดภัย/เอกสาร) → แก้ครบ → **Approve** — merged `f77c715` |
+| **PR-06 ([GitHub #64](https://github.com/jejaebubu/toktickit/pull/64))** | Role-aware Ticket Queue — staff search/filter/sort + pagination | `feature/lab03-issue6-staff-queue` | `lab3-staging` | **Request Changes → Approved** | Review: filter case-insensitive, validate ownerId/query params → 400, เพิ่ม unassigned-owner filter tests → แก้ครบ → **Approve** — merged `a131898` |
+| **PR-07 ([GitHub #65](https://github.com/jejaebubu/toktickit/pull/65))** | IT Staff ticket operations — claim/assign, itPriority, status, comments/notes, requesterIndicatedResolved (AC-08) & 404 no-leak | `feature/lab03-issue7-staff-operations` | `lab3-staging` | **Request Changes → Approved** | Review: validate ownerId (BR-11), itPriority & status enums (BR-13), cap comment length, staff status change clears resolution flag → แก้ครบ → **Approve** — merged `2935ad2` |
+| **PR-08 ([GitHub #67](https://github.com/jejaebubu/toktickit/pull/67))** | Client Authentication UI — Login, mandatory password change & role-aware app shell (JWT) | `feature/lab03-issue8-client-auth` | `lab3-staging` | **Approved** | Review (ฉบับสมบูรณ์): ตรวจ client auth flow, token storage, route guard และ role-aware shell ครบ → **Approve** — merged `8593a12` |
+| **PR-09 ([GitHub #66](https://github.com/jejaebubu/toktickit/pull/66))** | Administrator User Management — CRUD, reset-password, safety rules (self-deactivate block, duplicate email 409) | `feature/lab03-issue9-admin-user-management` | `lab3-staging` | **Approved** | Review: ตรวจรหัสผ่านหลักฐานบรรทัดต่อบรรทัด — safety rules & RBAC ครบถ้วน → **Approve** — merged `dd8656d` |
+| **PR-10 ([GitHub #68](https://github.com/jejaebubu/toktickit/pull/68))** | Zen Green UI — Ticket Queue, Staff Detail, User Management screens + UI-Style/Responsive tests | `feature/lab03-issue10-ui-style-responsive` | `lab3-staging` | **Request Changes → Approved** | Review: search input state mismatch → แก้ + เพิ่ม Clear Filters + `fetchUsers` error alert → ตรวจซ้ำ **Approve** — merged `d0d7e46` |
+| **PR-11 ([GitHub #69](https://github.com/jejaebubu/toktickit/pull/69))** | E2E Testing — Playwright E2E ครอบ 3 viewports (Desktop/Tablet/Mobile), Header responsive nav, StaffTicketDetail PATCH merge fix, evidence screenshots | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved → (merged by author — ผิดขั้นตอน) → Reverted (#71)** | Review 2026-09-16: 0 blocking issues, E2E ครอบทุก AC + Viewport, Zen Green ถูกต้อง. Non-blocking: (อนาคต) ปิด dropdown nav เมื่อคลิกภายนอก. **กระบวนการผิดพลาด**: #69 ถูก merge โดย author (ไม่ใช่ reviewer) → ถูก **revert ผ่าน #71** และ re-add ใหม่ผ่าน #72 |
+| **PR-12 ([GitHub #71](https://github.com/jejaebubu/toktickit/pull/71))** | Revert ของ #69 (แก้กระบวนการ: ให้ Reviewer เป็นผู้ merge ใหม่) | `fix/lab03-revert-pr69-e2e` | `lab3-staging` | **Approved** | ย้อนเนื้อหา E2E ออกจาก staging กลับสู่ `d0d7e46` เพื่อให้ Reviewer เปิด PR re-add ใหม่ — merged `7720e35` |
+| **PR-13 ([GitHub #72](https://github.com/jejaebubu/toktickit/pull/72))** | E2E Testing (re-add จาก #69) — เนื้อหาเดียวกับ #69 + แก้ตาม review: `isSubmitting` lock PATCH, preserve attachments (null-safe), touch target 44px + Esc, `searchAndFind` deterministic | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Request Changes → Approve** | Review 2026-09-16: 3 blocking (race condition PATCH, STYLE-03 touch target <44px, E2E findUser flaky กับ pagination) → แก้ครบ commits `18974f0`/`d1d282a` → **Re-review: Approve** — merged `6955c48` (โดย Reviewer) — **Closes #49** |
+| **PR-14 ([GitHub #70](https://github.com/jejaebubu/toktickit/pull/70))** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Approved (Re-review)** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **Re-review (2026-09-16 19:42 UTC): APPROVED — AC-01..AC-06 ผ่านครบ** → **รอ Reviewer กด Merge เข้า `main`** — **Closes #50** |
 
 > **บันทึก**: ทุก PR ถูกตรวจทานจริงบน GitHub (state: CHANGES_REQUESTED/APPROVED) โดย Reviewer `phatthidawadi`; การ merge ตาม Lab Section 11.1 เป็นบทบาทของ Reviewer หลัง merge ทั้งหมดไปยัง `lab3-staging` แล้วจึงทำ **Release PR** `lab3-staging` → `main` (Section 11.1) และบันทึกผลการตรวจจริงใน PR นั้นเมื่อคน review/merge แล้ว
 >
@@ -46,7 +46,7 @@
 
 ---
 
-### 3.1 PR-01 (GitHub #52) — Specification & Engineering Contract (Issue #39)
+### 3.1 PR-01 ([GitHub #52](https://github.com/jejaebubu/toktickit/pull/52)) — Specification & Engineering Contract (Issue #39)
 
 #### 3.1.1 Review #1 — Request Changes (phatthidawadi, 2026-09-15 04:23 UTC)
 
@@ -185,7 +185,7 @@ Issue #39 กำหนดให้แปลงโจทย์ Lab 3 (Handout PDF
 
    * เปลี่ยน DoD ทั้ง 6 ข้อเป็น `[ ]`
    * เปลี่ยนสถานะ test ใน `tests.md` เป็น `Pending` และจะอัปเดตผลจริงหลัง implement
-   * `reviewer.md` เหลือเฉพาะ PR-01 (GitHub #52) ที่มีอยู่จริง และลบ PR ที่เคยใส่ `APPROVED` ไว้ล่วงหน้า
+   * `reviewer.md` เหลือเฉพาะ PR-01 ([GitHub #52](https://github.com/jejaebubu/toktickit/pull/52)) ที่มีอยู่จริง และลบ PR ที่เคยใส่ `APPROVED` ไว้ล่วงหน้า
    * `ui-spec.md` เปลี่ยน screenshot checklist เป็น `[ ]` เพราะยังไม่ได้ capture ค่ะ
 
 5. **เพิ่ม test cases แล้ว**
@@ -213,7 +213,7 @@ Admin สามารถเป็น Ticket Owner ได้ค่ะ และ�
 
 ---
 
-### 3.2 PR-02 (GitHub #60) — Database Migration & Seed (Issue #40)
+### 3.2 PR-02 ([GitHub #60](https://github.com/jejaebubu/toktickit/pull/60)) — Database Migration & Seed (Issue #40)
 
 #### 3.2.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
 
@@ -315,7 +315,7 @@ Issue #40 กำหนดให้ยกระดับโมเดลข้อ�
 
 ---
 
-### 3.3 PR-03 (GitHub #61) — JWT Authentication API (Issue #41)
+### 3.3 PR-03 ([GitHub #61](https://github.com/jejaebubu/toktickit/pull/61)) — JWT Authentication API (Issue #41)
 
 #### 3.3.1 Review #1 — Request Changes (phatthidawadi, 2026-09-15 10:11 UTC)
 
@@ -433,7 +433,7 @@ Issue #41 กำหนดให้สร้างระบบการยืน�
 
 ---
 
-### 3.4 PR-04 (GitHub #62) — RBAC requireRole Guard (Issue #42)
+### 3.4 PR-04 ([GitHub #62](https://github.com/jejaebubu/toktickit/pull/62)) — RBAC requireRole Guard (Issue #42)
 
 #### 3.4.1 Review — Approved (phatthidawadi, 2026-09-15 15:39 UTC)
 
@@ -441,7 +441,7 @@ Issue #41 กำหนดให้สร้างระบบการยืน�
 
 ---
 
-### 3.5 PR-05 (GitHub #63) — Requester Regression & Impersonation Fallback Removal (Issue #43)
+### 3.5 PR-05 ([GitHub #63](https://github.com/jejaebubu/toktickit/pull/63)) — Requester Regression & Impersonation Fallback Removal (Issue #43)
 
 #### 3.5.1 Review #1 — Request Changes (phatthidawadi, 2026-09-15 11:28 UTC)
 
@@ -528,7 +528,7 @@ const JWT_SECRET: string = (() => {
 
 ---
 
-### 3.6 PR-06 (GitHub #64) — Role-Aware Staff Ticket Queue & Query APIs (Issue #44)
+### 3.6 PR-06 ([GitHub #64](https://github.com/jejaebubu/toktickit/pull/64)) — Role-Aware Staff Ticket Queue & Query APIs (Issue #44)
 
 #### 3.6.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
 
@@ -667,7 +667,7 @@ Staff Queue ตอนนี้ตรวจสอบ `page/limit/sort/order/categ
 
 ---
 
-### 3.7 PR-07 (GitHub #65) — IT Staff Ticket Operations & Public Comments / Internal Notes (Issue #45)
+### 3.7 PR-07 ([GitHub #65](https://github.com/jejaebubu/toktickit/pull/65)) — IT Staff Ticket Operations & Public Comments / Internal Notes (Issue #45)
 
 #### 3.7.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
 
@@ -807,7 +807,7 @@ Verify: migrate reset + vitest = 71/71 ผ่าน (15 ไฟล์)  + tsc
 
 ---
 
-### 3.8 PR-08 (GitHub #67) — Client Authentication UI & Foundation (Issue #46)
+### 3.8 PR-08 ([GitHub #67](https://github.com/jejaebubu/toktickit/pull/67)) — Client Authentication UI & Foundation (Issue #46)
 
 #### 3.8.1 Inline Review Comments (phatthidawadi — GitHub diff comments, non-blocking)
 
@@ -876,7 +876,7 @@ PR #67 เพิ่มและปรับปรุงส่วนติดต�
 
 ---
 
-### 3.9 PR-09 (GitHub #66) — Administrator User Management REST API & Safety Controls (Issue #47)
+### 3.9 PR-09 ([GitHub #66](https://github.com/jejaebubu/toktickit/pull/66)) — Administrator User Management REST API & Safety Controls (Issue #47)
 
 #### 3.9.1 Review — Approved (phatthidawadi, 2026-09-15 17:39 UTC)
 
@@ -903,7 +903,7 @@ PR #67 เพิ่มและปรับปรุงส่วนติดต�
 
 ---
 
-### 3.10 PR-10 (GitHub #68) — Zen Green UI Screens + UI Style/Responsive Tests (Issue #48)
+### 3.10 PR-10 ([GitHub #68](https://github.com/jejaebubu/toktickit/pull/68)) — Zen Green UI Screens + UI Style/Responsive Tests (Issue #48)
 
 #### 3.10.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
 
@@ -1061,7 +1061,7 @@ Issue #48 กำหนดให้พัฒนายกระดับส่ว�
 
 ---
 
-### 3.11 PR-11 (GitHub #69) — E2E Testing (Issue #49) — first submission (merged by author by mistake, later reverted)
+### 3.11 PR-11 ([GitHub #69](https://github.com/jejaebubu/toktickit/pull/69)) — E2E Testing (Issue #49) — first submission (merged by author by mistake, later reverted)
 
 #### 3.11.1 Review — Approved (phatthidawadi, 2026-09-16 17:12 UTC)
 
@@ -1127,7 +1127,7 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 
 ---
 
-### 3.12 PR-12 (GitHub #71) — Revert PR #69 (Process Correction) (fix/lab03-revert-pr69-e2e)
+### 3.12 PR-12 ([GitHub #71](https://github.com/jejaebubu/toktickit/pull/71)) — Revert PR #69 (Process Correction) (fix/lab03-revert-pr69-e2e)
 
 #### 3.12.1 Review — Approved (phatthidawadi, 2026-09-16 18:18 UTC)
 
@@ -1145,7 +1145,7 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 
 ---
 
-### 3.13 PR-13 (GitHub #72) — E2E Testing (re-add สำหรับ Issue #49) + Review Fixes
+### 3.13 PR-13 ([GitHub #72](https://github.com/jejaebubu/toktickit/pull/72)) — E2E Testing (re-add สำหรับ Issue #49) + Review Fixes
 
 #### 3.13.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
 
@@ -1286,12 +1286,12 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 
 ## 4. Release PR Review Trail (Section 11.1)
 
-- Release PR **GitHub #70** (Issue #50) จาก `release/lab03-post-merge-verification` → `main` ถูกตรวจทานจริงโดย Reviewer แล้ว รายละเอียดฉบับเต็มอยู่ใน **3.14 ด้านล่าง**
+- Release PR **[GitHub #70](https://github.com/jejaebubu/toktickit/pull/70)** (Issue #50) จาก `release/lab03-post-merge-verification` → `main` ถูกตรวจทานจริงโดย Reviewer แล้ว รายละเอียดฉบับเต็มอยู่ใน **3.14 ด้านล่าง**
 - สถานะล่าสุด: **Request Changes → ผู้เขียนแก้ครบทั้ง 3 จุด → Reviewer Re-review (2026-09-16 19:42 UTC): APPROVED → รอ Reviewer กด Merge เข้า `main`**
 
 ---
 
-### 3.14 PR-14 (GitHub #70) — Release Integration to main (Issue #50)
+### 3.14 PR-14 ([GitHub #70](https://github.com/jejaebubu/toktickit/pull/70)) — Release Integration to main (Issue #50)
 
 #### 3.14.1 Inline Review Comments (phatthidawadi — GitHub diff comments)
 
@@ -1307,7 +1307,7 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 2. **`docs/lab-03/reviewer.md:31`**
    > **File:** `docs/lab-03/reviewer.md` (Line 31)
    > ```markdown
-   > | **PR-11 (GitHub #69)** | E2E Testing — Playwright E2E... | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved** | Review 2026-09-16: 0 blocking issues... merged `22d1665` |
+   > | **PR-11 ([GitHub #69](https://github.com/jejaebubu/toktickit/pull/69))** | E2E Testing — Playwright E2E... | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved** | Review 2026-09-16: 0 blocking issues... merged `22d1665` |
    > ```
    > **Problem:** ตาราง Review Log ขาดการบันทึกประวัติ PR #71 (Revert PR #69) และ PR #72 (Re-review & Fixes) ซึ่งเป็นลำดับขั้นตอนการตรวจจริงในระบบ ทำให้เอกสาร Audit Log ขาดความถูกต้องสมบูรณ์
    > **Fix:** อัปเดตบรรทัด PR-11 ให้ระบุเป็น PR #69/#71/#72 พร้อมรายละเอียดการ Revert และ SHA อนุมัติจริงล่าสุด (`d1d282a`)

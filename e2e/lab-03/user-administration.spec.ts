@@ -42,7 +42,7 @@ test.describe("E2E-04: Admin user creation, search, & password reset (AC-06)", (
     await page.getByTestId("user-search-btn").click();
     const jenniferRow = findUser("jennifer@toktickit.com");
     await expect(jenniferRow).toBeVisible({ timeout: 15_000 });
-    await page.screenshot({ path: shot(project, "user-admin", "user-search"), fullPage: true });
+    await page.screenshot({ path: shot(project, "user-management", "user-search"), fullPage: true });
     await page.getByTestId("user-clear-filters").click();
     // Clearing filters restores the full list (jennifer is included again).
     await expect(jenniferRow).toBeVisible({ timeout: 15_000 });
@@ -72,7 +72,7 @@ test.describe("E2E-04: Admin user creation, search, & password reset (AC-06)", (
     await page.getByTestId("user-password-input").fill("E2EUser123!");
     await page.getByTestId("user-modal-save").click();
     await expect(page.getByTestId("user-form-error")).toContainText(/already exists/i);
-    await page.screenshot({ path: shot(project, "user-admin", "duplicate-email-block"), fullPage: true });
+    await page.screenshot({ path: shot(project, "user-management", "duplicate-email-block"), fullPage: true });
     await page.getByTestId("user-modal-cancel").click();
 
     // --- 5. Self-deactivation is blocked server-side ---
@@ -91,7 +91,7 @@ test.describe("E2E-04: Admin user creation, search, & password reset (AC-06)", (
     await page.getByTestId("user-reset-password-input").fill("NewPass456!");
     await page.getByTestId("user-reset-save").click();
     await expect(page.getByTestId("user-mgmt-notice")).toContainText(/has been reset/i);
-    await page.screenshot({ path: shot(project, "user-admin", "password-reset"), fullPage: true });
+    await page.screenshot({ path: shot(project, "user-management", "password-reset"), fullPage: true });
     await expectNoHorizontalOverflow(page);
   });
 });

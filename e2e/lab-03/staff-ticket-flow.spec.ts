@@ -91,7 +91,7 @@ test.describe("E2E-03: IT Staff ticket queue, claim & update flow (AC-05)", () =
     await page.selectOption('[data-testid="detail-priority-select"]', "URGENT");
     await page.selectOption('[data-testid="detail-status-select"]', "Resolved");
     await expect(page.getByTestId("detail-notice")).toContainText(/updated successfully/i);
-    await page.screenshot({ path: shot(project, "staff-detail", "claimed-updated"), fullPage: true });
+    await page.screenshot({ path: shot(project, "staff-ticket-detail", "claimed-updated"), fullPage: true });
 
     // --- 7. Post a Public Comment (green/white card) ---
     await page.getByTestId("comment-input").fill("Sync issue repaired during end-to-end verification.");
@@ -103,7 +103,7 @@ test.describe("E2E-03: IT Staff ticket queue, claim & update flow (AC-05)", () =
     await page.getByTestId("note-submit").click();
     await expect(page.getByTestId("internal-notes-container")).toContainText("Root cause: stale profile; cleared remotely.");
 
-    await page.screenshot({ path: shot(project, "staff-detail", "comment-and-note"), fullPage: true });
+    await page.screenshot({ path: shot(project, "staff-ticket-detail", "comment-and-note"), fullPage: true });
     await expectNoHorizontalOverflow(page);
   });
 });

@@ -11,22 +11,22 @@
 
 | Test ID | Type | Requirement / AC | What It Tests | Expected Result | Automated Test File | Final Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **API-01** | API | AC-01 | Valid user authentication | Returns HTTP 200, user data & auth token | `server/tests/lab-03/auth.api.test.ts` | Pending |
-| **API-02** | API | AC-01 | Invalid login attempt | Returns HTTP 401 Unauthorized | `server/tests/lab-03/auth.api.test.ts` | Pending |
-| **API-03** | API | AC-01 | Inactive account login | Returns HTTP 401 with safe error message | `server/tests/lab-03/auth.api.test.ts` | Pending |
-| **API-04** | API | AC-02 | Mandatory password change enforcement | Blocks access to protected APIs until changed | `server/tests/lab-03/auth.api.test.ts` | Pending |
-| **API-05** | API | AC-03 | Requester requesting Internal Notes API | Returns HTTP 403 Forbidden | `server/tests/lab-03/authorization.api.test.ts` | Pending |
-| **API-06** | API | AC-03 | Requester requesting User Admin API | Returns HTTP 403 Forbidden | `server/tests/lab-03/authorization.api.test.ts` | Pending |
-| **API-07** | API | AC-04 | IT Staff Ticket Queue with search/filter | Returns filtered queue with pagination | `server/tests/lab-03/staff-queue.api.test.ts` | Pending |
-| **API-08** | API | AC-05 | IT Staff claim ticket ownership | Updates `ownerId` to current IT Staff | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pending |
-| **API-09** | API | AC-05 | IT Staff update IT Priority & Status | Updates ticket fields successfully | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pending |
-| **API-10** | API | AC-04 | Create Public Comment & Internal Note | Posts comment & note successfully | `server/tests/lab-03/comments-notes.api.test.ts` | Pending |
-| **API-11** | API | AC-06 | Admin self-deactivation attempt | Returns HTTP 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pending |
-| **API-12** | API | AC-07 | Admin deactivating last active Admin | Returns HTTP 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pending |
-| **API-13** | API | AC-06 | Duplicate email user creation | Returns HTTP 409 Conflict | `server/tests/lab-03/users-admin.api.test.ts` | Pending |
-| **API-14** | API | FR-04 / BR-03 / AC-09 | Server ignores client-supplied `requesterId` (ownership decided from token only) | Viewing own ticket with forged body/query `requesterId` still resolves to authenticated identity | `server/tests/lab-03/authorization.api.test.ts` | Pending |
-| **API-15** | API | AC-10 | Password length & complexity boundary validation | Rejects <8 chars / no uppercase / no lowercase / no digit-or-symbol with HTTP 400 | `server/tests/lab-03/auth.api.test.ts` | Pending |
-| **API-16** | API | FR-09 / BR-05 / AC-08 | Requester "Problem Appears Resolved" flow | Sets `requesterIndicatedResolved=true`, status becomes `Waiting for Requester`, staff sees the flag; requester cannot set status directly | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pending |
+| **API-01** | API | AC-01 | Valid user authentication | Returns HTTP 200, user data & auth token | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-02** | API | AC-01 | Invalid login attempt | Returns HTTP 401 Unauthorized | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-03** | API | AC-01 | Inactive account login | Returns HTTP 401 with safe error message | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-04** | API | AC-02 | Mandatory password change enforcement | Blocks access to protected APIs until changed | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-05** | API | AC-03 | Requester requesting Internal Notes API | Returns HTTP 403 Forbidden | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-06** | API | AC-03 | Requester requesting User Admin API | Returns HTTP 403 Forbidden | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-07** | API | AC-04 | IT Staff Ticket Queue with search/filter | Returns filtered queue with pagination | `server/tests/lab-03/staff-queue.api.test.ts` | Pass |
+| **API-08** | API | AC-05 | IT Staff claim ticket ownership | Updates `ownerId` to current IT Staff | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
+| **API-09** | API | AC-05 | IT Staff update IT Priority & Status | Updates ticket fields successfully | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
+| **API-10** | API | AC-04 | Create Public Comment & Internal Note | Posts comment & note successfully | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
+| **API-11** | API | AC-06 | Admin self-deactivation attempt | Returns HTTP 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-12** | API | AC-07 | Admin deactivating last active Admin | Returns HTTP 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-13** | API | AC-06 | Duplicate email user creation | Returns HTTP 409 Conflict | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-14** | API | FR-04 / BR-03 / AC-09 | Server ignores client-supplied `requesterId` (ownership decided from token only) | Viewing own ticket with forged body/query `requesterId` still resolves to authenticated identity | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-15** | API | AC-10 | Password length & complexity boundary validation | Rejects <8 chars / no uppercase / no lowercase / no digit-or-symbol with HTTP 400 | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-16** | API | FR-09 / BR-05 / AC-08 | Requester "Problem Appears Resolved" flow | Sets `requesterIndicatedResolved=true`, status becomes `Waiting for Requester`, staff sees the flag; requester cannot set status directly | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
 | **UI-01** | UI | AC-01 | Login component rendering & submission | Submits credentials and calls auth handler | `client/tests/lab-03/Login.test.tsx` | Pass |
 | **UI-02** | UI | AC-02 | Change Password component validation | Enforces rules and submits new password | `client/tests/lab-03/ChangePassword.test.tsx` | Pass |
 | **UI-03** | UI | AC-04 | Staff Ticket Queue table & filters | Renders ticket queue and triggers query update | `client/tests/lab-03/StaffTicketQueue.test.tsx` | Pass |
