@@ -5,5 +5,8 @@ export default defineConfig({
     environment: "node",
     include: ["tests/**/*.test.ts"],
     fileParallelism: false,
+    env: {
+      JWT_SECRET: "toktickit-lab3-vitest-test-secret-only",
+    },
   },
 });

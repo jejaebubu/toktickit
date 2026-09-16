@@ -28,7 +28,6 @@ function renderSection(
   return render(
     <AttachmentSection
       ticketId={1}
-      requesterId={1}
       attachments={attachments}
       onAttachmentsChange={overrides.onAttachmentsChange || vi.fn()}
       onError={overrides.onError || vi.fn()}

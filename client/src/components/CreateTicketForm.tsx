@@ -9,7 +9,7 @@ import {
   CreateTicketPayload,
   TicketResponse,
 } from "../api.js";
-import { useRequester } from "../context/RequesterContext.js";
+import { useAuth } from "../context/AuthContext.js";
 
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -21,7 +21,7 @@ const ALLOWED_MIME_TYPES = [
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 export const CreateTicketForm: React.FC<{ onCreated?: () => void }> = ({ onCreated }) => {
-  const { selectedRequester } = useRequester();
+  const { user } = useAuth();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [systems, setSystems] = useState<RelatedSystem[]>([]);
@@ -114,8 +114,8 @@ export const CreateTicketForm: React.FC<{ onCreated?: () => void }> = ({ onCreat
     setApiError(null);
     setUploadedCount(0);
 
-    if (!selectedRequester) {
-      setApiError("Please select a Requester User context first.");
+    if (!user) {
+      setApiError("Please sign in to create a ticket.");
       return;
     }
 
@@ -132,7 +132,7 @@ export const CreateTicketForm: React.FC<{ onCreated?: () => void }> = ({ onCreat
         requestedPriority,
       };
 
-      const result = await createTicket(payload, selectedRequester.id);
+      const result = await createTicket(payload);
 
       // Upload selected attachments after successful ticket creation (FR-04)
       const toUpload = files;
@@ -141,7 +141,7 @@ export const CreateTicketForm: React.FC<{ onCreated?: () => void }> = ({ onCreat
 
       for (const file of toUpload) {
         try {
-          await uploadAttachment(result.id, file, selectedRequester.id);
+          await uploadAttachment(result.id, file);
           uploaded += 1;
         } catch (uploadErr: any) {
           failed.push(`${file.name}: ${uploadErr.message || "upload failed"}`);
@@ -219,7 +219,7 @@ export const CreateTicketForm: React.FC<{ onCreated?: () => void }> = ({ onCreat
             style={{ backgroundColor: "#F0F4F2", color: "#1F2923" }}
             data-testid="readonly-requester"
           >
-            {selectedRequester ? selectedRequester.name : "—"}
+            {user ? user.name : "—"}
           </div>
         </div>
       </div>

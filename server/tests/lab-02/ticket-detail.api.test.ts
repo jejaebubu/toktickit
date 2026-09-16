@@ -1,20 +1,23 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
+import bcrypt from "bcryptjs";
 import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
+import { loginAs, TEST_PASSWORD } from "./helpers.js";
 
 const OWNER_EMAIL = "issue9.owner@example.com";
 const OTHER_EMAIL = "issue9.other@example.com";
 
 describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
-  let owner: { id: number };
-  let other: { id: number };
+  let owner: { id: number; email: string };
+  let other: { id: number; email: string };
   let ticketId: number;
   let category: { id: number; name: string };
   let system: { id: number; name: string };
 
   beforeAll(async () => {
     const prisma = getPrisma();
+    const hash = await bcrypt.hash(TEST_PASSWORD, 10);
 
     let cat = await prisma.category.findFirst();
     if (!cat) cat = await prisma.category.create({ data: { name: "Network" } });
@@ -24,13 +27,18 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     if (!sys) sys = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     system = sys;
 
-    let a = await prisma.requesterUser.findUnique({ where: { email: OWNER_EMAIL } });
-    if (!a) a = await prisma.requesterUser.create({ data: { name: "Issue9 Owner", email: OWNER_EMAIL, isActive: true } });
+    let a = await prisma.user.findUnique({ where: { email: OWNER_EMAIL } });
+    if (!a) a = await prisma.user.create({ data: { name: "Issue9 Owner", email: OWNER_EMAIL, passwordHash: hash, isActive: true } });
     owner = a;
 
-    let b = await prisma.requesterUser.findUnique({ where: { email: OTHER_EMAIL } });
-    if (!b) b = await prisma.requesterUser.create({ data: { name: "Issue9 Other", email: OTHER_EMAIL, isActive: true } });
+    let b = await prisma.user.findUnique({ where: { email: OTHER_EMAIL } });
+    if (!b) b = await prisma.user.create({ data: { name: "Issue9 Other", email: OTHER_EMAIL, passwordHash: hash, isActive: true } });
     other = b;
+
+    await prisma.user.updateMany({
+      where: { id: { in: [a.id, b.id] } },
+      data: { passwordHash: hash, mustChangePassword: false, isActive: true },
+    });
 
     const t = await prisma.ticket.create({
       data: {
@@ -50,15 +58,16 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     const prisma = getPrisma();
     await prisma.attachment.deleteMany({ where: { ticketId } });
     await prisma.ticket.deleteMany({ where: { id: ticketId } });
-    await prisma.requesterUser.deleteMany({
+    await prisma.user.deleteMany({
       where: { email: { in: [OWNER_EMAIL, OTHER_EMAIL] } },
     });
   });
 
   it("API-03a: Owner can view full ticket detail (200 OK)", async () => {
+    const token = await loginAs(OWNER_EMAIL);
     const res = await request(app)
       .get(`/api/tickets/${ticketId}`)
-      .set("X-Requester-Id", String(owner.id));
+      .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.id).toBe(ticketId);
@@ -75,33 +84,36 @@ describe("GET /api/tickets/:id (Issue 9 - Ticket Detail & Ownership)", () => {
     expect(res.body).toHaveProperty("updatedAt");
   });
 
-  it("API-03b: Another requester gets 403 Forbidden (Ownership Protection)", async () => {
+  it("API-03b: Another requester gets 404 Not Found for others' tickets (§6.2 no data leakage)", async () => {
+    const token = await loginAs(OTHER_EMAIL);
     const res = await request(app)
       .get(`/api/tickets/${ticketId}`)
-      .set("X-Requester-Id", String(other.id));
+      .set("Authorization", `Bearer ${token}`);
 
-    expect(res.status).toBe(403);
-    expect(res.body.error).toBe("Forbidden");
-    expect(res.body.message).toContain("permission");
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("Not Found");
+    expect(res.body.message).toContain("not found");
   });
 
   it("API-03c: Nonexistent or malformed ticket ID returns 404 Not Found", async () => {
+    const token = await loginAs(OWNER_EMAIL);
+
     const missing = await request(app)
       .get("/api/tickets/99999999")
-      .set("X-Requester-Id", String(owner.id));
+      .set("Authorization", `Bearer ${token}`);
     expect(missing.status).toBe(404);
     expect(missing.body.error).toBe("Not Found");
 
     const malformed = await request(app)
       .get("/api/tickets/not-a-number")
-      .set("X-Requester-Id", String(owner.id));
+      .set("Authorization", `Bearer ${token}`);
     expect(malformed.status).toBe(404);
     expect(malformed.body.error).toBe("Not Found");
   });
 
-  it("API-03d: Missing requester header returns 400 Bad Request", async () => {
+it("API-03d: Missing credentials header returns 401 Unauthorized", async () => {
     const res = await request(app).get(`/api/tickets/${ticketId}`);
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("Bad Request");
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("Unauthorized");
   });
 });

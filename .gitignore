@@ -25,3 +25,8 @@ coverage/
 .DS_Store
 # editor
 .vscode/
+
+# root scratch / handout files (not source — must never be committed)
+/*.pdf
+/*.png
+/.evidence-capture.mjs

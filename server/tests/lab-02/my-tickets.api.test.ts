@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
+import bcrypt from "bcryptjs";
 import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
+import { loginAs, TEST_PASSWORD } from "./helpers.js";
 
 const TEST_TICKET_NUMBERS = [
   "TKT-2026-700001",
@@ -22,6 +24,7 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
 
   beforeAll(async () => {
     const prisma = getPrisma();
+    const hash = await bcrypt.hash(TEST_PASSWORD, 10);
 
     let cat = await prisma.category.findFirst();
     if (!cat) cat = await prisma.category.create({ data: { name: "Network" } });
@@ -31,13 +34,18 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
     if (!sys) sys = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     system = sys;
 
-    let a = await prisma.requesterUser.findUnique({ where: { email: "test.requester.a@example.com" } });
-    if (!a) a = await prisma.requesterUser.create({ data: { name: "Tester A", email: "test.requester.a@example.com", isActive: true } });
+    let a = await prisma.user.findUnique({ where: { email: "test.requester.a@example.com" } });
+    if (!a) a = await prisma.user.create({ data: { name: "Tester A", email: "test.requester.a@example.com", passwordHash: hash, isActive: true } });
     requesterA = a;
 
-    let b = await prisma.requesterUser.findUnique({ where: { email: "test.requester.b@example.com" } });
-    if (!b) b = await prisma.requesterUser.create({ data: { name: "Tester B", email: "test.requester.b@example.com", isActive: true } });
+    let b = await prisma.user.findUnique({ where: { email: "test.requester.b@example.com" } });
+    if (!b) b = await prisma.user.create({ data: { name: "Tester B", email: "test.requester.b@example.com", passwordHash: hash, isActive: true } });
     requesterB = b;
+
+    await prisma.user.updateMany({
+      where: { id: { in: [a.id, b.id] } },
+      data: { passwordHash: hash, mustChangePassword: false, isActive: true },
+    });
 
     const tickets = [
       { ticketNumber: "TKT-2026-700001", requesterId: a.id, summary: "Laptop battery drains quickly", requestedPriority: "MEDIUM", status: "New" },
@@ -65,9 +73,10 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
   });
 
   it("API-07a: Returns only the selected requester's tickets (ownership) with meta", async () => {
+    const token = await loginAs("test.requester.a@example.com");
     const res = await request(app)
       .get("/api/tickets")
-      .set("Authorization", `Bearer dev_requester_${requesterA.id}`);
+      .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.tickets)).toBe(true);
@@ -86,9 +95,10 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
   });
 
   it("API-07b: Search filters by summary text (case-insensitive)", async () => {
+    const token = await loginAs("test.requester.a@example.com");
     const res = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ search: "vpn" });
 
     expect(res.status).toBe(200);
@@ -97,9 +107,10 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
   });
 
   it("API-07c: Search matches by official ticket number", async () => {
+    const token = await loginAs("test.requester.a@example.com");
     const res = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ search: "700003" });
 
     expect(res.status).toBe(200);
@@ -108,9 +119,11 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
   });
 
   it("API-07d: Filters by priority and status", async () => {
+    const token = await loginAs("test.requester.a@example.com");
+
     const byPriority = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ priority: "URGENT" });
 
     expect(byPriority.status).toBe(200);
@@ -119,7 +132,7 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
 
     const byStatus = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ status: "New" });
 
     expect(byStatus.status).toBe(200);
@@ -127,9 +140,11 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
   });
 
   it("API-07e: Sorts by created ASC / requestedPriority DESC", async () => {
+    const token = await loginAs("test.requester.a@example.com");
+
     const asc = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ sort: "createdAt", order: "asc" });
 
     expect(asc.status).toBe(200);
@@ -137,7 +152,7 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
 
     const byPriorityDesc = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ sort: "requestedPriority", order: "desc" });
 
     expect(byPriorityDesc.status).toBe(200);
@@ -145,9 +160,11 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
   });
 
   it("API-07f: Paginates with page and limit", async () => {
+    const token = await loginAs("test.requester.a@example.com");
+
     const res = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ page: 2, limit: 2 });
 
     expect(res.status).toBe(200);
@@ -156,50 +173,50 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
 
     const beyond = await request(app)
       .get("/api/tickets")
-      .set("X-Requester-Id", String(requesterA.id))
+      .set("Authorization", `Bearer ${token}`)
       .query({ page: 99 });
 
     expect(beyond.status).toBe(200);
     expect(beyond.body.tickets).toHaveLength(0);
   });
 
-  it("API-07g: Rejects missing requester header with 400", async () => {
+it("API-07g: Missing credentials header returns 401 Unauthorized", async () => {
     const res = await request(app).get("/api/tickets");
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("Bad Request");
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("Unauthorized");
   });
 
   it("API-07h: Rejects invalid query parameters with 400", async () => {
-    const reqA = requesterA.id;
+    const token = await loginAs("test.requester.a@example.com");
 
-    const badPage = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ page: 0 });
+    const badPage = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ page: 0 });
     expect(badPage.status).toBe(400);
 
-    const badLimit = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ limit: 999 });
+    const badLimit = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ limit: 999 });
     expect(badLimit.status).toBe(400);
 
-    const badSort = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ sort: "bogus" });
+    const badSort = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ sort: "bogus" });
     expect(badSort.status).toBe(400);
 
-    const badOrder = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ order: "sideways" });
+    const badOrder = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ order: "sideways" });
     expect(badOrder.status).toBe(400);
 
-    const badPriority = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ priority: "CRITICAL" });
+    const badPriority = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ priority: "CRITICAL" });
     expect(badPriority.status).toBe(400);
 
-    const badStatus = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "Bogus" });
+    const badStatus = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ status: "Bogus" });
     expect(badStatus.status).toBe(400);
   });
 
   it("API-07k: status filter is case-insensitive and returns 200 (FR-07)", async () => {
-    const reqA = requesterA.id;
+    const token = await loginAs("test.requester.a@example.com");
 
-    const lower = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "new" });
+    const lower = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ status: "new" });
     expect(lower.status).toBe(200);
     expect(lower.body.meta.total).toBeGreaterThanOrEqual(1);
     lower.body.tickets.forEach((t: any) => expect(t.status).toBe("New"));
 
-    const mixed = await request(app).get("/api/tickets").set("X-Requester-Id", String(reqA)).query({ status: "iN pRoGrEsS" });
+    const mixed = await request(app).get("/api/tickets").set("Authorization", `Bearer ${token}`).query({ status: "iN pRoGrEsS" });
     expect(mixed.status).toBe(200);
     mixed.body.tickets.forEach((t: any) => expect(t.status).toBe("In Progress"));
   });
@@ -224,9 +241,10 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
     });
 
     try {
+      const token = await loginAs("test.requester.a@example.com");
       const res = await request(app)
         .get("/api/tickets")
-        .set("X-Requester-Id", String(requesterA.id))
+        .set("Authorization", `Bearer ${token}`)
         .query({ category: cat2.id });
 
       expect(res.status).toBe(200);
@@ -237,20 +255,27 @@ describe("GET /api/tickets (Issue 7 - My Tickets List REST API)", () => {
     }
   });
 
-  it("API-07i: Rejects inactive or missing requester with 400", async () => {
+  it("API-07i: Rejects inactive identity with 401 (cannot authenticate)", async () => {
     const prisma = getPrisma();
-    let inactive = await prisma.requesterUser.findUnique({ where: { email: "test.requester.inactive@example.com" } });
+    const hash = await bcrypt.hash(TEST_PASSWORD, 10);
+
+    let inactive = await prisma.user.findUnique({ where: { email: "test.requester.inactive@example.com" } });
     if (!inactive) {
-      inactive = await prisma.requesterUser.create({
-        data: { name: "Tester Inactive", email: "test.requester.inactive@example.com", isActive: false },
+      inactive = await prisma.user.create({
+        data: { name: "Tester Inactive", email: "test.requester.inactive@example.com", passwordHash: hash, isActive: false },
+      });
+    } else {
+      inactive = await prisma.user.update({
+        where: { id: inactive.id },
+        data: { passwordHash: hash, isActive: false },
       });
     }
 
     const res = await request(app)
-      .get("/api/tickets")
-      .set("X-Requester-Id", String(inactive.id));
+      .post("/api/auth/login")
+      .send({ email: "test.requester.inactive@example.com", password: TEST_PASSWORD });
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(401);
     expect(res.body.message).toContain("inactive");
   });
 });

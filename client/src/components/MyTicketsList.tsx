@@ -6,7 +6,7 @@ import {
   fetchCategories,
   fetchMyTickets,
 } from "../api.js";
-import { useRequester } from "../context/RequesterContext.js";
+import { useAuth } from "../context/AuthContext.js";
 
 const PRIORITY_OPTIONS = ["LOW", "MEDIUM", "HIGH", "URGENT"];
 const STATUS_OPTIONS = ["New", "In Progress", "Resolved", "Closed", "Rejected"];
@@ -82,7 +82,7 @@ interface MyTicketsListProps {
 }
 
 export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refreshKey = 0 }) => {
-  const { selectedRequester } = useRequester();
+  const { user } = useAuth();
 
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [searchInput, setSearchInput] = useState<string>("");
@@ -100,7 +100,7 @@ export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refr
   }, []);
 
   useEffect(() => {
-    if (!selectedRequester) {
+    if (!user) {
       setData(null);
       return;
     }
@@ -117,8 +117,7 @@ export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refr
         sort: filters.sort,
         order: filters.order,
         page,
-      },
-      selectedRequester.id
+      }
     )
       .then((result) => {
         if (!cancelled) setData(result);
@@ -136,7 +135,7 @@ export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refr
     return () => {
       cancelled = true;
     };
-  }, [selectedRequester?.id, filters, page, refreshKey]);
+  }, [user, filters, page, refreshKey]);
 
   const updateFilter = (patch: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...patch }));
@@ -163,7 +162,7 @@ export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refr
   const showingStart = total === 0 ? 0 : (metaPage - 1) * metaLimit + 1;
   const showingEnd = total === 0 ? 0 : Math.min(metaPage * metaLimit, total);
 
-  if (!selectedRequester) {
+  if (!user) {
     return null;
   }
 
@@ -179,7 +178,7 @@ export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refr
             🎫 My <span style={{ color: "#006B3C" }}>Tickets</span>
           </h2>
           <small className="text-muted">
-            All your IT requests for: <strong>{selectedRequester.name}</strong>
+            All your IT requests for: <strong>{user.name}</strong>
           </small>
         </div>
       </div>

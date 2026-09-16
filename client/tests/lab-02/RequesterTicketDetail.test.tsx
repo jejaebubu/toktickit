@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TicketDetail } from "../../src/components/TicketDetail.js";
-import { RequesterProvider } from "../../src/context/RequesterContext.js";
+import { AuthProvider } from "../../src/context/AuthContext.js";
 import { TicketDetail as TicketDetailData } from "../../src/api.js";
 
 const mockRequester = { id: 1, name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true };
@@ -17,7 +17,10 @@ const detailData: TicketDetailData = {
   status: "New",
   createdAt: "2026-09-01T10:00:00.000Z",
   updatedAt: "2026-09-02T10:00:00.000Z",
+  requesterId: 1,
+  requesterIndicatedResolved: false,
   requester: { id: 1, name: "Jennifer Anderson", email: "jennifer@example.com" },
+  owner: { id: 2, name: "Sam Patel", email: "sam@example.com" },
   category: { id: 1, name: "Network" },
   relatedSystem: { id: 2, name: "Campus Wi-Fi" },
   attachments: [
@@ -43,16 +46,19 @@ function okRes(data: unknown) {
 
 function renderDetail(onBack = vi.fn()) {
   return render(
-    <RequesterProvider>
+    <AuthProvider>
       <TicketDetail ticketId={101} onBack={onBack} />
-    </RequesterProvider>
+    </AuthProvider>
   );
 }
 
 describe("UIClass-09: Ticket Detail Screen (Read-only + Ownership)", () => {
   beforeEach(() => {
-    localStorage.setItem("toktickit_requester", JSON.stringify(mockRequester));
+    localStorage.setItem("toktickit_token", "test-token");
     fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) {
+        return okRes({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } });
+      }
       if (url.includes("/api/requesters")) return okRes([mockRequester]);
       if (url.includes("/api/tickets/101")) return okRes(detailData);
       return Promise.reject(new Error("Unhandled URL: " + url));
@@ -96,17 +102,20 @@ describe("UIClass-09: Ticket Detail Screen (Read-only + Ownership)", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("UI-13: Shows 403 unauthorized error box when a different requester's ticket is accessed", async () => {
+  it("UI-13: Shows 404 no-leak error box when a different requester's ticket is accessed", async () => {
     fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) {
+        return okRes({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } });
+      }
       if (url.includes("/api/requesters")) return okRes([mockRequester]);
       if (url.includes("/api/tickets/101")) {
         return Promise.resolve({
           ok: false,
-          status: 403,
+          status: 404,
           json: () =>
             Promise.resolve({
-              error: "Forbidden",
-              message: "Access denied. You do not have permission to view this ticket.",
+              error: "Not Found",
+              message: "Ticket not found.",
             }),
         });
       }
@@ -118,14 +127,19 @@ describe("UIClass-09: Ticket Detail Screen (Read-only + Ownership)", () => {
 
     await waitFor(() => {
       const err = screen.getByTestId("detail-error");
-      expect(err).toHaveTextContent("permission");
+      expect(err).toHaveTextContent("Ticket not found.");
       expect(err).toHaveClass("alert-danger");
     });
-    expect(screen.getByTestId("detail-unauthorized-back")).toBeInTheDocument();
+    // 404 is shown as a generic error (no ownership leak), so the
+    // "unauthorized" back CTA is not rendered.
+    expect(screen.queryByTestId("detail-unauthorized-back")).not.toBeInTheDocument();
   });
 
   it("UI-14: Shows error box when the detail API fails (500)", async () => {
     fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) {
+        return okRes({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } });
+      }
       if (url.includes("/api/requesters")) return okRes([mockRequester]);
       if (url.includes("/api/tickets/101")) {
         return Promise.resolve({

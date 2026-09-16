@@ -2,17 +2,23 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CreateTicketForm } from "../../src/components/CreateTicketForm.js";
-import { RequesterProvider } from "../../src/context/RequesterContext.js";
+import { AuthProvider } from "../../src/context/AuthContext.js";
 import * as api from "../../src/api.js";
 
 const mockRequester = { id: 1, name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true };
 
 describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
   beforeEach(() => {
-    localStorage.setItem("toktickit_requester", JSON.stringify(mockRequester));
+    localStorage.setItem("toktickit_token", "test-token");
     vi.stubGlobal(
       "fetch",
       vi.fn().mockImplementation((url: string) => {
+        if (url.includes("/api/auth/me")) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ user: { ...mockRequester, role: "REQUESTER", mustChangePassword: false, isActive: true } }),
+          });
+        }
         if (url.includes("/api/categories")) {
           return Promise.resolve({
             ok: true,
@@ -38,9 +44,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
 
   it("UI-02: Form shows red asterisks and validation error messages when required fields are missing", async () => {
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     // Verify red asterisks exist on required fields
@@ -70,9 +76,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     vi.spyOn(api, "createTicket").mockImplementation(() => delayedPromise as any);
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -111,9 +117,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
 
   it("UI-18: Create form loads Category & Related System options and Requested Priority dropdown (FR-01, FR-02)", async () => {
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -147,9 +153,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     } as any);
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const user = userEvent.setup();
@@ -172,16 +178,16 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     });
 
     expect(uploadSpy).toHaveBeenCalledTimes(1);
-    expect(uploadSpy).toHaveBeenCalledWith(101, file, 1);
+    expect(uploadSpy).toHaveBeenCalledWith(101, file);
   });
 
   it("UI-20: API failure on create shows red error alert with message (AC-01)", async () => {
     vi.spyOn(api, "createTicket").mockRejectedValue(new Error("Internal server error"));
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const user = userEvent.setup();
@@ -212,9 +218,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     const badFile = new File(["not an image"], "notes.txt", { type: "text/plain" });
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const user = userEvent.setup();
@@ -253,9 +259,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     );
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const user = userEvent.setup();
@@ -296,9 +302,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
       } as any);
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const user = userEvent.setup();
@@ -342,9 +348,9 @@ describe("UI-02 & UI-03: Create Ticket Form (AC-01)", () => {
     } as any);
 
     render(
-      <RequesterProvider>
+      <AuthProvider>
         <CreateTicketForm />
-      </RequesterProvider>
+      </AuthProvider>
     );
 
     const user = userEvent.setup();
