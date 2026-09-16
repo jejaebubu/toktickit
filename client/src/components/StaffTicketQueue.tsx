@@ -237,6 +237,20 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onOpenTicket
         >
           {filters.order === "asc" ? "↑ Asc" : "↓ Desc"}
         </button>
+        <button
+          type="button"
+          className="btn btn-outline-success btn-sm fw-bold"
+          onClick={() => {
+            setSearchInput("");
+            setFilters({ ...DEFAULT });
+          }}
+          disabled={!hasActiveFilters && searchInput.trim() === ""}
+          data-testid="queue-clear-filters"
+          aria-label="Clear all filters"
+          style={{ minHeight: 44 }}
+        >
+          Clear Filters
+        </button>
       </div>
 
       {isLoading && (

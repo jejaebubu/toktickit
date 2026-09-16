@@ -242,6 +242,45 @@ describe("STYLE-02: Form conventions and editable/read-only fields", () => {
     expect(within(modal).getByTestId("user-name-input")).toBeEnabled();
     expect(within(modal).getByTestId("user-name-input")).toHaveValue("User One");
   });
+
+  it("STYLE-02f: UserManagement search input commits query to API on button click (regression fix)", async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) return okRes({ user: admin });
+      if (url.includes("/api/users")) return okRes([]);
+      return Promise.reject(new Error("Unhandled URL: " + url));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithAuth(<UserManagement />, admin);
+    await waitFor(() => screen.getByTestId("user-mgmt-card"));
+
+    const user = userEvent.setup();
+    await user.type(screen.getByTestId("user-search-input"), "alice");
+    await user.click(screen.getByTestId("user-search-btn"));
+
+    const userCalls = (fetchMock.mock.calls as [string][]).filter(
+      (call) => call[0].includes("/api/users") && !call[0].includes("/api/auth")
+    );
+    expect(userCalls.length).toBeGreaterThanOrEqual(2);
+    const lastUrl = userCalls[userCalls.length - 1][0];
+    expect(lastUrl).toContain("search=alice");
+  });
+
+  it("STYLE-02g: StaffTicketDetail shows warning when assignable staff list fails to load (admin)", async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) return okRes({ user: admin });
+      if (url.includes("/api/categories")) return okRes([{ id: 1, name: "Hardware" }]);
+      if (url.includes("/api/tickets/201/comments")) return okRes(detailData.publicComments ?? []);
+      if (url.includes("/api/tickets/201/internal-notes")) return okRes(detailData.internalNotes ?? []);
+      if (url.includes("/api/tickets/201")) return okRes(detailData);
+      if (url.includes("/api/users")) return errRes(500, "Server error");
+      return Promise.reject(new Error("Unhandled URL: " + url));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithAuth(<StaffTicketDetail ticketId={201} onBack={vi.fn()} />, admin);
+
+    const alert = await waitFor(() => screen.getByTestId("detail-staff-users-error"));
+    expect(alert).toHaveTextContent(/owner dropdown shows only/i);
+  });
 });
 
 describe("STYLE-03: Accessibility, touch targets, and overflow", () => {
@@ -352,6 +391,31 @@ describe("STYLE-03: Accessibility, touch targets, and overflow", () => {
     const pwInput = screen.getByTestId("login-password");
     expect(emailInput.style.outline).toBe("");
     expect(pwInput.style.outline).toBe("");
+  });
+
+  it("STYLE-03i: StaffTicketQueue Clear Filters button resets search input and all dropdowns", async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/auth/me")) return okRes({ user: staff });
+      if (url.includes("/api/categories")) return okRes([{ id: 1, name: "Hardware" }]);
+      if (url.includes("/api/tickets")) return okRes({ tickets: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } });
+      return Promise.reject(new Error("Unhandled URL: " + url));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithAuth(<StaffTicketQueue onOpenTicket={vi.fn()} />, staff);
+    await waitFor(() => screen.getByTestId("staff-queue-card"));
+
+    const user = userEvent.setup();
+    await user.type(screen.getByTestId("queue-search"), "VPN");
+    await user.click(screen.getByTestId("queue-search-btn"));
+    expect(screen.getByTestId("queue-search")).toHaveValue("VPN");
+
+    await user.click(screen.getByTestId("queue-clear-filters"));
+
+    expect(screen.getByTestId("queue-search")).toHaveValue("");
+    expect(screen.getByTestId("queue-filter-category")).toHaveValue("");
+    expect(screen.getByTestId("queue-filter-status")).toHaveValue("");
+    expect(screen.getByTestId("queue-filter-priority")).toHaveValue("");
+    expect(screen.getByTestId("queue-filter-owner")).toHaveValue("");
   });
 });
 

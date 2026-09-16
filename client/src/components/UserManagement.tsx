@@ -46,7 +46,8 @@ export const UserManagement: React.FC = () => {
   }, []);
 
   const applyFilters = () => {
-    load({ search: searchInput || undefined, role: roleFilter === "ALL" ? undefined : roleFilter });
+    setSearch(searchInput.trim());
+    load({ search: searchInput.trim() || undefined, role: roleFilter === "ALL" ? undefined : roleFilter });
   };
 
   const reset = (message?: string) => {
@@ -175,8 +176,8 @@ export const UserManagement: React.FC = () => {
               type="search"
               className="form-control"
               placeholder="Search by name or email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               data-testid="user-search-input"
               style={{ minHeight: 44 }}
             />

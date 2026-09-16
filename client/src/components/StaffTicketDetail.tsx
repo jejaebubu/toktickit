@@ -55,6 +55,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [comments, setComments] = useState<ConversationEntry[]>([]);
   const [notes, setNotes] = useState<ConversationEntry[]>([]);
   const [staffUsers, setStaffUsers] = useState<AdminUser[]>([]);
+  const [staffUsersError, setStaffUsersError] = useState<string | null>(null);
   const [commentInput, setCommentInput] = useState("");
   const [noteInput, setNoteInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +88,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   useEffect(() => {
     if (!isAdmin) return;
-    fetchUsers().then(setStaffUsers).catch(() => setStaffUsers([]));
+    fetchUsers()
+      .then((list) => { setStaffUsers(list); setStaffUsersError(null); })
+      .catch((err: any) => {
+        setStaffUsers([]);
+        setStaffUsersError(err instanceof ApiError ? err.message : "Failed to load assignable staff. Owner reassignment is unavailable.");
+      });
   }, [isAdmin]);
 
   const assignableUsers = useMemo(
@@ -200,6 +206,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {actionError && (
         <div className="alert alert-danger border-0 shadow-sm" role="alert" data-testid="detail-action-error">
           ⚠️ <strong>Error:</strong> {actionError}
+        </div>
+      )}
+
+      {isAdmin && staffUsersError && (
+        <div className="alert alert-warning border-0 shadow-sm" role="alert" data-testid="detail-staff-users-error">
+          ⚠️ <strong>Warning:</strong> {staffUsersError} The owner dropdown shows only "Unassigned".
         </div>
       )}
 
