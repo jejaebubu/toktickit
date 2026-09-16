@@ -33,7 +33,7 @@
 | **PR-11 ([GitHub #69](https://github.com/jejaebubu/toktickit/pull/69))** | E2E Testing — Playwright E2E ครอบ 3 viewports (Desktop/Tablet/Mobile), Header responsive nav, StaffTicketDetail PATCH merge fix, evidence screenshots | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved → (merged by author — ผิดขั้นตอน) → Reverted (#71)** | Review 2026-09-16: 0 blocking issues, E2E ครอบทุก AC + Viewport, Zen Green ถูกต้อง. Non-blocking: (อนาคต) ปิด dropdown nav เมื่อคลิกภายนอก. **กระบวนการผิดพลาด**: #69 ถูก merge โดย author (ไม่ใช่ reviewer) → ถูก **revert ผ่าน #71** และ re-add ใหม่ผ่าน #72 |
 | **PR-12 ([GitHub #71](https://github.com/jejaebubu/toktickit/pull/71))** | Revert ของ #69 (แก้กระบวนการ: ให้ Reviewer เป็นผู้ merge ใหม่) | `fix/lab03-revert-pr69-e2e` | `lab3-staging` | **Approved** | ย้อนเนื้อหา E2E ออกจาก staging กลับสู่ `d0d7e46` เพื่อให้ Reviewer เปิด PR re-add ใหม่ — merged `7720e35` |
 | **PR-13 ([GitHub #72](https://github.com/jejaebubu/toktickit/pull/72))** | E2E Testing (re-add จาก #69) — เนื้อหาเดียวกับ #69 + แก้ตาม review: `isSubmitting` lock PATCH, preserve attachments (null-safe), touch target 44px + Esc, `searchAndFind` deterministic | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Request Changes → Approve** | Review 2026-09-16: 3 blocking (race condition PATCH, STYLE-03 touch target <44px, E2E findUser flaky กับ pagination) → แก้ครบ commits `18974f0`/`d1d282a` → **Re-review: Approve** — merged `6955c48` (โดย Reviewer) — **Closes #49** |
-| **PR-14 ([GitHub #70](https://github.com/jejaebubu/toktickit/pull/70))** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Approved (Re-review)** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **Re-review (2026-09-16 19:42 UTC): APPROVED — AC-01..AC-06 ผ่านครบ** → **รอ Reviewer กด Merge เข้า `main`** — **Closes #50** |
+| **PR-14 ([GitHub #70](https://github.com/jejaebubu/toktickit/pull/70))** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Approved (Re-review ×2)** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **Re-review (2026-09-16 19:42 UTC): APPROVED — AC-01..AC-06 ผ่านครบ** → **Re-review รอบ 2 (2026-09-16 20:23 UTC): APPROVED** — ตรวจซ้ำบน head หลังแก้ (README ตัวเลขจริง/9 test files, reviewer.md #71/#72, ai-use Prompt 10, .gitignore ตาม AC-02) → **รอ Reviewer Approve + Merge head ล่าสุด เข้า `main`** — **Closes #50** |
 
 > **บันทึก**: ทุก PR ถูกตรวจทานจริงบน GitHub (state: CHANGES_REQUESTED/APPROVED) โดย Reviewer `phatthidawadi`; การ merge ตาม Lab Section 11.1 เป็นบทบาทของ Reviewer หลัง merge ทั้งหมดไปยัง `lab3-staging` แล้วจึงทำ **Release PR** `lab3-staging` → `main` (Section 11.1) และบันทึกผลการตรวจจริงใน PR นั้นเมื่อคน review/merge แล้ว
 >
@@ -1428,23 +1428,36 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 **อนุมัติ (Approve)** และพร้อม Merge เข้า `main` เพื่อจบ Release Integration ของ Lab 3
 ```
 
+#### 3.14.6 Review #3 — Approved (phatthidawadi, 2026-09-16 20:23 UTC)
+
+```text
+ตรวจทานซ้ำ (Re-review) บน commit ล่าสุด (`c9ed15d`) เรียบร้อยแล้ว เอกสารและข้อความประกอบการส่งมอบแก้ไขครบถ้วนเรียบร้อยดีมาก:
+
+* **README.md**: อัปเดตตัวเลขผลการทดสอบฝั่ง Client ชัดเจนตามซอร์สโค้ดจริงบน Release branch (Server 76/76, Client 79/79 ครอบคลุม 9 test files)
+* **docs/lab-03/reviewer.md**: เติมประวัติการ Review ย้อนหลังของ PR #71 (Revert) และ PR #72 (Re-review) ลงในตารางสรุป พร้อมบันทึก Full Review Trail ครบถ้วน
+* **docs/lab-03/ai-use.md**: เพิ่ม Prompt 10 บันทึกเบื้องหลังการแก้ไขจุด Blocking จากรอบ Re-review และสรุป Reflection สมบูรณ์
+* **.gitignore**: เพิ่มการซ่อน root scratch files (`/*.pdf`, `/*.png`, `/.evidence-capture.mjs`) ตรงตามข้อกำหนด AC-02
+
+เช็กผลการรันอัตโนมัติทั้งหมดผ่าน 100% (Server 76/76, Client 79/79, Playwright E2E 18/18 ครอบคลุม 3 viewports) **ขออนุมัติ (Approve)** และพร้อมกด Merge เข้าสู่ branch `main` เพื่อเสร็จสิ้น Release Integration ของ Lab 3
+```
+
 ## 4. Peer Reviews Conducted by `jejaebubu` (ผู้เขียนทำหน้าที่ Reviewer ตรวจงาน Partner `phatthidawadi`)
 
 ตาม Lab Section 11.1 Peer Review คือการตรวจทานสองทาง ผู้เขียน `jejaebubu` จึงได้ทำหน้าที่ Reviewer ตรวจทาน PRs ของ Partner (`phatthidawadi`) ใน repository `phatthidawadi/toktickit` ประจำ Sprint 3 (Lab 3) ครบทั้ง 11 PR โดยทุก PR ผ่านการ **Request Changes → แก้ไข → Approve** จริงจาก GitHub และ Partner เป็นผู้กด Merge เข้า `lab3-staging`
 
 | PR | Scope | Branch | Review Decisions (`jejaebubu`) | Merged SHA |
 | :--- | :--- | :--- | :--- | :--- |
-| [#61](https://github.com/phatthidawadi/toktickit/pull/61) | docs(release): Sprint 3 peer reviewer documentation, AI reflection, and release integration (Issue #25) | `feature/25-doc-reviewer-ai-use` → `lab3-staging` | Request Changes → Approved | `` |
-| [#60](https://github.com/phatthidawadi/toktickit/pull/60) | feat(style-responsive): Zen Green visual style, accessibility, and responsive inspection (Issue #24) | `feature/24-visual-style-responsive` → `lab3-staging` | Request Changes → Approved | `` |
-| [#59](https://github.com/phatthidawadi/toktickit/pull/59) | test(e2e): End-to-End Playwright Test Automation & Final Integration Verification (Issue #23) | `feature/23-e2e-integration-tests` → `lab3-staging` | Request Changes → Comment → Approved | `` |
-| [#58](https://github.com/phatthidawadi/toktickit/pull/58) | feat: Administrator User Management UI Portal & Responsive Layouts (Issue #22) | `feature/22-admin-user-management-ui` → `lab3-staging` | Request Changes → Approved | `` |
-| [#57](https://github.com/phatthidawadi/toktickit/pull/57) | feat: Administrator User Management Backend APIs & Safety Controls (Issue #21) | `feature/21-admin-user-management` → `lab3-staging` | Request Changes → Approved | `` |
-| [#56](https://github.com/phatthidawadi/toktickit/pull/56) | feat(staff-queue): IT staff ticket queue and operational workflows (Issue #20) | `feature/20-staff-queue-operations` → `lab3-staging` | Request Changes → Approved | `` |
-| [#55](https://github.com/phatthidawadi/toktickit/pull/55) | feat: implement requester workflow regression and public comments | `feature/19-requester-workflow-comments` → `lab3-staging` | Request Changes → Approved | `` |
-| [#54](https://github.com/phatthidawadi/toktickit/pull/54) | feat(authz): Server-Side Authorization and Role-Based Navigation Header (PR #54) | `feature/18-authorization-header` → `lab3-staging` | Request Changes → Approved | `` |
-| [#53](https://github.com/phatthidawadi/toktickit/pull/53) | feat(auth): Authentication Foundation and Password Security (Issue 17) | `feature/17-auth-foundation` → `lab3-staging` | Request Changes → Comment → Approved | `` |
-| [#52](https://github.com/phatthidawadi/toktickit/pull/52) | feat(db): Database Schema Evolution, User Migration, and Seed Data (#39) | `feature/16-db-schema-seed` → `lab3-staging` | Request Changes → Comment → Comment → Approved → Approved | `` |
-| [#51](https://github.com/phatthidawadi/toktickit/pull/51) | docs: Sprint 3 Engineering Specification and Design Contracts (#38) | `feature/15-doc-spec-tests` → `lab3-staging` | Request Changes → Comment → Approved | `` |
+| [#61](https://github.com/phatthidawadi/toktickit/pull/61) | docs(release): Sprint 3 peer reviewer documentation, AI reflection, and release integration (Issue #25) | `feature/25-doc-reviewer-ai-use` → `lab3-staging` | Request Changes → Approved | `e2e502c` |
+| [#60](https://github.com/phatthidawadi/toktickit/pull/60) | feat(style-responsive): Zen Green visual style, accessibility, and responsive inspection (Issue #24) | `feature/24-visual-style-responsive` → `lab3-staging` | Request Changes → Approved | `e5361f0` |
+| [#59](https://github.com/phatthidawadi/toktickit/pull/59) | test(e2e): End-to-End Playwright Test Automation & Final Integration Verification (Issue #23) | `feature/23-e2e-integration-tests` → `lab3-staging` | Request Changes → Comment → Approved | `96cea4d` |
+| [#58](https://github.com/phatthidawadi/toktickit/pull/58) | feat: Administrator User Management UI Portal & Responsive Layouts (Issue #22) | `feature/22-admin-user-management-ui` → `lab3-staging` | Request Changes → Approved | `e71c538` |
+| [#57](https://github.com/phatthidawadi/toktickit/pull/57) | feat: Administrator User Management Backend APIs & Safety Controls (Issue #21) | `feature/21-admin-user-management` → `lab3-staging` | Request Changes → Approved | `655be85` |
+| [#56](https://github.com/phatthidawadi/toktickit/pull/56) | feat(staff-queue): IT staff ticket queue and operational workflows (Issue #20) | `feature/20-staff-queue-operations` → `lab3-staging` | Request Changes → Approved | `90101ab` |
+| [#55](https://github.com/phatthidawadi/toktickit/pull/55) | feat: implement requester workflow regression and public comments | `feature/19-requester-workflow-comments` → `lab3-staging` | Request Changes → Approved | `c50b0c8` |
+| [#54](https://github.com/phatthidawadi/toktickit/pull/54) | feat(authz): Server-Side Authorization and Role-Based Navigation Header (PR #54) | `feature/18-authorization-header` → `lab3-staging` | Request Changes → Approved | `05e866a` |
+| [#53](https://github.com/phatthidawadi/toktickit/pull/53) | feat(auth): Authentication Foundation and Password Security (Issue 17) | `feature/17-auth-foundation` → `lab3-staging` | Request Changes → Comment → Approved | `0753d13` |
+| [#52](https://github.com/phatthidawadi/toktickit/pull/52) | feat(db): Database Schema Evolution, User Migration, and Seed Data (#39) | `feature/16-db-schema-seed` → `lab3-staging` | Request Changes → Comment → Comment → Approved → Approved | `bc75c2b` |
+| [#51](https://github.com/phatthidawadi/toktickit/pull/51) | docs: Sprint 3 Engineering Specification and Design Contracts (#38) | `feature/15-doc-spec-tests` → `lab3-staging` | Request Changes → Comment → Approved | `9ecc24e` |
 
 > Section 4 สรุป: **11 PRs / 28 review bodies (`jejaebubu` → `phatthidawadi`) / 17 author responses** — ข้อความทั้งหมดคัดลอกจาก GitHub ตามตัวอักษร (line-ending ถูก normalize เป็น LF)
 
