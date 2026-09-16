@@ -32,7 +32,7 @@
 | **PR-11 (GitHub #69)** | E2E Testing — Playwright E2E ครอบ 3 viewports (Desktop/Tablet/Mobile), Header responsive nav, StaffTicketDetail PATCH merge fix, evidence screenshots | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Approved → (merged by author — ผิดขั้นตอน) → Reverted (#71)** | Review 2026-09-16: 0 blocking issues, E2E ครอบทุก AC + Viewport, Zen Green ถูกต้อง. Non-blocking: (อนาคต) ปิด dropdown nav เมื่อคลิกภายนอก. **กระบวนการผิดพลาด**: #69 ถูก merge โดย author (ไม่ใช่ reviewer) → ถูก **revert ผ่าน #71** และ re-add ใหม่ผ่าน #72 |
 | **PR-12 (GitHub #71)** | Revert ของ #69 (แก้กระบวนการ: ให้ Reviewer เป็นผู้ merge ใหม่) | `fix/lab03-revert-pr69-e2e` | `lab3-staging` | **Approved** | ย้อนเนื้อหา E2E ออกจาก staging กลับสู่ `d0d7e46` เพื่อให้ Reviewer เปิด PR re-add ใหม่ — merged `7720e35` |
 | **PR-13 (GitHub #72)** | E2E Testing (re-add จาก #69) — เนื้อหาเดียวกับ #69 + แก้ตาม review: `isSubmitting` lock PATCH, preserve attachments (null-safe), touch target 44px + Esc, `searchAndFind` deterministic | `feature/lab03-issue11-e2e-testing` | `lab3-staging` | **Request Changes → Approve** | Review 2026-09-16: 3 blocking (race condition PATCH, STYLE-03 touch target <44px, E2E findUser flaky กับ pagination) → แก้ครบ commits `18974f0`/`d1d282a` → **Re-review: Approve** — merged `6955c48` (โดย Reviewer) — **Closes #49** |
-| **PR-14 (GitHub #70)** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Re-review pending** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **รอ Reviewer Re-review & Merge** — **Closes #50** |
+| **PR-14 (GitHub #70)** | Release Integration — Auth/RBAC, Staff Ticketing, Admin, E2E evidence, final docs (Lab 3 → `main`) | `release/lab03-post-merge-verification` | `main` | **Request Changes → Fixes applied → Approved (Re-review)** | Review 2026-09-16 19:19: 3 blocking doc fixes (README client test count, reviewer.md #71/#72 history, ai-use.md re-review prompts) → ผู้เขียนแก้ครบ: README ยืนยันตัวเลขจริง 79/79 (9 test files), reviewer.md + Full Review Trail ครบทุก PR รวม #71/#72, ai-use.md +Prompt 10 → **Re-review (2026-09-16 19:42 UTC): APPROVED — AC-01..AC-06 ผ่านครบ** → **รอ Reviewer กด Merge เข้า `main`** — **Closes #50** |
 
 > **บันทึก**: ทุก PR ถูกตรวจทานจริงบน GitHub (state: CHANGES_REQUESTED/APPROVED) โดย Reviewer `phatthidawadi`; การ merge ตาม Lab Section 11.1 เป็นบทบาทของ Reviewer หลัง merge ทั้งหมดไปยัง `lab3-staging` แล้วจึงทำ **Release PR** `lab3-staging` → `main` (Section 11.1) และบันทึกผลการตรวจจริงใน PR นั้นเมื่อคน review/merge แล้ว
 >
@@ -1287,7 +1287,7 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 ## 4. Release PR Review Trail (Section 11.1)
 
 - Release PR **GitHub #70** (Issue #50) จาก `release/lab03-post-merge-verification` → `main` ถูกตรวจทานจริงโดย Reviewer แล้ว รายละเอียดฉบับเต็มอยู่ใน **3.14 ด้านล่าง**
-- สถานะล่าสุด: **Request Changes → ผู้เขียนแก้ครบทั้ง 3 จุด → รอ Reviewer Re-review & Merge**
+- สถานะล่าสุด: **Request Changes → ผู้เขียนแก้ครบทั้ง 3 จุด → Reviewer Re-review (2026-09-16 19:42 UTC): APPROVED → รอ Reviewer กด Merge เข้า `main`**
 
 ---
 
@@ -1383,7 +1383,46 @@ Issue #49 กำหนดให้จัดทำชุดทดสอบอั�
 ผู้เขียนแก้ไขครบทั้ง 3 จุด Blocking แล้ว (พร้อมกับอัปเดตเอกสารฉบับเต็ม):
 
 1. **`README.md`**: ยืนยันตัวเลขจริงโดยการรัน `npx vitest run` — **79/79 passed (9 test files)** และ `server 76/76`; เลข 51/8 files ที่ตรวจพบน่าจะมาจาก snapshot ที่เก่ากว่า → ปรับบรรทัดเป็น "server 76 tests + client 79 tests — ยืนยันผลรันจริง 2026-09-16: server 76/76, client 79/79 (9 test files)"
-2. **`docs/lab-03/reviewer.md`**: บันทึกประวัติครบถ้วนแล้ว — แถว PR-11 (#69), PR-12 (#71 Revert), PR-13 (#72 Re-review & Approve, merged `6955c48`, fix commits `18974f0`/`d1d282a`) + เพิ่ม **Section 3 Full Review Trail** ที่เก็บข้อความรีวิวฉบับเต็มจาก GitHub ทุก PR ทุก comment (21 review bodies + 23 inline comments + 8 author responses) + แถว PR-14 (#70) นี้
+2. **`docs/lab-03/reviewer.md`**: บันทึกประวัติครบถ้วนแล้ว — แถว PR-11 (#69), PR-12 (#71 Revert), PR-13 (#72 Re-review & Approve, merged `6955c48`, fix commits `18974f0`/`d1d282a`) + เพิ่ม **Section 3 Full Review Trail** ที่เก็บข้อความรีวิวฉบับเต็มจาก GitHub ทุก PR ทุก comment (23 review bodies + 26 inline comments + 9 author responses) + แถว PR-14 (#70) นี้
 3. **`docs/lab-03/ai-use.md`**: เพิ่ม **Prompt 10 (Re-review & Blocking Fixes — PR #72)** ที่ระบุวิธีแก้ 3 จุด (isSubmitting lock, minHeight 44px + Esc listener, searchAndFind helper)
 
-รอ Reviewer Re-review และ Approve/Merge
+รอ Reviewer Re-review และ Approve/Merge — **ผล Re-review แล้ว: APPROVED (2026-09-16 19:42 UTC)**
+
+#### 3.14.4 Author Response — ข้อความฉบับเต็มใน GitHub (jejaebubu, 2026-09-16 19:36 UTC)
+
+```text
+ขอบคุณสำหรับรีวิวค่ะ แก้ครบทั้ง 3 จุดแล้ว (commits `23cf137` + `c9ed15d`):
+
+1. **README.md client test count**
+
+* รัน `npx vitest run` ใหม่จริงบนโค้ดล่าสุดแล้ว: **9 test files, 79/79 passed** (Lab 01: 3, Lab 02: 4 files, Lab 03: 4 files) และ server **76/76**
+* ตัวเลข 51 tests/8 files อาจมาจาก snapshot ที่ยังไม่รวม test files ล่าสุดค่ะ
+* จึงอัปเดตตัวเลขใน README เป็น **"server 76/76, client 79/79 (9 test files, ยืนยัน 2026-09-16)"**
+
+2. **reviewer.md**
+
+* บันทึกประวัติครบแล้ว: แถว PR-11 (#69), PR-12 (#71 Revert), PR-13 (#72 Re-review & Approve, merged `6955c48`, fix commits `18974f0`/`d1d282a`)
+* เพิ่ม **Section 3: Full Review Trail** เก็บข้อความรีวิวฉบับเต็มจาก GitHub ของทุก PR และทุก comment (**21 review bodies + 23 inline comments + 8 author responses**)
+* เพิ่มแถว PR-14 (#70) นี้แล้วค่ะ
+
+3. **ai-use.md**
+
+* เพิ่ม **Prompt 10 (Re-review & Blocking Fixes — PR #72)**
+* บันทึกวิธีแก้ทั้ง 3 จุด ได้แก่ `isSubmitting` lock, `minHeight 44px + Esc listener` และ `searchAndFind` helper
+
+รบกวน re-review  ได้เลยค่ะ ขอบคุณมากค่ะ
+```
+
+#### 3.14.5 Review #2 — Approved (phatthidawadi, 2026-09-16 19:42 UTC)
+
+```text
+ขอบคุณสำหรับการอัปเดตและแก้ไขเอกสารครบทุกจุด ตรวจสอบซ้ำ (Re-review) บนโค้ดล่าสุดแล้ว:
+
+1. **README.md (L65)**: ชี้แจงตัวเลขผลรันจริงชัดเจนเรียบร้อย (Server 76/76, Client 79/79 บน 9 test files)
+2. **docs/lab-03/reviewer.md**: บันทึกประวัติ PR #71 (Revert), PR #72 (Re-review) และ PR #70 ในตารางและ Section 3 Full Review Trail ครบถ้วนแล้ว
+3. **docs/lab-03/ai-use.md**: เพิ่ม Prompt 10 บันทึกการแก้ไขจุด Blocking จากการ Re-review สมบูรณ์แล้ว
+
+ทุกข้อกำหนดของ Issue #50 (Acceptance Criteria AC-01 ถึง AC-06) ผ่านทั้งหมด ผลการรันชุดทดสอบผ่าน 100% (Server 76/76, Client 79/79, Playwright E2E 18/18 ครอบคลุม 3 viewports)
+
+**อนุมัติ (Approve)** และพร้อม Merge เข้า `main` เพื่อจบ Release Integration ของ Lab 3
+```
