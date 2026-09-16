@@ -170,7 +170,6 @@ async function main() {
       where: { email: u.email },
       update: {
         name: u.name,
-        passwordHash,
         role: u.role,
         isActive: u.isActive,
         mustChangePassword: u.mustChangePassword,

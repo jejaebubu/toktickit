@@ -4,7 +4,7 @@ const BASE_URL = "http://localhost:5173";
 const API_URL = "http://localhost:3000";
 
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./e2e/lab-02",
   timeout: 60_000,
   fullyParallel: false,
   workers: 1,

@@ -17,15 +17,6 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow, "page should not have horizontal scroll").toBeLessThanOrEqual(1);
 }
 
-async function clickNav(page: Page, id: string, project: string) {
-  if (project === "desktop") {
-    await page.getByTestId(`header-nav-${id}`).click();
-  } else {
-    await page.getByTestId("header-nav-toggle").click();
-    await page.getByTestId(`header-mobile-nav-${id}`).click();
-  }
-}
-
 test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
   test("select requester -> create ticket with attachment -> find in My Tickets -> detail + soft-remove", async ({
     page,
@@ -35,18 +26,14 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
     const description = "Playwright end-to-end flow verifying the full requester ticket journey.";
     const fixture = path.join(__dirname, "fixtures", "wifi_error.png");
 
-    // --- Step 1: Login as Requester and navigate to Create Ticket ---
+    // --- Step 1: Requester selection modal (mandatory when no context) ---
     await page.goto("/");
-    await page.getByTestId("login-email").fill("jennifer@toktickit.com");
-    await page.getByTestId("login-password").fill("Password123!");
-    await page.getByTestId("login-submit").click();
-    await expect(page.getByTestId("header-user-name")).toContainText("Jennifer Anderson");
-    if (project === "desktop") {
-      await expect(page.getByTestId("header-nav-create-ticket")).toBeVisible();
-    } else {
-      await expect(page.getByTestId("header-nav-toggle")).toBeVisible();
-    }
-    await clickNav(page, "create-ticket", project);
+    await expect(page.getByTestId("requester-selector-modal")).toBeVisible();
+    await page
+      .locator('[data-testid^="requester-card-"]')
+      .filter({ hasText: "Jennifer Anderson" })
+      .click();
+    await expect(page.getByTestId("requester-selector-modal")).toBeHidden();
     await expect(page.getByTestId("readonly-requester")).toHaveText(/Jennifer Anderson/);
     await expectNoHorizontalOverflow(page);
 
@@ -67,9 +54,6 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
       .textContent()
       .then((t) => (t ?? "").match(/TKT-\d{4}-\d{6}/)![0]);
     expect(ticketNumber).toMatch(/^TKT-/);
-
-    // Navigate back to My Tickets to locate the freshly created ticket
-    await clickNav(page, "my-tickets", project);
 
     // --- Step 3: Find ticket in My Tickets (search mirrors backend query) ---
     await page.getByTestId("my-tickets-search").fill(summary);

@@ -37,7 +37,7 @@
 | **STYLE-03** | UI Style | ui-spec §2, Lab2 §8.8 | Accessibility, touch targets ≥44px, zero horizontal overflow | Aria attributes, min-height ≥44px controls, overflow-hidden responsive tables | `client/tests/lab-03/UI-Style-Responsive.test.tsx` | Pass |
 | **RESP-01** | Responsive | spec §6 / Lab2 §8.7 | Staff Queue desktop table ↔ mobile cards | Both table (`d-none d-md-block`) and card view (`d-md-none`) render | `client/tests/lab-03/UI-Style-Responsive.test.tsx` | Pass |
 | **RESP-02** | Responsive | spec §6 / Lab2 §8.7 | Login / ChangePassword / UserManagement responsive layout | Centered constrained cards and breakpoint-aware toolbars | `client/tests/lab-03/UI-Style-Responsive.test.tsx` | Pass |
-| **E2E-01** | E2E | AC-01 | Login & Logout full flow | User logs in, sees dashboard, logs out | `e2e/lab-03/authentication.spec.ts` | Pass |
-| **E2E-02** | E2E | AC-02 | Initial password login & mandatory change | First login redirects to change password | `e2e/lab-03/authentication.spec.ts` | Pass |
-| **E2E-03** | E2E | AC-05 | IT Staff ticket queue, claim & update flow | IT Staff claims ticket, updates status/notes | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
-| **E2E-04** | E2E | AC-06 | Admin user creation, search, & password reset | Admin creates user, filters, resets password | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-01** | E2E | AC-01 | Login & Logout full flow | User logs in, sees dashboard, logs out | `e2e/lab-03/authentication.spec.ts` | Pending |
+| **E2E-02** | E2E | AC-02 | Initial password login & mandatory change | First login redirects to change password | `e2e/lab-03/authentication.spec.ts` | Pending |
+| **E2E-03** | E2E | AC-05 | IT Staff ticket queue, claim & update flow | IT Staff claims ticket, updates status/notes | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pending |
+| **E2E-04** | E2E | AC-06 | Admin user creation, search, & password reset | Admin creates user, filters, resets password | `e2e/lab-03/user-administration.spec.ts` | Pending |
