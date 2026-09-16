@@ -84,7 +84,10 @@ export const LoginScreen: React.FC = () => {
                 className={`form-control ${errors.email ? "is-invalid" : ""}`}
                 placeholder="you@toktickit.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (apiError) setApiError(null);
+                }}
                 disabled={isSubmitting}
                 autoComplete="username"
                 data-testid="login-email"
@@ -103,7 +106,10 @@ export const LoginScreen: React.FC = () => {
                   className={`form-control ${errors.password ? "is-invalid" : ""}`}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (apiError) setApiError(null);
+                  }}
                   disabled={isSubmitting}
                   autoComplete="current-password"
                   data-testid="login-password"
