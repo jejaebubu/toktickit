@@ -122,9 +122,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
     setActionError(null);
     try {
       const updated = await updateTicket(ticketId, payload);
-      setTicket(updated);
-      setComments(updated.publicComments ?? comments);
-      setNotes(updated.internalNotes ?? notes);
+      // The PATCH response omits attachments/conversation lists; merge it into the
+      // current ticket so those collections are preserved instead of wiped to undefined.
+      setTicket((prev) => (prev ? { ...prev, ...updated } : updated));
       notify("Ticket updated successfully.");
       await refreshConversation();
     } catch (err: any) {

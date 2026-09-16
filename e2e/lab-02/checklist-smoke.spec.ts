@@ -5,6 +5,15 @@ const fixture = path.join(__dirname, "fixtures", "wifi_error.png");
 
 // Final acceptance checklist against the labsheet (runs on the live app).
 // Mirrors the requirements matrix in tests.md + ui-spec 3.2/4.
+async function clickNav(page: Page, id: string, project: string) {
+  if (project === "desktop") {
+    await page.getByTestId(`header-nav-${id}`).click();
+  } else {
+    await page.getByTestId("header-nav-toggle").click();
+    await page.getByTestId(`header-mobile-nav-${id}`).click();
+  }
+}
+
 test.describe("Acceptance checklist (labsheet conformance)", () => {
   test("all required UI functions are present and render on the live app", async ({ page }, testInfo) => {
     const isMobile = testInfo.project.name === "mobile";
@@ -19,17 +28,15 @@ test.describe("Acceptance checklist (labsheet conformance)", () => {
       // consume the promise so failures bubble up with context
     };
 
-    // 1. Requester selection (FR-01 / BR-03)
+    // 1. Login as Requester and open Create Ticket (FR-01 / BR-03)
     await page.goto("/");
-    await expect(page.getByTestId("requester-selector-modal")).toBeVisible();
-    check("Requester selector modal shown on first visit");
-    await page
-      .locator('[data-testid^="requester-card-"]')
-      .filter({ hasText: "Jennifer Anderson" })
-      .click();
-    await expect(page.getByTestId("requester-selector-modal")).toBeHidden();
+    await page.getByTestId("login-email").fill("jennifer@toktickit.com");
+    await page.getByTestId("login-password").fill("Password123!");
+    await page.getByTestId("login-submit").click();
+    await expect(page.getByTestId("header-user-name")).toContainText("Jennifer Anderson");
+    await clickNav(page, "create-ticket", testInfo.project.name);
     await expect(page.getByTestId("readonly-requester")).toHaveText(/Jennifer Anderson/);
-    check("Requester selection persists (localStorage)");
+    check("Login + navigation to Create Ticket");
 
     // 2. Create Ticket screen — every required control (FR-02, ui-spec 3.2)
     await expect(page.getByTestId("readonly-ticket-number")).toHaveText(/Auto-generated/);
@@ -68,6 +75,9 @@ test.describe("Acceptance checklist (labsheet conformance)", () => {
     await expect(page.getByTestId("uploaded-count")).toHaveText(/Attachments uploaded: 1 file\(s\)/);
     const tn = await page.getByTestId("success-alert").getByText(/TKT-\d{4}-\d{6}/).textContent().then((t) => (t ?? "").match(/TKT-\d{4}-\d{6}/)![0]);
     check("Create ticket succeeds and attachment uploads at create time (FR-04)");
+
+    // Navigate to My Tickets to locate the ticket just created
+    await clickNav(page, "my-tickets", testInfo.project.name);
 
     // 4. My Tickets screen — every control (FR-05..FR-08, ui-spec 4)
     await page.getByTestId("my-tickets-search").fill(summary);
