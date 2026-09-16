@@ -48,7 +48,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [navOpen, setNavOpen] = useState(false);
 
   if (!user) return null;
 
@@ -94,48 +93,6 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate }) => {
             </button>
           ))}
         </nav>
-
-        <div className="position-relative d-lg-none">
-          <button
-            type="button"
-            className="btn btn-sm btn-outline-light rounded-pill px-3 py-1 border border-white border-opacity-25"
-            aria-label="Open navigation"
-            aria-expanded={navOpen}
-            aria-haspopup="menu"
-            onClick={() => setNavOpen((o) => !o)}
-            data-testid="header-nav-toggle"
-          >
-            ☰ Menu
-          </button>
-
-          {navOpen && (
-            <div
-              className="position-absolute end-0 mt-2 border rounded-3 shadow-lg overflow-hidden"
-              style={{ backgroundColor: "#FFFFFF", minWidth: 200, zIndex: 1000 }}
-              role="menu"
-              aria-label="Navigation"
-              data-testid="header-mobile-nav-menu"
-            >
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`dropdown-item fw-semibold py-2 px-3 text-start w-100 ${
-                    item.matches.includes(activeView) ? "fw-bold text-success" : ""
-                  }`}
-                  style={{ color: "#1F2923" }}
-                  onClick={() => {
-                    setNavOpen(false);
-                    onNavigate(item.id);
-                  }}
-                  data-testid={`header-mobile-nav-${item.id}`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
         <div className="position-relative">
           <button
