@@ -27,7 +27,7 @@ async function clickNav(page: Page, id: string, project: string) {
 }
 
 test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
-  test("select requester -> create ticket with attachment -> find in My Tickets -> detail + soft-remove", async ({
+  test("login as requester -> create ticket with attachment -> find in My Tickets -> detail + soft-remove", async ({
     page,
     }, testInfo) => {
     const project = testInfo.project.name;
@@ -74,6 +74,10 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
     // --- Step 3: Find ticket in My Tickets (search mirrors backend query) ---
     await page.getByTestId("my-tickets-search").fill(summary);
     await page.getByTestId("my-tickets-search-btn").click();
+    // The summary is unique (timestamped), so the filtered result set must
+    // settle on exactly one ticket. Waiting for the total first stops us from
+    // matching a row in the pre-search list that the next fetch then unmounts.
+    await expect(page.getByTestId("my-tickets-total")).toContainText("of 1 ticket");
     // Desktop/tablet render the table; mobile (<768px) renders cards.
     const isMobile = project === "mobile";
     const rowOrCard = page
@@ -85,7 +89,6 @@ test.describe("E2E-01: Requester Ticket Flow (full journey)", () => {
       .filter({ hasText: summary })
       .first();
     await expect(rowOrCard).toBeVisible();
-    await rowOrCard.scrollIntoViewIfNeeded();
     await page.screenshot({ path: shot(project, "my-tickets", "my-tickets"), fullPage: true });
     await expectNoHorizontalOverflow(page);
 
