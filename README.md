@@ -62,8 +62,10 @@ npm run dev          # รัน server (http://localhost:3000) + client (http:/
 ### 4. การรันชุดทดสอบอัตโนมัติ (Unit + API + UI)
 
 ```bash
-npm test            # รัน test ทั้งหมด (server 76 tests + client 79 tests) — ยืนยันผลรันจริง 2026-09-17: server 76/76, client 79/79 (12 test files: lab-01 1 + lab-02 4 + lab-03 7)
+npm test            # รัน test ทั้งหมด — ยืนยันผลรันจริง 2026-10-02: server 83/83 (16 files), client 79/79 (12 test files: lab-01 1 + lab-02 4 + lab-03 7)
 ```
+
+> ชุด server เป็น self-isolating — รันซ้ำโดยไม่ต้อง seed ใหม่ก็ได้ผลเหมือนเดิม (ยืนยันแล้ว 3/3 รอบเมื่อไม่ seed ซ้ำ และ 10/10 รอบเมื่อ seed ใหม่ก่อนทุกรอบ) ดูรายละเอียดที่ `docs/lab-03/tests.md` §5.1
 
 หรือรันแยก:
 
@@ -83,11 +85,21 @@ npm run test:e2e    # รัน seed + build server + ทดสอบ 3 viewport
 
 ## ผู้ใช้เริ่มต้น (Seed) สำหรับ Lab 3
 
+รหัสผ่านของทุกบัญชีที่ seed สร้างคือ `Password123!`
+
 | บทบาท | อีเมล | รหัสผ่าน | หมายเหตุ |
 | :--- | :--- | :--- | :--- |
-| Requester | `jennifer.west@dome-lab.id` | `DomeLab!23` | สร้าง/view tickets |
-| IT Staff | `alex.morgan@dome-lab.id` | `DomeLab!23` | Ticket Queue, claim, comment/note |
-| Administrator | `john.doe@dome-lab.id` | `DomeLab!23` | User management |
+| Requester | `jennifer@toktickit.com` | `Password123!` | สร้าง/view tickets |
+| Requester | `michael@toktickit.com` | `Password123!` | |
+| Requester | `sarah@toktickit.com` | `Password123!` | |
+| Requester | `david.lee@toktickit.com` | `Password123!` | |
+| Requester (inactive) | `inactive.requester@toktickit.com` | `Password123!` | ใช้ทดสอบ login ถูกปฏิเสธ 401 |
+| IT Staff | `alex.it@toktickit.com` | `Password123!` | Ticket Queue, claim, comment/note |
+| IT Staff | `kevin.it@toktickit.com` | `Password123!` | |
+| IT Staff | `emily.it@toktickit.com` | `Password123!` | |
+| IT Staff (inactive) | `inactive.it@toktickit.com` | `Password123!` | ใช้ทดสอบ login ถูกปฏิเสธ 401 |
+| Administrator | `admin@toktickit.com` | `Password123!` | User management |
+| Requester (first login) | `newuser@toktickit.com` | `Password123!` | มี `mustChangePassword = true` — ต้องเปลี่ยนรหัสผ่านก่อนใช้งาน |
 
 ## Backend API
 
