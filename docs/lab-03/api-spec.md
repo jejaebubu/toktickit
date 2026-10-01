@@ -261,3 +261,44 @@
   ```
 - **Success Response (`200 OK`)**
 - **Error Response (`400 Bad Request`)**: รหัสผ่านเริ่มต้นใหม่ไม่ผ่าน Password Policy
+
+---
+
+### 2.5 Lab 2 Requester APIs — Compatibility & Access Restriction
+
+Lab 3 ต้องรักษาความสามารถเดิมจาก Lab 2 ไว้ (ดู §6 ของ handout) โดยมีการเปลี่ยนแปลงด้านสิทธิ์การเข้าถึงดังนี้
+
+#### GET /api/requesters — เปลี่ยนแปลงใน Lab 3
+
+- **คำอธิบาย**: คืนรายชื่อผู้ใช้ที่มีบทบาท `REQUESTER` และยังใช้งานอยู่ เรียงตาม `id` จากน้อยไปมาก
+- **สิทธิ์ที่ต้องมี**: `IT_STAFF` หรือ `ADMINISTRATOR` (ต้องยืนยันตัวตนก่อนเสมอ)
+- **การเปลี่ยนแปลง**: ใน Lab 2 endpoint นี้เปิดใช้งานได้โดยไม่ต้องยืนยันตัวตน ซึ่งทำให้มีการเปิดเผยข้อมูลผู้ใช้ (ชื่อและอีเมล) โดยไม่ได้ยืนยันตัวตน ผิดข้อกำหนด §6.2 ที่กำหนดให้ทุก endpoint ต้องตรวจสอบสิทธิ์ก่อนเข้าถึงข้อมูล ใน Lab 3 จึงเพิ่ม `authenticateToken` + `checkPasswordChangeState` + `requireRole("IT_STAFF", "ADMINISTRATOR")` และกรองผลลัพธ์ให้เหลือเฉพาะ `role: "REQUESTER"`
+- **เหตุผลที่ยังคง endpoint ไว้**: คำสั่งใน handout ระบุให้ "ลบ" selector เดิม แต่การลบทั้ง endpoint จะทำให้ชุดทดสอบ regression ของ Lab 2 ใช้ไม่ได้ จึงเลือกปิดสิทธิ์การเข้าถึงแทน ซึ่งบรรลุผลตามเจตนาของข้อกำหนด (ไม่เปิดเผยข้อมูลต่อสาธารณะ) และยังคง regression เดิมไว้ได้ บันทึกการตัดสินใจไว้ใน Issue #73 และ PR #75
+- **Success Response (`200 OK`)**
+  ```json
+  [
+    { "id": 1, "name": "Jennifer Anderson", "email": "jennifer@toktickit.com", "role": "REQUESTER" }
+  ]
+  ```
+- **Error Responses**:
+  - `401 Unauthorized`: ไม่มี token หรือ token ไม่ถูกต้อง / ผู้ใช้ถูกปิดใช้งาน
+  - `403 Forbidden`: ผู้ใช้มีบทบาท `REQUESTER` (รวมถึงกรณี `mustChangePassword = true` ซึ่งจะถูกบล็อกก่อนตรวจบทบาท)
+  - ไม่มีกรณี `500` — การอ่านรายชื่อไม่มีเงื่อนไขที่ทำให้ query ล้มเหลว
+
+#### Endpoint อื่นของ Lab 2 ที่ยังคงใช้งานได้
+
+| Endpoint | ผู้ที่เรียกได้ | หมายเหตุ |
+| :--- | :--- | :--- |
+| `POST /api/tickets` | ทุกบทบาทที่ยืนยันตัวตนแล้ว | เจ้าของตั๋วมาจาก token เท่านั้น client ส่ง `requesterId` มาด้วยจะถูกเพิกเฉย (FR-04 / BR-03 / AC-09) |
+| `GET /api/tickets/mine` | `REQUESTER` | พร้อม search / filter / sort / pagination |
+| `GET /api/tickets/:id` | เจ้าของตั๋ว และ IT Staff / Administrator | ผู้ใช้ที่ไม่ใช่เจ้าของได้ `404` เพื่อไม่ให้รั่วข้อมูลการมีอยู่ของตั๋ว |
+| `POST /api/tickets/:id/comments` | เจ้าของตั๋ว, IT Staff, Administrator | Public Comment — เห็นได้ทุกบทบาทที่มีสิทธิ์เข้าถึงตั๋ว |
+| `POST /api/tickets/:id/attachments` | เจ้าของตั๋ว | จำกัด 5 ไฟล์ active ต่อตั๋ว |
+| `GET`/`DELETE` `/api/tickets/:id/attachments/:attachmentId` | เจ้าของไฟล์เท่านั้น | Soft-remove ต้องระบุเหตุผล |
+
+#### ข้อกำหนดด้านความสมบูรณ์ของเลขตั๋ว (เพิ่มเติมจากการตรวจทาน)
+
+- เลขตั๋วต้องอยู่ในรูปแบบ `TKT-YYYY-NNNNNN` และ **เรียงลำดับจากน้อยไปมากต่อเนื่อง**
+- ตัวสร้างเลขตั๋วต้องเพิกเฉยต่อเลขที่ไม่อยู่ในรูปแบบมาตรฐาน ไม่ให้เลขผิดรูปแบบใดบังคับให้ลำดับรีเซ็ต
+- เมื่อเกิดชนกันของ `ticketNumber` (เช่นการสร้างตั๋วพร้อมกัน) ระบบต้องลองสร้างใหม่อัตโนมัติ ไม่ใช่ตอบ `500 Internal Server Error`
+- ข้อกำหนดนี้มีเทสต์รองรับที่ `server/tests/lab-02/create-ticket.api.test.ts` (`API-03`)
