@@ -146,6 +146,19 @@ async function main() {
   const prisma = getPrisma();
   const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
 
+  // 0. Reset transactional data so every run starts from the same state.
+  // Upsert alone is idempotent for the canonical rows but lets tickets and
+  // throwaway accounts created by the test suites accumulate, which makes
+  // `findFirst({ role: "REQUESTER" })` and queue-count assertions resolve to
+  // different rows from run to run. Child rows are removed before parents.
+  const seededEmails = USERS.map((u) => u.email);
+
+  await prisma.internalNote.deleteMany({});
+  await prisma.publicComment.deleteMany({});
+  await prisma.attachment.deleteMany({});
+  await prisma.ticket.deleteMany({});
+  await prisma.user.deleteMany({ where: { email: { notIn: seededEmails } } });
+
   // 1. Seed Categories
   for (const name of CATEGORIES) {
     await prisma.category.upsert({
