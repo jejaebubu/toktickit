@@ -80,12 +80,80 @@ describe("Lab 3 Admin User Management API Suite (users-admin.api.test.ts)", () =
     expect(resetRes.body.message).toContain("successfully");
   });
 
+  it("API-16: The last active Administrator cannot hand their own role away (400)", async () => {
+    const prisma = getPrisma();
+
+    // Isolate the rule: exactly one active Administrator, and it is the caller.
+    const others = await prisma.user.findMany({
+      where: { role: "ADMINISTRATOR", isActive: true, NOT: { id: adminUserId } },
+      select: { id: true },
+    });
+    for (const other of others) {
+      await prisma.user.update({ where: { id: other.id }, data: { isActive: false } });
+    }
+
+    try {
+      const activeAdmins = await prisma.user.count({ where: { role: "ADMINISTRATOR", isActive: true } });
+      expect(activeAdmins).toBe(1);
+
+      const res = await request(app)
+        .patch(`/api/users/${adminUserId}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ role: "REQUESTER" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain("last active Administrator");
+
+      const after = await prisma.user.findUnique({ where: { id: adminUserId } });
+      expect(after!.role).toBe("ADMINISTRATOR");
+    } finally {
+      await prisma.user.updateMany({ where: { role: "ADMINISTRATOR" }, data: { isActive: true } });
+    }
+  });
+
+  it("API-17: A second Administrator may be demoted while one remains (200)", async () => {
+    const prisma = getPrisma();
+
+    const secondAdmin = await prisma.user.findUnique({ where: { email: "sarah@toktickit.com" } });
+    expect(secondAdmin).not.toBeNull();
+    await prisma.user.update({
+      where: { id: secondAdmin!.id },
+      data: { role: "ADMINISTRATOR", isActive: true },
+    });
+
+    try {
+      const activeAdmins = await prisma.user.count({ where: { role: "ADMINISTRATOR", isActive: true } });
+      expect(activeAdmins).toBe(2);
+
+      const res = await request(app)
+        .patch(`/api/users/${secondAdmin!.id}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ role: "REQUESTER" });
+
+      expect(res.status).toBe(200);
+      expect(res.body.role).toBe("REQUESTER");
+
+      const after = await prisma.user.findUnique({ where: { id: secondAdmin!.id } });
+      expect(after!.role).toBe("REQUESTER");
+    } finally {
+      await prisma.user.update({
+        where: { id: secondAdmin!.id },
+        data: { role: "REQUESTER", isActive: true },
+      });
+    }
+  });
+
   afterAll(async () => {
     const prisma = getPrisma();
     const seedHash = await bcrypt.hash("Password123!", 10);
     await prisma.user.updateMany({
       where: { email: "jennifer@toktickit.com" },
       data: { passwordHash: seedHash, mustChangePassword: false },
+    });
+    // Guarantee the seeded single Administrator is active again for other suites.
+    await prisma.user.updateMany({
+      where: { role: "ADMINISTRATOR" },
+      data: { isActive: true },
     });
   });
 });

@@ -22,7 +22,7 @@ describe("Lab 3 RBAC Authorization Matrix Suite (authorization.api.test.ts)", ()
     let sys = await prisma.relatedSystem.findFirst();
     if (!sys) sys = await prisma.relatedSystem.create({ data: { name: "Email", isActive: true } });
 
-    const reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER" } });
+    const reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER" }, orderBy: { id: "asc" } });
     const ticket = await prisma.ticket.create({
       data: {
         ticketNumber: `TKT-2026-AUTH-${Date.now()}`,
