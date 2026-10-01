@@ -134,12 +134,15 @@ app.get("/api/categories", async (_req: Request, res: Response) => {
 });
 
 // ---------------------------------------------------------------------------
-// Lab 2 — Development Requesters list
+// Requesters list (formerly the Lab 2 Development Requester Selector source)
+// Lab 3: the selector UI is removed, so this endpoint is no longer public.
+// It is restricted to IT Staff and Administrator to close the unauthenticated
+// name/email disclosure; Requesters must not be able to enumerate accounts.
 // ---------------------------------------------------------------------------
-app.get("/api/requesters", async (_req: Request, res: Response) => {
+app.get("/api/requesters", authenticateToken, checkPasswordChangeState, requireRole("IT_STAFF", "ADMINISTRATOR"), async (_req: Request, res: Response) => {
   try {
     const requesters = await getPrisma().user.findMany({
-      where: { isActive: true },
+      where: { isActive: true, role: "REQUESTER" },
       orderBy: { id: "asc" },
       select: {
         id: true,
