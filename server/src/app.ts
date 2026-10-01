@@ -192,20 +192,25 @@ async function generateTicketNumber(): Promise<string> {
   const currentYear = new Date().getFullYear();
   const prefix = `TKT-${currentYear}-`;
 
-  const lastTicket = await prisma.ticket.findFirst({
-    where: { ticketNumber: { startsWith: prefix } },
-    orderBy: { ticketNumber: "desc" },
-    select: { ticketNumber: true },
-  });
+  // Order by the numeric sequence, not by the raw string. `orderBy
+  // ticketNumber: "desc"` put non-conforming numbers such as
+  // TKT-2026-AUTH-1760000000000 above TKT-2026-000008 (because "A" > "0"),
+  // which made the counter fall back to 1 and collide with the existing
+  // TKT-2026-000001.
+  const rows = await prisma.$queryRaw<{ ticketNumber: string }[]>`
+    SELECT "ticketNumber" FROM "Ticket"
+    WHERE "ticketNumber" LIKE ${`${prefix}%`}
+      AND "ticketNumber" ~ ${`^TKT-[0-9]{4}-[0-9]{6}$`}
+    ORDER BY "ticketNumber" DESC
+    LIMIT 1
+  `;
 
   let nextSeq = 1;
-  if (lastTicket?.ticketNumber) {
-    const parts = lastTicket.ticketNumber.split("-");
-    if (parts.length === 3) {
-      const seq = parseInt(parts[2], 10);
-      if (!isNaN(seq)) {
-        nextSeq = seq + 1;
-      }
+  const lastTicketNumber = rows[0]?.ticketNumber;
+  if (lastTicketNumber) {
+    const seq = parseInt(lastTicketNumber.slice(-6), 10);
+    if (!isNaN(seq)) {
+      nextSeq = seq + 1;
     }
   }
 
@@ -450,34 +455,60 @@ app.post("/api/tickets", authenticateToken, checkPasswordChangeState, async (req
       });
     }
 
-    const ticketNumber = await generateTicketNumber();
+    const ticketData = {
+      requesterId,
+      categoryId: Number(categoryId),
+      relatedSystemId: Number(relatedSystemId),
+      summary: summary.trim(),
+      description: description.trim(),
+      requestedPriority,
+      itPriority: "MEDIUM",
+      status: "New",
+    };
 
-    const ticket = await prisma.ticket.create({
-      data: {
-        ticketNumber,
-        requesterId,
-        categoryId: Number(categoryId),
-        relatedSystemId: Number(relatedSystemId),
-        summary: summary.trim(),
-        description: description.trim(),
-        requestedPriority,
-        itPriority: "MEDIUM",
-        status: "New",
-      },
-      select: {
-        id: true,
-        ticketNumber: true,
-        summary: true,
-        description: true,
-        requestedPriority: true,
-        itPriority: true,
-        status: true,
-        createdAt: true,
-        categoryId: true,
-        relatedSystemId: true,
-        requesterId: true,
-      },
-    });
+    const ticketSelect = {
+      id: true,
+      ticketNumber: true,
+      summary: true,
+      description: true,
+      requestedPriority: true,
+      itPriority: true,
+      status: true,
+      createdAt: true,
+      categoryId: true,
+      relatedSystemId: true,
+      requesterId: true,
+    };
+
+    // Ticket numbers are derived from the highest existing sequence, so two
+    // concurrent creates can compute the same value. Retry on the unique
+    // violation (Prisma P2002) instead of surfacing a 500.
+    type CreatedTicket = {
+      id: number;
+      ticketNumber: string;
+      summary: string;
+      description: string;
+      requestedPriority: string;
+      itPriority: string;
+      status: string;
+      createdAt: Date;
+      categoryId: number;
+      relatedSystemId: number;
+      requesterId: number;
+    };
+
+    let ticket: CreatedTicket | undefined;
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        ticket = await prisma.ticket.create({
+          data: { ticketNumber: await generateTicketNumber(), ...ticketData },
+          select: ticketSelect,
+        });
+        break;
+      } catch (err: any) {
+        if (attempt === 4 || err?.code !== "P2002") throw err;
+      }
+    }
 
     return res.status(201).json(ticket);
   } catch (err: any) {

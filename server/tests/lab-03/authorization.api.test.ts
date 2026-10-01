@@ -91,6 +91,47 @@ describe("Lab 3 RBAC Authorization Matrix Suite (authorization.api.test.ts)", ()
     expect(Array.isArray(res.body)).toBe(true);
   });
 
+  it("API-10: Server ignores client-supplied requesterId and derives ownership from the token", async () => {
+    const prisma = getPrisma();
+
+    const [cat, sys] = await Promise.all([
+      prisma.category.findFirst({ orderBy: { id: "asc" } }),
+      prisma.relatedSystem.findFirst({ where: { isActive: true }, orderBy: { id: "asc" } }),
+    ]);
+    const otherRequester = await prisma.user.findFirst({
+      where: { role: "REQUESTER", email: { not: "jennifer@toktickit.com" } },
+      orderBy: { id: "asc" },
+    });
+
+    const ticketNumber = `TKT-2026-OWNER-${Date.now()}`;
+    const res = await request(app)
+      .post("/api/tickets")
+      .set("Authorization", `Bearer ${requesterToken}`)
+      // requesterId is deliberately supplied and must be ignored (FR-04 / BR-03).
+      .send({
+        requesterId: otherRequester!.id,
+        categoryId: cat!.id,
+        relatedSystemId: sys!.id,
+        summary: "Ownership derives from JWT",
+        description: "Client-supplied requesterId must not be trusted.",
+        requestedPriority: "MEDIUM",
+      });
+
+    expect(res.status, JSON.stringify(res.body)).toBe(201);
+
+    const created = await prisma.ticket.findFirst({
+      where: { summary: "Ownership derives from JWT" },
+      orderBy: { id: "desc" },
+    });
+    expect(created).not.toBeNull();
+
+    const jennifer = await prisma.user.findUnique({ where: { email: "jennifer@toktickit.com" } });
+    expect(created!.requesterId).toBe(jennifer!.id);
+    expect(created!.requesterId).not.toBe(otherRequester!.id);
+
+    await prisma.ticket.delete({ where: { id: created!.id } });
+  });
+
   afterAll(async () => {
     const prisma = getPrisma();
     await prisma.ticket.deleteMany({ where: { ticketNumber: { startsWith: "TKT-2026-AUTH-" } } });

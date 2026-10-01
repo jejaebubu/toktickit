@@ -156,4 +156,58 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
     expect(resInvalidPriority.body.error).toBe("Bad Request");
     expect(resInvalidPriority.body.message).toContain("requestedPriority");
   });
+
+  it("API-03: Ticket numbering continues the canonical sequence past non-conforming numbers", async () => {
+    const prisma = getPrisma();
+    const { category, system, requester } = await getValidTestEntities();
+    const token = await loginAs(requester.email);
+
+    const year = new Date().getFullYear();
+    const prefix = `TKT-${year}-`;
+    const isCanonical = (value: string) => /^TKT-\d{4}-\d{6}$/.test(value);
+
+    const highestCanonicalSeq = () =>
+      prisma.ticket
+        .findMany({ where: { ticketNumber: { startsWith: prefix } } })
+        .then((rows) =>
+          rows
+            .map((r) => r.ticketNumber)
+            .filter(isCanonical)
+            .map((n) => parseInt(n.slice(-6), 10)),
+        )
+        .then((seqs) => (seqs.length ? Math.max(...seqs) : 0));
+
+    // "ZZ" sorts above the digits in a descending string comparison, so this row
+    // used to become the "last ticket", resetting the counter to 000001 and
+    // colliding with an existing TKT-YYYY-000001 (HTTP 500).
+    const noise = await prisma.ticket.create({
+      data: {
+        ticketNumber: `${prefix}ZZ-${Date.now()}`,
+        requesterId: requester.id,
+        categoryId: category.id,
+        relatedSystemId: system.id,
+        summary: "Non-conforming ticket number",
+        description: "Guards the ticket-number sequence generator.",
+        requestedPriority: "LOW",
+      },
+    });
+    createdTicketIds.push(noise.id);
+
+    const expectedSeq = (await highestCanonicalSeq()) + 1;
+
+    const res = await request(app)
+      .post("/api/tickets")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        categoryId: category.id,
+        relatedSystemId: system.id,
+        summary: "Sequence continues after non-conforming number",
+        description: "Regression guard for generateTicketNumber().",
+        requestedPriority: "LOW",
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.ticketNumber).toBe(`${prefix}${String(expectedSeq).padStart(6, "0")}`);
+    createdTicketIds.push(res.body.id);
+  });
 });
