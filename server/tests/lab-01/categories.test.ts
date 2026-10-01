@@ -44,19 +44,44 @@ describe("GET /api/categories", () => {
 
   it("returns an empty array when no categories exist", async () => {
     const prisma = getPrisma();
-    await prisma.ticket.deleteMany({});
-    await prisma.category.deleteMany({});
+
+    // Snapshot everything this assertion destroys. The previous version ran
+    // ticket.deleteMany({}) + category.deleteMany({}) and only re-created the
+    // four category *names* afterwards, which (a) destroyed the seeded tickets
+    // permanently and (b) re-issued Category ids, so suites that hardcode
+    // categoryId 1 started failing purely because of file execution order.
+    const categories = await prisma.category.findMany();
+    const tickets = await prisma.ticket.findMany();
+    const ticketIds = tickets.map((t) => t.id);
+    const attachments = await prisma.attachment.findMany({ where: { ticketId: { in: ticketIds } } });
+    const publicComments = await prisma.publicComment.findMany({ where: { ticketId: { in: ticketIds } } });
+    const internalNotes = await prisma.internalNote.findMany({ where: { ticketId: { in: ticketIds } } });
+
     try {
+      await prisma.internalNote.deleteMany({});
+      await prisma.publicComment.deleteMany({});
+      await prisma.attachment.deleteMany({});
+      await prisma.ticket.deleteMany({});
+      await prisma.category.deleteMany({});
+
       const res = await request(app).get("/api/categories");
       expect(res.status).toBe(200);
       expect(res.body).toEqual([]);
     } finally {
-      for (const name of ["Account and Access", "Hardware", "Software", "Network"]) {
-        await prisma.category.upsert({
-          where: { name },
-          update: {},
-          create: { name },
-        });
+      for (const c of categories) {
+        await prisma.category.create({ data: { id: c.id, name: c.name } });
+      }
+      for (const t of tickets) {
+        await prisma.ticket.create({ data: { ...t } });
+      }
+      for (const a of attachments) {
+        await prisma.attachment.create({ data: { ...a } });
+      }
+      for (const c of publicComments) {
+        await prisma.publicComment.create({ data: { ...c } });
+      }
+      for (const n of internalNotes) {
+        await prisma.internalNote.create({ data: { ...n } });
       }
     }
   });

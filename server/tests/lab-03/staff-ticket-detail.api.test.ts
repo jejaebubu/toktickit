@@ -18,7 +18,7 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
     if (!ticket) {
       let cat = await prisma.category.findFirst() || await prisma.category.create({ data: { name: "Hardware" } });
       let sys = await prisma.relatedSystem.findFirst() || await prisma.relatedSystem.create({ data: { name: "Corporate Laptop", isActive: true } });
-      let reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER" } });
+      let reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER" }, orderBy: { id: "asc" } });
 
       ticket = await prisma.ticket.create({
         data: {
@@ -135,7 +135,7 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
     expect(missing.status).toBe(400);
 
     const prisma = getPrisma();
-    const aRequester = await prisma.user.findFirst({ where: { role: "REQUESTER" } });
+    const aRequester = await prisma.user.findFirst({ where: { role: "REQUESTER" }, orderBy: { id: "asc" } });
     const requesterAsOwner = await request(app)
       .patch(`/api/tickets/${targetTicketId}`)
       .set("Authorization", `Bearer ${staffToken}`)
@@ -170,7 +170,7 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
     const flagged = await prisma.ticket.create({
       data: {
         ticketNumber: `TKT-2026-FLAG-${Date.now()}`,
-        requesterId: (await prisma.user.findFirst({ where: { role: "REQUESTER" } }))!.id,
+        requesterId: (await prisma.user.findFirst({ where: { role: "REQUESTER" }, orderBy: { id: "asc" } }))!.id,
         categoryId: cat.id,
         relatedSystemId: sys.id,
         summary: "Flag reset test ticket",

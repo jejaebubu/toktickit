@@ -5,38 +5,55 @@ import { app } from "../../src/app.js";
 import { getPrisma } from "../../src/prisma.js";
 import { loginAs, TEST_PASSWORD } from "./helpers.js";
 
+const TEST_REQUESTER_EMAIL = "test.requester.create-ticket@example.com";
+const createdTicketIds: number[] = [];
+
 describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
   afterAll(async () => {
-    // Clean up created test tickets to prevent foreign key issues in other test suites
+    // Remove only what this suite created. A blanket ticket.deleteMany({}) also
+    // removed the seeded tickets, which made the ticket-count assertions in the
+    // Lab 3 queue suites depend on file execution order.
     const prisma = getPrisma();
-    await prisma.ticket.deleteMany({});
+    if (createdTicketIds.length > 0) {
+      await prisma.ticket.deleteMany({ where: { id: { in: createdTicketIds } } });
+    }
+    await prisma.user.deleteMany({ where: { email: TEST_REQUESTER_EMAIL } });
   });
 
   async function getValidTestEntities() {
     const prisma = getPrisma();
 
-    let category = await prisma.category.findFirst();
+    let category = await prisma.category.findFirst({ orderBy: { id: "asc" } });
     if (!category) {
       category = await prisma.category.create({ data: { name: "Network" } });
     }
 
-    let system = await prisma.relatedSystem.findFirst({ where: { isActive: true } });
+    let system = await prisma.relatedSystem.findFirst({
+      where: { isActive: true },
+      orderBy: { id: "asc" },
+    });
     if (!system) {
       system = await prisma.relatedSystem.create({ data: { name: "Campus Wi-Fi", isActive: true } });
     }
 
+    // Dedicated requester owned by this suite. The previous
+    // findFirst({ where: { isActive: true } }) returned an arbitrary active
+    // user — sometimes alex.it — and this block then overwrote that seeded
+    // account's passwordHash with TEST_PASSWORD, breaking every later suite
+    // that logs in with the seed password "Password123!".
     const hash = await bcrypt.hash(TEST_PASSWORD, 10);
-    let requester = await prisma.user.findFirst({ where: { isActive: true } });
-    if (!requester) {
-      requester = await prisma.user.create({
-        data: { name: "Jennifer Anderson", email: "jennifer@example.com", passwordHash: hash, isActive: true },
-      });
-    } else {
-      requester = await prisma.user.update({
-        where: { id: requester.id },
-        data: { passwordHash: hash, mustChangePassword: false, isActive: true },
-      });
-    }
+    const requester = await prisma.user.upsert({
+      where: { email: TEST_REQUESTER_EMAIL },
+      update: { passwordHash: hash, mustChangePassword: false, isActive: true },
+      create: {
+        name: "Create Ticket Requester",
+        email: TEST_REQUESTER_EMAIL,
+        passwordHash: hash,
+        role: "REQUESTER",
+        mustChangePassword: false,
+        isActive: true,
+      },
+    });
 
     return { category, system, requester };
   }
@@ -65,6 +82,7 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
     expect(res.body.summary).toBe(payload.summary);
     expect(res.body.status).toBe("New");
     expect(res.body).toHaveProperty("createdAt");
+    createdTicketIds.push(res.body.id);
   });
 
   it("API-01b: Creates a new ticket successfully as the logged-in requester", async () => {
@@ -86,6 +104,7 @@ describe("POST /api/tickets (Issue 5 - Create Ticket REST API)", () => {
 
     expect(res.status).toBe(201);
     expect(res.body.summary).toBe(payload.summary);
+    createdTicketIds.push(res.body.id);
   });
 
   it("API-02: Rejects ticket creation if mandatory fields are missing (HTTP 400 Bad Request)", async () => {

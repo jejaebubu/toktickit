@@ -17,7 +17,7 @@ describe("Lab 3 IT Staff Ticket Queue API Suite (staff-queue.api.test.ts)", () =
     if (count === 0) {
       let cat = await prisma.category.findFirst() || await prisma.category.create({ data: { name: "Hardware" } });
       let sys = await prisma.relatedSystem.findFirst() || await prisma.relatedSystem.create({ data: { name: "Corporate Laptop", isActive: true } });
-      let reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER" } });
+      let reqUser = await prisma.user.findFirst({ where: { role: "REQUESTER" }, orderBy: { id: "asc" } });
 
       await prisma.ticket.create({
         data: {
