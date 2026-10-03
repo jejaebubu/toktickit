@@ -134,6 +134,27 @@ Test ID ที่ปรากฏใน**ชื่อ `it(...)` จริง** �
 
 ---
 
+## 4.4 Visual Checklist (ตาม Lab Sheet Part 9)
+
+ตรวจสอบด้วยตาบนภาพจริงทั้ง 3 viewport คู่กับเทสต์อัตโนมัติที่ยืนยัน token แต่ละข้อ
+ทุกข้อผ่านทั้งแบบตรวจด้วยตาและแบบอัตโนมัติ
+
+| # | หัวข้อ (Lab Sheet) | ผลตรวจด้วยตา | ยืนยันอัตโนมัติด้วย | สถานะ |
+| :--- | :--- | :--- | :--- | :--- |
+| **V-01** | Design consistency | โทน Zen Green เดียวกันทุกหน้าจอ ใช้ token เดียวกับ `ui-spec.md`; container ของ Internal Note สีครีม `#FFFDF0` ขอบส้ม และ Public Comment พื้นขาวขอบเขียว | `STYLE-01a`–`STYLE-01h` | **PASS** |
+| **V-02** | Role navigation | เมนู Header เปลี่ยนตาม role; badge แสดง role ถูกต้อง (`Admin` / `IT Staff`); dropdown มี `aria-expanded` / `aria-haspopup` / `role="menu"` | `STYLE-03a`, `STYLE-03b`, E2E `header-role-badge` | **PASS** |
+| **V-03** | Badges | RoleBadge 3 ระดับ, StatusBadge, PriorityBadge ใช้สูตรสีตรงตาม token (เช่น REQUESTER `#E6F6FF`/`#006699`, Resolved `#C6F6D5`/`#22543D`) | `STYLE-01a`–`STYLE-01f` | **PASS** |
+| **V-04** | Editable / read-only fields | ช่องที่แก้ไขได้เป็น input/select; ช่องข้อมูลอ้างอิงเป็น `div` อ่านอย่างเดียว ไม่ถูกทำให้แก้ได้ | `STYLE-02b`, `STYLE-02c`, `STYLE-02d`, `STYLE-02e` | **PASS** |
+| **V-05** | Validation placement | เครื่องหมาย `*` บนฟิลด์บังคับ สีแดง `#C5221F` อยู่ติด label; ข้อความผิดพลาด/เตือนแสดงใต้ช่องที่เกี่ยวข้อง ไม่ทับเนื้อหา | `STYLE-02a`, `STYLE-02f`, `STYLE-02g` | **PASS** |
+| **V-06** | Focus | โฟกัสเข้าถึงทุก control; วงแหวนโฟกัสของเบราว์เซอร์ยังแสดง (ไม่ถูก `outline: none` ทิ้ง) | `STYLE-03h` | **PASS** |
+| **V-07** | Clipping | ตารางมี wrapper `overflow-hidden` + responsive class; ไม่มีเนื้อหาล้นขอบหรือถูกตัดจนอ่านไม่ออก | `STYLE-03f`, `STYLE-03g` | **PASS** |
+| **V-08** | Overlap | ปุ่มและ control ที่กดได้สูงอย่างน้อย 44px จึงไม่ทับกันแม้บน viewport เล็ก | `STYLE-03c`, `STYLE-03d`, `STYLE-03e` | **PASS** |
+| **V-09** | Horizontal overflow | ทุกหน้าจอไม่มีการ scroll แนวนอน ทั้ง desktop / tablet / mobile; สลับระหว่างตาราง (จอใหญ่) กับ card (จอเล็ก) ได้ถูกจุดตัด | `RESP-01a`, `RESP-02a`–`RESP-02c`, E2E `expectNoHorizontalOverflow` ทุก spec | **PASS** |
+
+> หลักฐานภาพ: `artifacts/lab-03/screenshots/` ครบ 3 viewport ต่อ 23 ภาพ — ดูรายละเอียดใน Answer Part 9 ของ `Lab3_Answer_Parts1-9.pdf`
+
+---
+
 ## 5. Security & Regression Tests ที่เพิ่มระหว่าง Review
 
 | Test | Requirement | สิ่งที่พิสูจน์ | ไฟล์ |
