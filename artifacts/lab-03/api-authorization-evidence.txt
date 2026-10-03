@@ -1,0 +1,128 @@
+═══════════════════════════════════════════════════════════════════════
+ Lab 3 Part 7 — Direct API Authorization Evidence
+ Recorded live against: http://localhost:3000/api
+ (node server/dist/src/index.js, freshly seeded database)
+ Every block below is raw server output captured with curl.
+═══════════════════════════════════════════════════════════════════════
+
+Tokens obtained by POST /api/auth/login for three seeded roles:
+  REQUESTER     jennifer@toktickit.com
+  IT_STAFF      alex.it@toktickit.com
+  ADMINISTRATOR admin@toktickit.com
+
+Subject ticket used for the isolation checks: id=291
+
+───────────────────────────────────────────────────────────────
+# AUTH-01  No Authorization header is rejected
+GET /api/tickets/:id/internal-notes   (no header)
+  expected HTTP 401   ->   actual HTTP 401
+
+{"error":"Unauthorized","message":"Authentication required."}
+
+RESULT: PASS (expected 401)
+
+───────────────────────────────────────────────────────────────
+# AUTH-02  Forged token is rejected
+GET /api/tickets/:id/internal-notes   (forged signature)
+  expected HTTP 401   ->   actual HTTP 401
+
+{"error":"Unauthorized","message":"Invalid or expired token."}
+
+RESULT: PASS (expected 401)
+
+───────────────────────────────────────────────────────────────
+# AUTH-03  REQUESTER is forbidden from Internal Notes
+GET /api/tickets/291/internal-notes   (Bearer <REQUESTER>)
+  expected HTTP 403   ->   actual HTTP 403
+
+{"error":"Forbidden","message":"You do not have permission to perform this action."}
+
+RESULT: PASS (expected 403)
+
+───────────────────────────────────────────────────────────────
+# AUTH-04  REQUESTER is forbidden from Admin User Management
+GET /api/users   (Bearer <REQUESTER>)
+  expected HTTP 403   ->   actual HTTP 403
+
+{"error":"Forbidden","message":"You do not have permission to perform this action."}
+
+RESULT: PASS (expected 403)
+
+───────────────────────────────────────────────────────────────
+# AUTH-05  IT_STAFF is forbidden from Admin User Management
+GET /api/users   (Bearer <IT_STAFF>)
+  expected HTTP 403   ->   actual HTTP 403
+
+{"error":"Forbidden","message":"You do not have permission to perform this action."}
+
+RESULT: PASS (expected 403)
+
+───────────────────────────────────────────────────────────────
+# AUTH-06  REQUESTER cannot read another user's ticket (404, no leak)
+GET /api/tickets/291   (Bearer <REQUESTER>, ticket owned by someone else)
+  expected HTTP 404   ->   actual HTTP 404
+
+{"error":"Not Found","message":"Ticket not found."}
+
+RESULT: PASS (expected 404)
+
+───────────────────────────────────────────────────────────────
+# AUTH-07  IT_STAFF MAY read Internal Notes (positive control)
+GET /api/tickets/291/internal-notes   (Bearer <IT_STAFF>)
+  expected HTTP 200   ->   actual HTTP 200
+
+[]
+
+RESULT: PASS (expected 200)
+
+───────────────────────────────────────────────────────────────
+# AUTH-08  ADMINISTRATOR MAY call User Management (positive control)
+GET /api/users   (Bearer <ADMINISTRATOR>)
+  expected HTTP 200   ->   actual HTTP 200
+
+[{"id":1,"name":"Jennifer Anderson","email":"jennifer@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.699Z","updatedAt":"2026-10-03T21:02:48.759Z"},{"id":2,"name":"Michael Brown","email":"michael@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.700Z","updatedAt":"2026-10-03T21:02:48.762Z"},{"id":3,"name":"Sarah Jenkins","email":"sarah@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.701Z","updatedAt":"2026-10-03T21:02:48.763Z"},{"id":4,"name":"David Lee","email":"david.lee@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.702Z","updatedAt":"2026-10-0
+
+RESULT: PASS (expected 200)
+
+───────────────────────────────────────────────────────────────
+# AUTH-09  Wrong password cannot obtain a token
+POST /api/auth/login   {"email":"jennifer@...","password":"WrongPassword123!"}
+  expected HTTP 401   ->   actual HTTP 401
+
+{"error":"Unauthorized","message":"Invalid email or password."}
+
+RESULT: PASS (expected 401)
+
+───────────────────────────────────────────────────────────────
+# AUTH-10  Inactive account cannot obtain a token
+POST /api/auth/login   {"email":"inactive.requester@...","password":"Password123!"}
+  expected HTTP 401   ->   actual HTTP 401
+
+{"error":"Unauthorized","message":"Account is inactive. Please contact system administrator."}
+
+RESULT: PASS (expected 401)
+
+═══════════════════════════════════════════════════════════════════════
+ Row-level isolation (same endpoint, different role)
+═══════════════════════════════════════════════════════════════════════
+
+  GET /api/tickets  as REQUESTER  -> 2 ticket(s)  (own only)
+  GET /api/tickets  as IT_STAFF   -> 8 ticket(s)  (full queue)
+
+  The requester cannot widen the result set by any query parameter;
+  ownership is derived from the token, never from client input.
+  Covered by API-10 and API-11 in server/tests/lab-03.
+
+═══════════════════════════════════════════════════════════════════════
+ Mapping to the automated suite
+═══════════════════════════════════════════════════════════════════════
+  AUTH-01/02 -> API-07  Missing Authorization header returns 401
+  AUTH-03    -> API-05  Requester requesting Internal Notes returns 403
+  AUTH-04    -> API-06  Requester requesting Admin User Mgmt returns 403
+  AUTH-05    -> API-07  IT Staff requesting Admin User Mgmt returns 403
+  AUTH-06    -> API-11  Requester cannot view or update another user
+  AUTH-07    -> API-08  IT Staff can read internal notes
+  AUTH-08    -> API-09  Administrator can access User Management API
+  AUTH-09    -> API-02  Invalid password returns 401
+  AUTH-10    -> API-03  Inactive account login returns 401
+═══════════════════════════════════════════════════════════════════════
