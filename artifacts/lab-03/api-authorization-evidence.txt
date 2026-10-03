@@ -1,6 +1,7 @@
 ═══════════════════════════════════════════════════════════════════════
  Lab 3 Part 7 — Direct API Authorization Evidence
  Recorded live against: http://localhost:3000/api
+ Repository state: main = a6d8ad1
  (node server/dist/src/index.js, freshly seeded database)
  Every block below is raw server output captured with curl.
 ═══════════════════════════════════════════════════════════════════════
@@ -10,7 +11,7 @@ Tokens obtained by POST /api/auth/login for three seeded roles:
   IT_STAFF      alex.it@toktickit.com
   ADMINISTRATOR admin@toktickit.com
 
-Subject ticket used for the isolation checks: id=291
+Subject ticket used for the isolation checks: id=332
 
 ───────────────────────────────────────────────────────────────
 # AUTH-01  No Authorization header is rejected
@@ -32,7 +33,7 @@ RESULT: PASS (expected 401)
 
 ───────────────────────────────────────────────────────────────
 # AUTH-03  REQUESTER is forbidden from Internal Notes
-GET /api/tickets/291/internal-notes   (Bearer <REQUESTER>)
+GET /api/tickets/332/internal-notes   (Bearer <REQUESTER>)
   expected HTTP 403   ->   actual HTTP 403
 
 {"error":"Forbidden","message":"You do not have permission to perform this action."}
@@ -59,7 +60,7 @@ RESULT: PASS (expected 403)
 
 ───────────────────────────────────────────────────────────────
 # AUTH-06  REQUESTER cannot read another user's ticket (404, no leak)
-GET /api/tickets/291   (Bearer <REQUESTER>, ticket owned by someone else)
+GET /api/tickets/332   (Bearer <REQUESTER>, ticket owned by someone else)
   expected HTTP 404   ->   actual HTTP 404
 
 {"error":"Not Found","message":"Ticket not found."}
@@ -68,7 +69,7 @@ RESULT: PASS (expected 404)
 
 ───────────────────────────────────────────────────────────────
 # AUTH-07  IT_STAFF MAY read Internal Notes (positive control)
-GET /api/tickets/291/internal-notes   (Bearer <IT_STAFF>)
+GET /api/tickets/332/internal-notes   (Bearer <IT_STAFF>)
   expected HTTP 200   ->   actual HTTP 200
 
 []
@@ -80,7 +81,7 @@ RESULT: PASS (expected 200)
 GET /api/users   (Bearer <ADMINISTRATOR>)
   expected HTTP 200   ->   actual HTTP 200
 
-[{"id":1,"name":"Jennifer Anderson","email":"jennifer@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.699Z","updatedAt":"2026-10-03T21:02:48.759Z"},{"id":2,"name":"Michael Brown","email":"michael@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.700Z","updatedAt":"2026-10-03T21:02:48.762Z"},{"id":3,"name":"Sarah Jenkins","email":"sarah@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.701Z","updatedAt":"2026-10-03T21:02:48.763Z"},{"id":4,"name":"David Lee","email":"david.lee@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.702Z","updatedAt":"2026-10-0
+[{"id":1,"name":"Jennifer Anderson","email":"jennifer@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.699Z","updatedAt":"2026-10-03T21:29:38.917Z"},{"id":2,"name":"Michael Brown","email":"michael@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.700Z","updatedAt":"2026-10-03T21:29:38.921Z"},{"id":3,"name":"Sarah Jenkins","email":"sarah@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.701Z","updatedAt":"2026-10-03T21:29:38.922Z"},{"id":4,"name":"David Lee","email":"david.lee@toktickit.com","role":"REQUESTER","isActive":true,"mustChangePassword":false,"createdAt":"2026-10-01T19:20:26.702Z","updatedAt":"2026-10-0
 
 RESULT: PASS (expected 200)
 
