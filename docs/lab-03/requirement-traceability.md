@@ -9,7 +9,7 @@ tests listed below. Every test ID in this document exists in the repository:
 |---|---|
 | `API-01`…`API-17` | `server/tests/lab-03/*.api.test.ts` |
 | `E2E-01`…`E2E-04` | `e2e/lab-03/*.spec.ts` |
-| `STYLE-*`, `RESP-*` | `client/src/**/*.test.ts(x)` |
+| `STYLE-*`, `RESP-*` | `client/tests/lab-03/*.test.tsx` |
 | `AUTH-01`…`AUTH-10` | `artifacts/lab-03/api-authorization-evidence.txt` (live `curl`) |
 
 Test results on the final `main`: **server 83/83, client 79/79, E2E 18/18 = 180 passing**.
@@ -27,7 +27,7 @@ Test results on the final `main`: **server 83/83, client 79/79, E2E 18/18 = 180 
 | Authenticated user and role displayed | `API-04, E2E-01` | test + screenshot | Pass |
 | Logout, and direct URL access blocked afterwards | `E2E-01` | test | Pass |
 
-All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
+All rows above verified in `server/tests/lab-03`, `client/tests/lab-03`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
 
 
 ## 6.9 IT Staff Ticket Queue
@@ -47,7 +47,7 @@ All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the re
 | Safe failure (bad ownerId -> 400, never 500) | `API-07f` | test | Pass |
 | Responsive desktop / tablet / mobile | `queue-filtered x3` | screenshot | Pass |
 
-All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
+All rows above verified in `server/tests/lab-03`, `client/tests/lab-03`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
 
 
 ## 7.9 IT Staff Ticket Detail
@@ -66,7 +66,7 @@ All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the re
 | Safe failure (invalid ownerId -> 400) | `API-12, API-13` | test | Pass |
 | Requester cannot read another user's ticket (404, no leak) | `API-11, AUTH-06` | test + live curl | Pass |
 
-All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
+All rows above verified in `server/tests/lab-03`, `client/tests/lab-03`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
 
 
 ## 8.9 Administrator User Management
@@ -85,4 +85,4 @@ All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the re
 | Forbidden for non-Administrators | `AUTH-04, AUTH-05` | live curl | Pass |
 | Responsive desktop / tablet / mobile | `user-search x3` | screenshot | Pass |
 
-All rows above verified in `server/tests`, `client/src`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
+All rows above verified in `server/tests/lab-03`, `client/tests/lab-03`, `e2e/lab-03` and the recorded API evidence file on `main` = `f6c3502`.
