@@ -384,4 +384,38 @@ describe("Lab 4 Actions Taken API Suite (actions-taken.api.test.ts)", () => {
     expect(clearOpenResult.status).toBe(200);
     expect(clearOpenResult.body.result).toBeNull();
   });
+
+  it("API-16: assignable staff endpoint lists only active IT Staff/Admin and rejects Requesters", async () => {
+    const res = await request(app)
+      .get("/api/users/assignable")
+      .set("Authorization", `Bearer ${staffToken}`);
+
+    expect(res.status).toBe(200);
+    const ids = res.body.map((u: any) => u.id);
+    expect(ids).toContain(staffId);
+    expect(ids).toContain(adminId);
+    expect(ids).not.toContain(inactiveStaffId);
+    expect(ids).not.toContain(requesterId);
+    expect(res.body.every((u: any) => u.role === "IT_STAFF" || u.role === "ADMINISTRATOR")).toBe(true);
+
+    const requesterRes = await request(app)
+      .get("/api/users/assignable")
+      .set("Authorization", `Bearer ${requesterToken}`);
+    expect(requesterRes.status).toBe(403);
+  });
+
+  it("API-17: ticket detail includes the Actions Taken history for the UI", async () => {
+    const res = await request(app)
+      .get(`/api/tickets/${ticketId}`)
+      .set("Authorization", `Bearer ${staffToken}`);
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.actionsTaken)).toBe(true);
+    expect(res.body.actionsTaken.length).toBeGreaterThan(0);
+
+    const action = res.body.actionsTaken.find((a: any) => a.id === actionId);
+    expect(action).toBeTruthy();
+    expect(action.performedBy.id).toBe(staffId);
+    expect(action.assignee.id).toBe(adminId);
+  });
 });

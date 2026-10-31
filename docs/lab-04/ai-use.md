@@ -26,7 +26,10 @@
 6. **Prompt 6 (Issue #3 — Actions Taken REST API & RBAC)**:
    > "พัฒนา REST API สำหรับ Actions Taken ใน `server/src/app.ts` ได้แก่ GET/POST `/api/tickets/:id/actions-taken` และ PATCH `/api/tickets/:id/actions-taken/:actionId` โดยใช้ JWT identity จาก token, จำกัด POST/PATCH เฉพาะ IT_STAFF/ADMINISTRATOR, Requester ดูได้เฉพาะตั๋วของตนเอง (404 no-leak), ตรวจ assignee ต้องเป็น IT Staff/Admin ที่ active (422), บังคับ `result` เฉพาะสถานะ COMPLETED (400) และบังคับ Action Status Matrix ตาม BR-14 พร้อมเขียน API tests API-01..05, API-12, API-14, API-15 ใน `server/tests/lab-04/actions-taken.api.test.ts`"
 
-*(Prompts 7 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #4 ถึง #11)*
+7. **Prompt 7 (Issue #4 — Actions Taken UI)**:
+   > "สร้างคอมโพเนนต์ `ActionsTaken.tsx` สำหรับหน้า Ticket Detail ตาม `ui-spec.md` §2.4 ได้แก่ list เรียงใหม่→เก่า, ปุ่ม Add/Edit เฉพาะ IT_STAFF/ADMINISTRATOR, ฟอร์ม datetime-local/description/result/assignee/status/follow-up/attachment notes พร้อม validation แบบ dynamic (result บังคับเฉพาะ COMPLETED, follow-up note บังคับเมื่อเปิด), Complete/Cancel quick actions พร้อม loading state, แสดง error 422 จาก API โดยไม่ล้างข้อมูล, และ Requester เห็นแบบ read-only พร้อมเขียนเทสต์ UI-01/02/06 ใน `client/tests/lab-04/ActionsTaken.test.tsx` รวมทั้งเพิ่ม `GET /api/users/assignable` และให้ GET ticket detail ส่ง `actionsTaken` มาด้วย"
+
+*(Prompts 8 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #5 ถึง #11)*
 
 ---
 

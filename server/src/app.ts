@@ -751,6 +751,10 @@ app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (
         requester: { select: { id: true, name: true, email: true } },
         owner: { select: { id: true, name: true, email: true } },
         attachments: true,
+        actionsTaken: {
+          orderBy: [{ actionDateTime: "asc" }, { createdAt: "asc" }],
+          include: ACTION_TAKEN_INCLUDE,
+        },
         publicComments: {
           orderBy: { createdAt: "asc" },
           include: { author: { select: { id: true, name: true, email: true, role: true } } },
@@ -1474,6 +1478,25 @@ app.post("/api/tickets/:id/internal-notes", authenticateToken, checkPasswordChan
 // ---------------------------------------------------------------------------
 // Lab 3 — Administrator User Management (ADMINISTRATOR only)
 // ---------------------------------------------------------------------------
+app.get(
+  "/api/users/assignable",
+  authenticateToken,
+  checkPasswordChangeState,
+  requireRole("IT_STAFF", "ADMINISTRATOR"),
+  async (_req: Request, res: Response) => {
+    try {
+      const users = await getPrisma().user.findMany({
+        where: { isActive: true, role: { in: ["IT_STAFF", "ADMINISTRATOR"] } },
+        select: { id: true, name: true, email: true, role: true, isActive: true },
+        orderBy: { name: "asc" },
+      });
+      res.status(200).json(users);
+    } catch (err: any) {
+      res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    }
+  },
+);
+
 app.get("/api/users", authenticateToken, checkPasswordChangeState, requireRole("ADMINISTRATOR"), async (req: Request, res: Response) => {
   try {
     const { search, role } = req.query;
