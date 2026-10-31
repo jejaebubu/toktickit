@@ -18,6 +18,19 @@ const JWT_SECRET: string = (() => {
 })();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 const TICKET_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
+const ACTION_STATUSES = ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
+type ActionStatus = (typeof ACTION_STATUSES)[number];
+const ACTION_STATUS_TRANSITIONS: Record<ActionStatus, ActionStatus[]> = {
+  PENDING: ["IN_PROGRESS", "COMPLETED", "CANCELLED"],
+  IN_PROGRESS: ["COMPLETED", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+};
+const ACTION_USER_SELECT = { id: true, name: true, email: true, role: true } as const;
+const ACTION_TAKEN_INCLUDE = {
+  performedBy: { select: ACTION_USER_SELECT },
+  assignee: { select: { ...ACTION_USER_SELECT, isActive: true } },
+} as const;
 const TICKET_STATUSES: Record<string, string> = {
   NEW: "New",
   OPEN: "Open",
@@ -763,6 +776,307 @@ app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (
     res.status(500).json({ error: "Internal Server Error", message: err?.message });
   }
 });
+
+// ---------------------------------------------------------------------------
+// Lab 4 (Issue 3) — Actions Taken REST API (RBAC, validation, status machine)
+// GET/POST /api/tickets/:id/actions-taken
+// PATCH    /api/tickets/:id/actions-taken/:actionId
+// ---------------------------------------------------------------------------
+type AssigneeResolution = { id: number } | { status: number; message: string };
+
+async function resolveActionAssignee(raw: unknown): Promise<AssigneeResolution> {
+  if (raw === undefined || raw === null || raw === "") {
+    return { status: 400, message: "assigneeId is required." };
+  }
+  const assigneeId = Number(raw);
+  if (!Number.isInteger(assigneeId) || assigneeId <= 0) {
+    return { status: 400, message: "assigneeId must be a positive integer." };
+  }
+  const assignee = await getPrisma().user.findUnique({ where: { id: assigneeId } });
+  if (!assignee || !assignee.isActive || (assignee.role !== "IT_STAFF" && assignee.role !== "ADMINISTRATOR")) {
+    return { status: 422, message: "Assignee must be an active IT Staff or Administrator." };
+  }
+  return { id: assigneeId };
+}
+
+function parseActionStatus(raw: unknown): ActionStatus | null {
+  if (typeof raw !== "string") return null;
+  const normalized = raw.trim().toUpperCase();
+  return ACTION_STATUSES.includes(normalized as ActionStatus) ? (normalized as ActionStatus) : null;
+}
+
+function parseOptionalText(raw: unknown): { ok: true; value: string | null | undefined } | { ok: false } {
+  if (raw === undefined) return { ok: true, value: undefined };
+  if (raw === null) return { ok: true, value: null };
+  if (typeof raw !== "string") return { ok: false };
+  const trimmed = raw.trim();
+  return { ok: true, value: trimmed.length ? trimmed : null };
+}
+
+app.get("/api/tickets/:id/actions-taken", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = Number(req.params.id);
+    if (!Number.isInteger(ticketId) || ticketId <= 0) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+
+    const ticket = await getPrisma().ticket.findUnique({
+      where: { id: ticketId },
+      select: { id: true, requesterId: true },
+    });
+    if (!ticket) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+
+    const actions = await getPrisma().actionTaken.findMany({
+      where: { ticketId },
+      orderBy: [{ actionDateTime: "asc" }, { createdAt: "asc" }],
+      include: ACTION_TAKEN_INCLUDE,
+    });
+
+    res.status(200).json(actions);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+app.post(
+  "/api/tickets/:id/actions-taken",
+  authenticateToken,
+  checkPasswordChangeState,
+  requireRole("IT_STAFF", "ADMINISTRATOR"),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const ticketId = Number(req.params.id);
+      if (!Number.isInteger(ticketId) || ticketId <= 0) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+      const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId }, select: { id: true } });
+      if (!ticket) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+
+      const body = req.body ?? {};
+      const description = typeof body.actionDescription === "string" ? body.actionDescription.trim() : "";
+      if (description.length < 3) {
+        return res.status(400).json({ error: "Bad Request", message: "actionDescription is required (min 3 characters)." });
+      }
+
+      let status: ActionStatus = "PENDING";
+      if (body.status !== undefined) {
+        const parsedStatus = parseActionStatus(body.status);
+        if (!parsedStatus) {
+          return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${ACTION_STATUSES.join(", ")}` });
+        }
+        status = parsedStatus;
+      }
+
+      const resultField = parseOptionalText(body.result);
+      if (!resultField.ok) {
+        return res.status(400).json({ error: "Bad Request", message: "result must be a string or null." });
+      }
+      const result = resultField.value ?? null;
+      if (status === "COMPLETED" && !result) {
+        return res.status(400).json({ error: "Bad Request", message: "result is required when status is COMPLETED." });
+      }
+
+      const assignee = await resolveActionAssignee(body.assigneeId);
+      if (!("id" in assignee)) {
+        return res.status(assignee.status).json({
+          error: assignee.status === 422 ? "Unprocessable Entity" : "Bad Request",
+          message: assignee.message,
+        });
+      }
+
+      let followUpRequired = false;
+      if (body.followUpRequired !== undefined) {
+        if (typeof body.followUpRequired !== "boolean") {
+          return res.status(400).json({ error: "Bad Request", message: "followUpRequired must be a boolean." });
+        }
+        followUpRequired = body.followUpRequired;
+      }
+      const followUpNoteField = parseOptionalText(body.followUpNote);
+      if (!followUpNoteField.ok) {
+        return res.status(400).json({ error: "Bad Request", message: "followUpNote must be a string or null." });
+      }
+      const followUpNote = followUpNoteField.value ?? null;
+      if (followUpRequired && !followUpNote) {
+        return res.status(400).json({ error: "Bad Request", message: "followUpNote is required when followUpRequired is true." });
+      }
+
+      const attachmentNotesField = parseOptionalText(body.attachmentNotes);
+      if (!attachmentNotesField.ok) {
+        return res.status(400).json({ error: "Bad Request", message: "attachmentNotes must be a string or null." });
+      }
+
+      let actionDateTime: Date | undefined;
+      if (body.actionDateTime !== undefined) {
+        if (typeof body.actionDateTime !== "string") {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be an ISO date string." });
+        }
+        actionDateTime = new Date(body.actionDateTime);
+        if (Number.isNaN(actionDateTime.getTime())) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be a valid ISO date string." });
+        }
+      }
+
+      const created = await getPrisma().actionTaken.create({
+        data: {
+          ticketId,
+          actionDescription: description,
+          result,
+          performedById: req.user!.id,
+          assigneeId: assignee.id,
+          status,
+          followUpRequired,
+          followUpNote,
+          attachmentNotes: attachmentNotesField.value ?? null,
+          ...(actionDateTime ? { actionDateTime } : {}),
+        },
+        include: ACTION_TAKEN_INCLUDE,
+      });
+
+      res.status(201).json(created);
+    } catch (err: any) {
+      res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    }
+  },
+);
+
+app.patch(
+  "/api/tickets/:id/actions-taken/:actionId",
+  authenticateToken,
+  checkPasswordChangeState,
+  requireRole("IT_STAFF", "ADMINISTRATOR"),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const ticketId = Number(req.params.id);
+      if (!Number.isInteger(ticketId) || ticketId <= 0) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+      const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId }, select: { id: true } });
+      if (!ticket) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+
+      const existing = await getPrisma().actionTaken.findFirst({
+        where: { id: req.params.actionId, ticketId },
+      });
+      if (!existing) {
+        return res.status(404).json({ error: "Not Found", message: "Action Taken not found." });
+      }
+
+      const body = req.body ?? {};
+      const data: any = {};
+
+      if (body.actionDescription !== undefined) {
+        const description = typeof body.actionDescription === "string" ? body.actionDescription.trim() : "";
+        if (description.length < 3) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDescription is required (min 3 characters)." });
+        }
+        data.actionDescription = description;
+      }
+
+      let nextResult = existing.result;
+      if (body.result !== undefined) {
+        const resultField = parseOptionalText(body.result);
+        if (!resultField.ok) {
+          return res.status(400).json({ error: "Bad Request", message: "result must be a string or null." });
+        }
+        nextResult = resultField.value ?? null;
+        data.result = nextResult;
+      }
+
+      let nextStatus = existing.status as ActionStatus;
+      if (body.status !== undefined) {
+        const parsedStatus = parseActionStatus(body.status);
+        if (!parsedStatus) {
+          return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${ACTION_STATUSES.join(", ")}` });
+        }
+        nextStatus = parsedStatus;
+        if (nextStatus !== existing.status) {
+          const allowed = ACTION_STATUS_TRANSITIONS[existing.status as ActionStatus] ?? [];
+          if (!allowed.includes(nextStatus)) {
+            return res.status(400).json({
+              error: "Bad Request",
+              message: `Invalid status transition from ${existing.status} to ${nextStatus}.`,
+            });
+          }
+          data.status = nextStatus;
+        }
+      }
+
+      if (nextStatus === "COMPLETED" && !nextResult) {
+        return res.status(400).json({ error: "Bad Request", message: "result is required when status is COMPLETED." });
+      }
+
+      if (body.assigneeId !== undefined) {
+        const assignee = await resolveActionAssignee(body.assigneeId);
+        if (!("id" in assignee)) {
+          return res.status(assignee.status).json({
+            error: assignee.status === 422 ? "Unprocessable Entity" : "Bad Request",
+            message: assignee.message,
+          });
+        }
+        data.assigneeId = assignee.id;
+      }
+
+      let nextFollowUpRequired = existing.followUpRequired;
+      if (body.followUpRequired !== undefined) {
+        if (typeof body.followUpRequired !== "boolean") {
+          return res.status(400).json({ error: "Bad Request", message: "followUpRequired must be a boolean." });
+        }
+        nextFollowUpRequired = body.followUpRequired;
+        data.followUpRequired = nextFollowUpRequired;
+      }
+
+      let nextFollowUpNote = existing.followUpNote;
+      if (body.followUpNote !== undefined) {
+        const followUpNoteField = parseOptionalText(body.followUpNote);
+        if (!followUpNoteField.ok) {
+          return res.status(400).json({ error: "Bad Request", message: "followUpNote must be a string or null." });
+        }
+        nextFollowUpNote = followUpNoteField.value ?? null;
+        data.followUpNote = nextFollowUpNote;
+      }
+      if (nextFollowUpRequired && !nextFollowUpNote) {
+        return res.status(400).json({ error: "Bad Request", message: "followUpNote is required when followUpRequired is true." });
+      }
+
+      if (body.attachmentNotes !== undefined) {
+        const attachmentNotesField = parseOptionalText(body.attachmentNotes);
+        if (!attachmentNotesField.ok) {
+          return res.status(400).json({ error: "Bad Request", message: "attachmentNotes must be a string or null." });
+        }
+        data.attachmentNotes = attachmentNotesField.value ?? null;
+      }
+
+      if (body.actionDateTime !== undefined) {
+        if (typeof body.actionDateTime !== "string") {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be an ISO date string." });
+        }
+        const parsedDate = new Date(body.actionDateTime);
+        if (Number.isNaN(parsedDate.getTime())) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be a valid ISO date string." });
+        }
+        data.actionDateTime = parsedDate;
+      }
+
+      const updated = await getPrisma().actionTaken.update({
+        where: { id: existing.id },
+        data,
+        include: ACTION_TAKEN_INCLUDE,
+      });
+
+      res.status(200).json(updated);
+    } catch (err: any) {
+      res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    }
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Lab 3 (Issue 7) — IT Staff Ticket Operations

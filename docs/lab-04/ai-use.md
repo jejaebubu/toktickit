@@ -23,7 +23,10 @@
 5. **Prompt 5 (Issue #2 — Migration & Idempotent Seed)**:
    > "เพิ่มโมเดล ActionTaken พร้อม ActionTakenStatus enum, assigneeId/assignee และ performedById/performedBy (named relations) ลงใน Prisma schema โดยไม่ทำลายข้อมูล Lab 1–3 สร้าง migration แบบ non-destructive และขยาย seed ให้ idempotent ครอบคลุม ticket ที่มี 0/1/หลาย Actions, ครบทั้ง 4 สถานะ, performer ต่างจาก assignee และ Resolved ticket ต้องไม่มี Action ค้าง พร้อมเพิ่ม DB migration/seed test ใน server/tests/lab-04/actions-taken-migration.test.ts"
 
-*(Prompts 6 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #3 ถึง #11)*
+6. **Prompt 6 (Issue #3 — Actions Taken REST API & RBAC)**:
+   > "พัฒนา REST API สำหรับ Actions Taken ใน `server/src/app.ts` ได้แก่ GET/POST `/api/tickets/:id/actions-taken` และ PATCH `/api/tickets/:id/actions-taken/:actionId` โดยใช้ JWT identity จาก token, จำกัด POST/PATCH เฉพาะ IT_STAFF/ADMINISTRATOR, Requester ดูได้เฉพาะตั๋วของตนเอง (404 no-leak), ตรวจ assignee ต้องเป็น IT Staff/Admin ที่ active (422), บังคับ `result` เฉพาะสถานะ COMPLETED (400) และบังคับ Action Status Matrix ตาม BR-14 พร้อมเขียน API tests API-01..05, API-12, API-14, API-15 ใน `server/tests/lab-04/actions-taken.api.test.ts`"
+
+*(Prompts 7 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #4 ถึง #11)*
 
 ---
 
