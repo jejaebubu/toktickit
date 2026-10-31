@@ -21,6 +21,7 @@
 - **A11Y-xx**: การทดสอบการเข้าถึงอย่างเท่าเทียม (Accessibility)
 - **E2E-xx**: การทดสอบจำลองผู้ใช้งานจริงระดับเบราว์เซอร์ด้วย Playwright
 - **REG-xx**: การทดสอบความเข้ากันได้ย้อนหลัง (Regression Coverage)
+- **MIG-xx**: การทดสอบ Database Migration และความสอดคล้องของ Seed Data
 
 ---
 
@@ -42,6 +43,7 @@
 | **API-12** | API | AC-12 / FR-13 / BR-13 | Create/Update Action Taken with inactive or Requester assignee | ปฏิเสธด้วย HTTP 422 Unprocessable Entity และไม่บันทึกข้อมูล | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
 | **API-13** | API | AC-13 / FR-15 / BR-15 | Resolve a Ticket while unresolved Actions Taken exist | ปฏิเสธด้วย HTTP 409 Conflict (`UNRESOLVED_ACTIONS_EXIST`) และสถานะตั๋วไม่เปลี่ยน | `server/tests/lab-04/ticket-workflow.api.test.ts` | Planned |
 | **API-14** | API | AC-14 / FR-14 / BR-14 | Action Taken status transitions (PENDING → IN_PROGRESS → COMPLETED/CANCELLED) | เปลี่ยนสถานะที่อนุญาตสำเร็จ HTTP 200 และปฏิเสธ transition จาก Final state ด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
+| **API-15** | API | AC-15 / FR-13 / BR-16 | Result validation depends on Action status | สร้าง/แก้ Action ที่ `PENDING`/`IN_PROGRESS` โดยไม่ส่ง `result` สำเร็จ (201/200, `result = null`) แต่ `COMPLETED` ที่ไม่มี `result` ถูกปฏิเสธด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
 | **UI-01** | UI | AC-01 / AC-03 | Actions Taken form input & dynamic follow-up note validation | สลับแสดงช่อง note และแสดง validation error เมื่อเว้นว่าง | `client/tests/lab-04/ActionsTaken.test.tsx` | Planned |
 | **UI-02** | UI | AC-02 / FR-04 | Actions Taken list rendering under Requester view | แสดงรายการแบบ Read-only และซ่อนปุ่ม Create/Edit | `client/tests/lab-04/ActionsTaken.test.tsx` | Planned |
 | **UI-03** | UI | AC-07 / AC-08 | Ticket workflow transition controls & advisory indicator | แสดงเฉพาะปุ่มสถานะที่อนุญาต และแสดงป้าย advisory เมื่อผู้ใช้แจ้งแก้แล้ว | `client/tests/lab-04/TicketWorkflow.test.tsx` | Planned |
@@ -56,6 +58,7 @@
 | **E2E-02** | E2E | AC-07 / AC-08 | Ticket resolution & lifecycle verification | Requester แจ้งแก้ไข $\rightarrow$ Staff ตรวจงาน $\rightarrow$ เปลี่ยนเป็น Resolved | `e2e/lab-04/ticket-resolution.spec.ts` | Planned |
 | **E2E-03** | E2E | AC-04 / AC-05 / FR-10 | Role dashboards navigation & drill-down flow | ตรวจสอบตัวเลข Dashboard ทั้งสองบทบาท และคลิก Drill-down สำเร็จ | `e2e/lab-04/dashboards.spec.ts` | Planned |
 | **REG-01** | Regression | AC-11 / FR-12 | Full regression of Lab 1, Lab 2, and Lab 3 features | ชุดทดสอบเดิมทั้งหมดรันผ่าน 100% | Full Vitest & Playwright Suites | Planned |
+| **MIG-01** | DB / Migration | Data Changes §5 / BR-01 / BR-13 / BR-16 | ActionTaken table, enum, indexes, and idempotent seed integrity | ตาราง/คอลัมน์/Enum ตรงตามสเปก, `result` เป็น Nullable, seed มี 0/1/หลาย Action, open work มี `result = null`, งานที่จบแล้วมี `result`, assignee/performer เป็น IT Staff/Admin ที่ Active, Resolved ticket ไม่มี Action ค้าง | `server/tests/lab-04/actions-taken-migration.test.ts` | Pass |
 
 ---
 
@@ -64,8 +67,8 @@
 
 | PR ID | Issue | วันที่ทดสอบ | ชุดทดสอบที่เกี่ยวข้อง | จำนวนเทสต์ที่ผ่าน | สถานะผลลัพธ์ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **PR-01** | Issue #1 | 2026-10-30 | Engineering Contract & Spec Review | - | Review in progress |
-| **PR-02** | Issue #2 | - | DB Migration & Seed Verification | - | Pending |
+| **PR-01** | Issue #1 | 2026-10-30 | Engineering Contract & Spec Review | - | Merged (PR #104) |
+| **PR-02** | Issue #2 | 2026-10-31 | DB Migration, Seed Verification, and Lab 1–3 Regression Smoke | 10 new + 83 existing = 93 | **Pass** (PR #105, review addressed) |
 | **PR-03** | Issue #3 | - | Actions Taken API Tests (`actions-taken.api.test.ts`) | - | Pending |
 | **PR-04** | Issue #4 | - | Actions Taken UI Tests (`ActionsTaken.test.tsx`) | - | Pending |
 | **PR-05** | Issue #5 | - | Ticket Workflow Tests (`ticket-workflow.api.test.ts`, `TicketWorkflow.test.tsx`) | - | Pending |
