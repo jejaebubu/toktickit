@@ -10,9 +10,11 @@
 ### Included (สิ่งที่รวมในสปรินต์นี้)
 - โครงสร้างข้อมูลแบบ Parent-Child: ตั๋ว 1 ใบสามารถมีรายการ Actions Taken ได้หลายรายการ
 - ฟังก์ชันบันทึกและแก้ไข Actions Taken สำหรับ IT Staff และ Administrator โดยระบบบันทึกผู้ปฏิบัติงาน (`performedBy`) จากบัญชีที่เข้าสู่ระบบจริงโดยอัตโนมัติ
+- การมอบหมายผู้รับผิดชอบ Action Taken (`assignee`) ให้แก่ผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่มีสถานะ `isActive = true` เท่านั้น พร้อมปฏิเสธการมอบหมายให้บัญชีที่ปิดใช้งานหรือเป็น `REQUESTER`
+- การติดตามสถานะของ Action Taken (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`) พร้อมการเปลี่ยนสถานะแบบ Complete / Cancel และการแสดง Badge สถานะบนรายการ
 - สิทธิ์การเข้าถึงแบบ Read-only สำหรับ Requester ในการดูประวัติ Actions Taken เฉพาะตั๋วที่ตนเองเป็นเจ้าของ
 - Ticket Status Transition Matrix ที่สมบูรณ์ ครอบคลุม 8 สถานะ: `New`, `Open`, `In Progress`, `Waiting for Requester`, `Resolved`, `Closed`, `Reopened`, และ `Cancelled`
-- Resolution Gate: การระบุเจตนา "Problem Appears Resolved" ของ Requester เป็นเพียงข้อความ Advisory ที่แจ้งเตือนเจ้าหน้าที่ ไม่เปลี่ยนสถานะตั๋วเป็น `Resolved` โดยอัตโนมัติ การตัดสินใจปิดเคสเป็นอำนาจของ IT Staff/Admin
+- Resolution Gate: การระบุเจตนา "Problem Appears Resolved" ของ Requester เป็นเพียงข้อความ Advisory ที่แจ้งเตือนเจ้าหน้าที่ ไม่เปลี่ยนสถานะตั๋วเป็น `Resolved` โดยอัตโนมัติ การตัดสินใจปิดเคสเป็นอำนาจของ IT Staff/Admin และระบบต้องปฏิเสธการเปลี่ยนสถานะเป็น `Resolved` ตราบใดที่ยังมี Action Taken ค้างอยู่ในสถานะ `PENDING` หรือ `IN_PROGRESS`
 - Role-Appropriate Dashboards:
   - **IT Staff / Admin Dashboard**: สรุปตัวชี้วัดเชิงปฏิบัติการ (`New`, `Open`, `In Progress`, `Waiting for Requester`, `My Assigned`), รายการตั๋วเร่งด่วน/ล่าสุด, กล่อง Quick Actions และลิงก์ Drill-down ไปยัง Ticket Queue ที่กรองตามสถานะ
   - **Requester Dashboard**: สรุปตัวเลขตั๋วของตนเอง (`My Open Tickets`, `In Progress`, `Resolved`, `Closed`), รายการตั๋วของฉันล่าสุด และลิงก์นำทางไปยัง My Tickets
@@ -45,6 +47,9 @@
 - **FR-10**: ระบบต้องรองรับการ Drill-down จากการ์ดตัวชี้วัดบน Dashboard ไปยังหน้ารายการตั๋วที่กรองตามสถานะนั้นๆ
 - **FR-11**: ระบบต้องตรวจจับและป้องกันข้อขัดแย้งจากการอัปเดตข้อมูลตั๋วพร้อมกัน (Stale/Concurrent Update Conflict Handling)
 - **FR-12**: ระบบต้องรักษาฟังก์ชันการทำงานเดิมจาก Lab 1, 2 และ 3 ทั้งหมดให้ทำงานได้อย่างถูกต้อง (Zero Regression)
+- **FR-13**: ระบบต้องอนุญาตให้ IT Staff และ Administrator มอบหมาย (`assigneeId`) ให้ผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่มีสถานะ `isActive = true` เป็นผู้รับผิดชอบ Action Taken และต้องปฏิเสธการมอบหมายให้ผู้ใช้ที่ปิดใช้งานหรือเป็น `REQUESTER` ด้วย `422 Unprocessable Entity`
+- **FR-14**: ระบบต้องรองรับการเปลี่ยนสถานะของ Action Taken (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`) ผ่าน API และ UI โดยบังคับใช้กฎการเปลี่ยนสถานะของ Action Taken ที่ฝั่ง Backend
+- **FR-15**: ระบบต้องบังคับใช้ Resolution Gate ที่ฝั่ง Backend โดยปฏิเสธการเปลี่ยนสถานะตั๋วเป็น `Resolved` ด้วย `409 Conflict` หากยังมี Action Taken ที่มีสถานะ `PENDING` หรือ `IN_PROGRESS` อยู่ภายใต้ตั๋วนั้น
 
 ## 5. Business Rules (กฎทางธุรกิจ)
 - **BR-01**: Action Taken แต่ละรายการต้องสังกัดตั๋วงาน (Ticket) เพียงใบเดียวเท่านั้น (Parent-Child relationship)
@@ -72,6 +77,14 @@
   - `My Assigned`: ตั๋วที่ยังไม่ปิด (`Resolved`, `Closed`, `Cancelled`) ที่มี `ownerId` ตรงกับ IT Staff ผู้เรียกดู
 - **BR-11**: ตัวชี้วัดบน Requester Dashboard ต้องคำนวณเฉพาะตั๋วที่ `requesterId` ตรงกับผู้ใช้ที่ล็อกอินอยู่เท่านั้น
 - **BR-12**: การตรวจจับ Stale Update บนตั๋ว: เมื่อ Client ส่งคำขอแก้ไขสถานะหรือข้อมูลตั๋ว จะต้องตรวจสอบ timestamp `updatedAt` หรือเวอร์ชัน หากข้อมูลบนเซิร์ฟเวอร์เปลี่ยนไปแล้วหลังจากที่ Client โหลดมา ต้องตอบกลับด้วย `409 Conflict`
+- **BR-13 (Assignee Eligibility)**: ผู้รับผิดชอบ Action Taken (`assigneeId`) ต้องเป็นผู้ใช้ที่มีบทบาท `IT_STAFF` หรือ `ADMINISTRATOR` และมีสถานะ `isActive = true` เท่านั้น ระบบต้องปฏิเสธการมอบหมายให้ผู้ใช้บทบาท `REQUESTER` หรือบัญชีที่ถูกปิดใช้งานด้วย `422 Unprocessable Entity` การตรวจสอบนี้ต้องบังคับใช้ที่ฝั่ง Backend ไม่ใช่เพียงซ่อนตัวเลือกใน UI
+- **BR-14 (Action Taken Status Machine)**: สถานะของ Action Taken มี 4 สถานะ ได้แก่ `PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED` และการเปลี่ยนสถานะต้องเป็นไปตาม matrix ต่อไปนี้:
+  - `PENDING` $\rightarrow$ `IN_PROGRESS`, `COMPLETED`, `CANCELLED`
+  - `IN_PROGRESS` $\rightarrow$ `COMPLETED`, `CANCELLED`
+  - `COMPLETED` $\rightarrow$ ไม่มีสถานะถัดไป (Final state)
+  - `CANCELLED` $\rightarrow$ ไม่มีสถานะถัดไป (Final state)
+  - การเปลี่ยนสถานะ Action Taken ต้องกระทำโดย `IT_STAFF` หรือ `ADMINISTRATOR` เท่านั้น และห้ามลบรายการ Action Taken (Append-only audit trail)
+- **BR-15 (Resolution Gate — Unresolved Actions Block)**: ระบบต้องปฏิเสธการเปลี่ยนสถานะตั๋วเป็น `Resolved` ด้วย `409 Conflict` หากตั๋วนั้นยังมี Action Taken ที่มีสถานะ `PENDING` หรือ `IN_PROGRESS` อยู่แม้แต่รายการเดียว ผู้ใช้ต้องเปลี่ยน Action Taken เหล่านั้นเป็น `COMPLETED` หรือ `CANCELLED` ให้ครบก่อนจึงจะ Resolve ตั๋วได้ การตรวจสอบนี้ต้องกระทำที่ฝั่ง Backend แม้ Client จะข้ามหน้าจอไปก็ตาม (ดู BR-09 สำหรับ Requester Advisory Flag)
 
 ### Authorization Matrix (ตารางสิทธิ์การเข้าถึงตามบทบาท)
 | ฟังก์ชัน / การทำงาน | REQUESTER | IT_STAFF | ADMINISTRATOR |
@@ -80,6 +93,8 @@
 | ดูประวัติ Actions Taken บนตั๋วของผู้อื่น | ✗ (`404`) | ✓ | ✓ |
 | สร้าง Action Taken ภายใต้ตั๋ว | ✗ (`403`) | ✓ | ✓ |
 | แก้ไข Action Taken ภายใต้ตั๋ว | ✗ (`403`) | ✓ | ✓ |
+| มอบหมายผู้รับผิดชอบ Action Taken (`assigneeId`) | ✗ (`403`) | ✓ | ✓ |
+| เปลี่ยนสถานะ Action Taken (`PENDING` / `IN_PROGRESS` / `COMPLETED` / `CANCELLED`) | ✗ (`403`) | ✓ | ✓ |
 | ลบ Action Taken | ✗ | ✗ | ✗ (Append-only audit trail) |
 | ดู IT Staff Dashboard (`/api/dashboard/staff`) | ✗ (`403`) | ✓ | ✓ |
 | ดู Requester Dashboard (`/api/dashboard/requester`) | ✓ | ✗ (`403`) | ✗ (`403`) |
@@ -101,10 +116,14 @@
   - รายการตั๋วของฉันล่าสุด และปุ่มด่วนสำหรับสร้างตั๋วใหม่
 - **Ticket Detail Actions Taken Section**:
   - จัดวางถัดจากส่วนข้อมูลตั๋วและข้อคิดเห็น โดยมีหัวข้อและ Badge แสดงจำนวนรายการ Actions Taken
-  - รายการประวัติแสดงวัน-เวลา, ผู้ปฏิบัติงาน, คำอธิบายงาน, ผลลัพธ์, สถานะ Follow-up (พร้อม Follow-up Note ถ้ามี) และ Attachment Notes
+  - รายการประวัติแสดงวัน-เวลา, ผู้ปฏิบัติงาน, ผู้รับผิดชอบ (`assignee`), คำอธิบายงาน, ผลลัพธ์, สถานะ Action Taken (Badge `PENDING` / `IN_PROGRESS` / `COMPLETED` / `CANCELLED`), สถานะ Follow-up (พร้อม Follow-up Note ถ้ามี) และ Attachment Notes
   - ปุ่ม "Add Action Taken" สำหรับ IT Staff/Admin เพื่อเปิดฟอร์มหรือ Modal กรอกข้อมูล
+  - ฟอร์ม Create/Edit มี Dropdown เลือก `Assignee` โดยแสดงเฉพาะผู้ใช้บทบาท IT Staff/Admin ที่ Active และมีตัวเลือกเปลี่ยนสถานะ Action Taken (Complete / Cancel)
   - เมื่อเปิดสวิตช์ `Follow-Up Required` จะแสดงช่องกรอก `Follow-Up Note` พร้อมสัญลักษณ์ดอกจันสีแดง และระบบตรวจสอบไม่ให้เว้นว่าง
   - สำหรับ Requester: แสดงรายการประวัติเท่านั้นโดยไม่มีปุ่ม Add หรือ Edit
+- **Resolution Gate Feedback**:
+  - ปุ่ม Resolve จะแสดงคำเตือนและ Modal ยืนยันเมื่อตั๋วยังมี Action Taken ที่ค้างสถานะ `PENDING` หรือ `IN_PROGRESS`
+  - หากผู้ใช้ยืนยัน ระบบต้องแสดงข้อความแจ้งว่าต้อง Complete หรือ Cancel Action ที่ค้างก่อน และไม่เปลี่ยนสถานะตั๋ว
 - **Responsive & Accessibility**:
   - รองรับหน้าจอ 3 ขนาด: Desktop ($\ge 1280\text{px}$), Tablet ($768\text{px} - 1279\text{px}$), Mobile ($< 768\text{px}$)
   - Touch target บนอุปกรณ์สัมผัสไม่ต่ำกว่า 44x44px
@@ -114,28 +133,42 @@
 ## 7. Data Changes (ความเปลี่ยนแปลงของโมเดลข้อมูล)
 ### Prisma Schema Increment
 ```prisma
+enum ActionTakenStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 model ActionTaken {
-  id                String   @id @default(uuid())
+  id                String            @id @default(uuid())
   ticketId          Int
-  ticket            Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  actionDateTime    DateTime @default(now())
-  actionDescription String   @db.Text
-  result            String   @db.Text
+  ticket            Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actionDateTime    DateTime          @default(now())
+  actionDescription String            @db.Text
+  result            String            @db.Text
   performedById     Int
-  performedBy       User     @relation(fields: [performedById], references: [id])
-  followUpRequired  Boolean  @default(false)
-  followUpNote      String?  @db.Text
-  attachmentNotes   String?  @db.Text
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  performedBy       User              @relation("ActionTakenPerformer", fields: [performedById], references: [id])
+  assigneeId        Int
+  assignee          User              @relation("ActionTakenAssignee", fields: [assigneeId], references: [id])
+  status            ActionTakenStatus @default(PENDING)
+  followUpRequired  Boolean           @default(false)
+  followUpNote      String?           @db.Text
+  attachmentNotes   String?           @db.Text
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   @@index([ticketId])
   @@index([performedById])
+  @@index([assigneeId])
+  @@index([ticketId, status])
 }
 ```
 ความสัมพันธ์เพิ่มเติมใน Model เดิม:
 - `Ticket`: เพิ่มความสัมพันธ์ `actionsTaken ActionTaken[]`
-- `User`: เพิ่มความสัมพันธ์ `actionsTaken ActionTaken[]`
+- `User`: เพิ่มความสัมพันธ์ `actionsTakenPerformed ActionTaken[] @relation("ActionTakenPerformer")` และ `actionsTakenAssigned ActionTaken[] @relation("ActionTakenAssignee")`
+
+เหตุผลที่ต้องมีทั้ง `performedById` และ `assigneeId`: `performedById` คือผู้บันทึกที่ดึงจาก Authenticated Identity (audit) ส่วน `assigneeId` คือผู้ที่ได้รับมอบหมายให้ลงมือทำงานตาม Handout AC-01 / Part 6 ซึ่งต้องตรวจสอบว่าเป็น IT Staff/Admin ที่ Active
 
 ### Database Design Decisions & Justifications (ข้อกำหนด Handout §5.1)
 1. **Decision 1: Relational Parent-Child Model with Foreign Key Indexing**:
@@ -144,18 +177,22 @@ model ActionTaken {
    - *Justification*: ในขั้นตอนการแก้ไขสถานะตั๋วและ Actions Taken ได้กำหนดให้มีกลไกตรวจสอบ `updatedAt` เพื่อป้องกันปัญหา Stale-update หรือ Lost Update เมื่อมีเจ้าหน้าที่ไอทีหลายคนเปิดดูตั๋วใบเดียวกันพร้อมกัน หาก timestamp ขณะบันทึกไม่ตรงกับข้อมูลล่าสุดในฐานข้อมูล ระบบจะปฏิเสธด้วย `409 Conflict` เพื่อให้ผู้ใช้โหลดข้อมูลล่าสุดก่อนตัดสินใจดำเนินการต่อ
 3. **Decision 3: Non-Destructive Migration with Safe Nullable / Default Handling**:
    - *Justification*: การ Migration ต้องไม่ลบหรือดัดแปลงโครงสร้างตั๋วเดิมใน Lab 1–3 ตั๋วที่มีอยู่เดิมจะมีความสัมพันธ์ไปยัง `actionsTaken` เป็นลิสต์ว่าง `[]` โดยอัตโนมัติ ซึ่งสอดคล้องกับพฤติกรรมจริงของตั๋วในอดีต และ Seed Data จะถูกออกแบบให้เป็น Idempotent ด้วยคำสั่ง `upsert` เพื่อให้สามารถรันซ้ำกี่ครั้งก็ได้โดยไม่เกิดข้อผิดพลาดของข้อมูลซ้ำซ้อน
+4. **Decision 4: แยก `assigneeId` ออกจาก `performedById` และใช้ Enum `ActionTakenStatus`**:
+   - *Justification*: Handout AC-01 และ Part 6 กำหนดให้ Action Taken มี "approved assignee" และต้องทดสอบ "inactive-assignee rejection" จึงต้องแยกผู้รับผิดชอบงาน (`assigneeId`) ออกจากผู้บันทึก (`performedById`) เพื่อให้ตั๋วที่เป็นของเจ้าหน้าที่คนหนึ่งสามารถส่งต่องานให้เจ้าหน้าที่อีกคนทำได้ พร้อมทั้งใช้ Enum แทน String อิสระสำหรับ `status` เพื่อให้ฐานข้อมูลบังคับค่าที่อนุญาต (PENDING, IN_PROGRESS, COMPLETED, CANCELLED) และรองรับการสาธิต Complete/Cancel ตาม Rubric Part 6
+5. **Decision 5: Composite Index `[ticketId, status]` สำหรับ Resolution Gate และ Dashboard**:
+   - *Justification*: Resolution Gate ต้อง query หา Action Taken ที่ค้างสถานะของตั๋วทุกครั้งที่พยายาม Resolve และ Dashboard/หน้ารายละเอียดต้องกรองตามสถานะบ่อยครั้ง การสร้าง Composite Index ช่วยลดต้นทุนการ query เมื่อจำนวน Actions Taken เพิ่มขึ้นโดยไม่กระทบโครงสร้างข้อมูลเดิม
 
 ## 8. API Contract Summary (สรุป REST API Contract)
 - `GET /api/tickets/:id/actions-taken`: ดึงรายการ Actions Taken ภายใต้ตั๋ว
-- `POST /api/tickets/:id/actions-taken`: สร้าง Action Taken ใหม่ (เฉพาะ IT Staff/Admin, บันทึก `performedById` อัตโนมัติ)
-- `PATCH /api/tickets/:id/actions-taken/:actionId`: แก้ไข Action Taken ที่มีอยู่เดิม (เฉพาะ IT Staff/Admin)
+- `POST /api/tickets/:id/actions-taken`: สร้าง Action Taken ใหม่ (เฉพาะ IT Staff/Admin, บันทึก `performedById` อัตโนมัติ, รับ `assigneeId` และ `status`, ตรวจสอบ assignee ต้องเป็น IT Staff/Admin ที่ Active)
+- `PATCH /api/tickets/:id/actions-taken/:actionId`: แก้ไข Action Taken ที่มีอยู่เดิม รวมถึงมอบหมาย `assigneeId` และเปลี่ยน `status` (เฉพาะ IT Staff/Admin)
 - `GET /api/dashboard/staff`: สรุปตัวชี้วัดเชิงปฏิบัติการและรายการตั๋วเร่งด่วนสำหรับ IT Staff/Admin
 - `GET /api/dashboard/requester`: สรุปตัวชี้วัดตั๋วและรายการตั๋วสำหรับ Requester ผู้ล็อกอิน
-- `PATCH /api/tickets/:id/status` หรือ `PATCH /api/tickets/:id`: อัปเดตสถานะตั๋วตาม Transition Matrix และตรวจสอบ Concurrency
+- `PATCH /api/tickets/:id/status` หรือ `PATCH /api/tickets/:id`: อัปเดตสถานะตั๋วตาม Transition Matrix ตรวจสอบ Concurrency และบังคับ Resolution Gate (`409 Conflict` เมื่อยังมี Action ค้าง)
 - ดูรายละเอียด Request/Response Schemas, Status Codes และ Error Handling ใน `docs/lab-04/api-spec.md`
 
 ## 9. Acceptance Criteria (เงื่อนไขการยอมรับ แบบ Given-When-Then)
-- **AC-01**: Given ผู้ใช้มีบทบาท IT Staff หรือ Admin และส่งข้อมูล Action Taken ที่ถูกต้อง, When ส่งคำขอสร้าง Action Taken, Then ข้อมูลถูกบันทึกภายใต้ Ticket นั้น โดยระบุผู้ปฏิบัติงานเป็นผู้ที่ล็อกอินอยู่ และส่งคืน HTTP 201 Created
+- **AC-01**: Given ผู้ใช้มีบทบาท IT Staff หรือ Admin และส่งข้อมูล Action Taken ที่ถูกต้อง พร้อมระบุ `assigneeId` ที่เป็น IT Staff/Admin และ Active, When ส่งคำขอสร้าง Action Taken, Then ข้อมูลถูกบันทึกภายใต้ Ticket นั้น โดยระบุผู้ปฏิบัติงานเป็นผู้ที่ล็อกอินอยู่ ผู้รับผิดชอบตาม `assigneeId` ที่ตรวจสอบแล้ว และส่งคืน HTTP 201 Created
 - **AC-02**: Given ผู้ใช้มีบทบาท Requester, When พยายามเรียก API เพื่อสร้างหรือแก้ไข Action Taken, Then เซิร์ฟเวอร์ตอบกลับ `403 Forbidden`
 - **AC-03**: Given ผู้ใช้ส่งข้อมูล Action Taken โดยระบุ `followUpRequired = true` แต่ไม่ระบุ `followUpNote` หรือระบุเป็นข้อความว่าง, When บันทึกข้อมูล, Then เซิร์ฟเวอร์ปฏิเสธด้วย `400 Bad Request` พร้อมข้อความแจ้งเตือนข้อผิดพลาด
 - **AC-04**: Given ผู้ใช้มีบทบาท IT Staff หรือ Admin, When เรียกดู IT Staff Dashboard, Then ระบบส่งคืนตัวชี้วัดการดำเนินงาน (`New`, `Open`, `In Progress`, `Waiting for Requester`, `My Assigned`) ที่คำนวณถูกต้องตรงกับฐานข้อมูล และรายการตั๋วเร่งด่วน
@@ -166,12 +203,17 @@ model ActionTaken {
 - **AC-09**: Given เจ้าหน้าที่เปิดหน้าตั๋วค้างไว้แล้วพยายามอัปเดตสถานะ แต่มีเจ้าหน้าที่คนอื่นอัปเดตตั๋วไปก่อนหน้าแล้ว, When ส่งคำขออัปเดต, Then เซิร์ฟเวอร์ตรวจพบ Stale Update และส่งคืน `409 Conflict`
 - **AC-10**: Given ผู้ใช้เปิดใช้งานแอปพลิเคชันบนอุปกรณ์มือถือ (หน้าจอ 375px), When ดูหน้า Dashboard และ Ticket Detail Actions Taken, Then การแสดงผลจัดเรียงอย่างถูกต้อง ไม่มีปุ่มหรือเนื้อหาทับซ้อน (Overlap) และไม่มีการเลื่อนในแนวนอน (No Horizontal Overflow)
 - **AC-11**: Given การรันชุดทดสอบ Regression จาก Lab 1, Lab 2 และ Lab 3, When ดำเนินการทดสอบทั้งหมด, Then ทุกชุดทดสอบยังคงรันผ่าน 100%
+- **AC-12**: Given ผู้ใช้มีบทบาท IT Staff หรือ Admin, When ส่งคำขอสร้างหรือแก้ไข Action Taken โดยระบุ `assigneeId` ของผู้ใช้ที่ `isActive = false` หรือมีบทบาท `REQUESTER`, Then เซิร์ฟเวอร์ปฏิเสธด้วย `422 Unprocessable Entity` พร้อมข้อความแจ้งว่า assignee ไม่ถูกต้อง และไม่บันทึกข้อมูลใดๆ ลงฐานข้อมูล
+- **AC-13**: Given ตั๋วมี Action Taken อย่างน้อย 1 รายการที่มีสถานะ `PENDING` หรือ `IN_PROGRESS`, When IT Staff/Admin พยายามเปลี่ยนสถานะตั๋วเป็น `Resolved` (แม้จะข้ามหน้าจอ UI มาที่ API โดยตรง), Then เซิร์ฟเวอร์ปฏิเสธด้วย `409 Conflict` พร้อมระบุจำนวน Action ที่ยังค้าง และสถานะตั๋วยังคงเดิม
+- **AC-14**: Given Action Taken อยู่ในสถานะ `PENDING`, When IT Staff/Admin เปลี่ยนสถานะเป็น `IN_PROGRESS` แล้ว `COMPLETED` หรือ `CANCELLED`, Then การเปลี่ยนสถานะสำเร็จและส่งคืน HTTP 200 แต่เมื่อพยายามเปลี่ยนจาก `COMPLETED` หรือ `CANCELLED` ไปสถานะอื่น ระบบต้องปฏิเสธด้วย `400 Bad Request` ตาม Action Taken Status Matrix (BR-14)
 
 ## 10. Definition of Done (นิยามความสำเร็จของสปรินต์)
 - [ ] เอกสารข้อกำหนดทั้งหมดใน `docs/lab-04/` (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`) ครบถ้วนและสอดคล้องกัน
 - [ ] โมเดลข้อมูล Prisma Schema และ Migration ผ่านการทดสอบแบบ Non-destructive ข้อมูลเดิมไม่สูญหาย
 - [ ] Idempotent Seed Data รองรับการรันซ้ำอย่างปลอดภัย ครอบคลุมเคส 0, 1 และหลาย Actions Taken และทดสอบค่า Dashboard 0 และไม่เป็น 0 ได้
 - [ ] API ทั้งหมดรองรับการตรวจสอบสิทธิ์ RBAC, Data Isolation และ Concurrency Handling อย่างถูกต้อง
+- [ ] Action Taken มี `assigneeId` ที่ตรวจสอบสถานะ Active/บทบาท และมี `status` ที่เปลี่ยนได้ตาม Action Taken Status Matrix (Complete / Cancel)
+- [ ] Resolution Gate บังคับใช้ที่ Backend: ไม่สามารถ Resolve ตั๋วได้ตราบใดที่ยังมี Action Taken สถานะ `PENDING` หรือ `IN_PROGRESS`
 - [ ] หน้าจอ UI ทั้งหมดตกแต่งตามธีม Zen Green, รองรับ 3 Viewports และผ่านการตรวจ Accessibility
 - [ ] ชุดทดสอบอัตโนมัติทั้งหมด (Server API, Client UI, Playwright E2E) ผ่าน 100% บนสาขา `main`
 - [ ] ชุดทดสอบ Regression ของ Lab 1–3 ทั้งหมดรันผ่าน 100%
@@ -184,3 +226,6 @@ model ActionTaken {
 2. รายการ Actions Taken มีลักษณะเป็นประวัติการปฏิบัติงานที่บันทึกแล้วไม่ควรถูกลบทิ้ง (Append-mostly / No Hard Deletion API) จึงไม่มี Endpoint สำหรับการลบ Action Taken เพื่อรักษาหลักฐานการทำงาน
 3. Requester Dashboard จะไม่นำเสนอข้อมูลสรุปของตั๋วคนอื่นเลยแม้แต่ตัวเลขสถิติรวม เพื่อรักษาความเป็นส่วนตัวและความปลอดภัยของข้อมูลตาม Handout §8.2
 4. การนับจำนวนตัวชี้วัดบน IT Staff Dashboard สำหรับ "My Assigned" จะนับเฉพาะตั๋วที่สถานะยังไม่สิ้นสุด (`New`, `Open`, `In Progress`, `Waiting for Requester`, `Reopened`) ที่ถูกมอบหมายให้ตนเอง
+5. Action Taken ที่สร้างใหม่จะมี `status` เริ่มต้นเป็น `PENDING` และต้องมี `assigneeId` ที่ถูกต้องเสมอ เพื่อให้ Resolution Gate ตรวจจับงานที่ยังไม่เสร็จได้จริง
+6. การเปลี่ยนสถานะ Action Taken ใช้ `PATCH /api/tickets/:id/actions-taken/:actionId` ร่วมกับฟิลด์ `status` โดยไม่เพิ่ม Endpoint แยก เพื่อลดความซ้ำซ้อนของ API และรักษารูปแบบเดียวกับ PATCH ที่มีอยู่
+

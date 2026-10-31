@@ -99,17 +99,28 @@
   - `Action Date/Time`: Input ชนิด datetime-local (ค่าเริ่มต้นคือเวลาปัจจุบัน)
   - `Action Description`: Textarea (บังคับกรอก มีดอกจันสีแดง `*`)
   - `Result`: Textarea สำหรับบันทึกผลการปฏิบัติงาน (บังคับกรอก `*`)
+  - `Assignee`: Dropdown (Select) สำหรับเลือกผู้รับผิดชอบงาน
+    - แสดงเฉพาะผู้ใช้บทบาท `IT_STAFF` และ `ADMINISTRATOR` ที่มีสถานะ `isActive = true`
+    - **บังคับเลือก** (มีดอกจันสีแดง `*`) และต้องแสดงชื่อพร้อม Badge บทบาทในตัวเลือก
+    - ไม่แสดงผู้ใช้บทบาท `REQUESTER` หรือบัญชีที่ถูกปิดใช้งานในรายการ
+  - `Action Status`: Dropdown หรือปุ่มเปลี่ยนสถานะของ Action Taken (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`)
+    - แสดง Badge สถานะปัจจุบันบนการ์ดรายการ พร้อมปุ่ม `Complete` และ `Cancel` สำหรับ IT Staff/Admin
+    - ปุ่ม Complete / Cancel ต้องมี Loading state และ Disable ระหว่างบันทึกเพื่อป้องกันการกดซ้ำ
+    - เมื่อเปลี่ยนเป็น `COMPLETED` หรือ `CANCELLED` แล้ว ตัวเลือกเปลี่ยนสถานะเพิ่มเติมต้องถูกซ่อน (Final state)
   - `Follow-Up Required?`: สวิตช์เปิด/ปิด หรือ Checkbox
   - `Follow-Up Note`: Textarea สำหรับระบุรายละเอียดการติดตามงาน
     - **Dynamic Behavior**: หากเลือก `Follow-Up Required = true` ช่องนี้จะแสดงขึ้นมาพร้อมดอกจันสีแดง `*` และระบบจะตรวจสอบไม่ให้เว้นว่าง
     - หาก `Follow-Up Required = false` ช่องนี้จะถูกซ่อนหรือปิดการใช้งาน
   - `Attachment Notes`: Input ข้อความสำหรับระบุชื่อไฟล์ ภาพ หรือเอกสารอ้างอิง เช่น `"network-log.txt, switch-photo.jpg"`
   - ปุ่ม `Save Action` (มีสถานะ Loading ป้องกันการกดซ้ำ) และปุ่ม `Cancel`
+  - **Validation Feedback**: หากเลือก Assignee ที่ไม่ถูกต้อง (inactive หรือ Requester) ให้แสดง error ใต้ช่อง และหากเซิร์ฟเวอร์ตอบ `422 Unprocessable Entity` ให้แสดงข้อความ error จาก API โดยไม่ล้างข้อมูลที่ผู้ใช้กรอก
 - **Actions Taken List Display**:
   - แสดงรายการเรียงจากรายการล่าสุดไปเก่าสุด
   - แต่ละการ์ดแสดง:
     - วัน-เวลาที่ปฏิบัติงาน (จัดรูปแบบอ่านง่าย เช่น `Oct 30, 2026, 10:30 AM`)
     - ผู้ปฏิบัติงาน: ชื่อเจ้าหน้าที่ พร้อม Badge บทบาท `IT_STAFF`
+    - ผู้รับผิดชอบ (`Assignee`): ชื่อเจ้าหน้าที่ พร้อม Badge บทบาท
+    - Badge สถานะ Action Taken: `PENDING` (เทา/เหลือง), `IN_PROGRESS` (น้ำเงิน), `COMPLETED` (เขียว), `CANCELLED` (เทาเข้ม) พร้อมข้อความไม่ใช้สีเพียงอย่างเดียว (มี label/ไอคอน)
     - รายละเอียดงาน (Description) และผลลัพธ์ (Result)
     - Badge สถานะ Follow-Up พร้อมข้อความบันทึก (ถ้ามี)
     - โน้ตไฟล์แนบ (Attachment Notes) แสดงด้วยไอคอนคลิปหนีบกระดาษ
@@ -120,6 +131,11 @@
 - **Workflow Action Bar (IT Staff / Admin)**:
   - ปุ่มเปลี่ยนสถานะแสดง **เฉพาะสถานะที่อนุญาตให้เปลี่ยนได้** จากสถานะปัจจุบันตาม Transition Matrix
   - เมื่อเปลี่ยนสถานะสำเร็จ แสดง Toast Notification สีเขียว และอัปเดตข้อมูลบนหน้าจอทันที
+  - **Resolution Gate Feedback**:
+    - หากตั๋วยังมี Action Taken ที่มีสถานะ `PENDING` หรือ `IN_PROGRESS` อยู่ ปุ่ม `Resolve` ต้องมีไอคอน/ข้อความเตือนว่า `"N action(s) still open"` และไม่แสดงเป็นปุ่มปกติที่กดได้โดยไม่แจ้งเตือน
+    - เมื่อผู้ใช้กด `Resolve` ระบบต้องแสดง Modal ยืนยันระบุว่า `"This ticket still has N unresolved action(s). Complete or cancel them before resolving the ticket."` พร้อมรายการ Action ที่ค้าง (ถ้าทำได้) และปุ่ม `Cancel` เป็นค่าเริ่มต้น
+    - หากยืนยัน ระบบต้องส่งคำขอไปยัง Backend และแสดง error จาก `409 Conflict` (`UNRESOLVED_ACTIONS_EXIST`) โดยไม่เปลี่ยนสถานะตั๋วบนหน้าจอ
+    - ห้ามปิดกั้นเฉพาะที่ UI เท่านั้น: Backend ต้องปฏิเสธเช่นกันเมื่อมีการเรียก API โดยตรง
   - หากเกิด Concurrency Conflict (มีผู้อื่นแก้ตั๋วไปก่อน) แสดง Modal แจ้งเตือน `"Ticket has been updated by another user. Please refresh."` พร้อมปุ่มกดโหลดข้อมูลใหม่
 - **Resolution Gate UI (Requester)**:
   - ในหน้าตั๋วของ Requester หากตั๋วยังไม่ปิด และยังไม่ได้ระบุเจตนา จะมีปุ่ม/แบนเนอร์ `"My problem is resolved"`
@@ -141,3 +157,4 @@
   - สีข้อความมี Contrast Ratio เทียบกับพื้นหลังไม่ต่ำกว่า $4.5:1$
   - มี Visible Focus Ring เมื่อใช้งานผ่านคีย์บอร์ด (ปุ่ม Tab)
   - ทุก Input Field มี Label ผูกด้วย `htmlFor` และมี `aria-required="true"` บนช่องที่บังคับกรอก
+

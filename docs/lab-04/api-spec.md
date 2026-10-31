@@ -37,6 +37,15 @@
         "email": "michael.chen@toktickit.com",
         "role": "IT_STAFF"
       },
+      "assigneeId": 3,
+      "assignee": {
+        "id": 3,
+        "name": "Sarah Johnson",
+        "email": "sarah.johnson@toktickit.com",
+        "role": "IT_STAFF",
+        "isActive": true
+      },
+      "status": "COMPLETED",
       "followUpRequired": true,
       "followUpNote": "Monitor connection stability over the next 24 hours",
       "attachmentNotes": "speedtest-results.png",
@@ -62,6 +71,8 @@
     "actionDateTime": "2026-10-30T10:00:00.000Z",
     "actionDescription": "Replaced faulty RAM stick in slot 2",
     "result": "System boots normally and passes 15-minute memory diagnostic",
+    "assigneeId": 3,
+    "status": "PENDING",
     "followUpRequired": true,
     "followUpNote": "Check memory dump logs after 48 hours of user operation",
     "attachmentNotes": "memtest-pass-screen.jpg"
@@ -70,6 +81,8 @@
 - **Validation Rules**:
   - `actionDescription`: string, required, ห้ามว่าง (min 3 chars)
   - `result`: string, required, ห้ามว่าง (min 3 chars)
+  - `assigneeId`: integer, required, ต้องอ้างอิงผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่ `isActive = true` เท่านั้น (ห้าม `REQUESTER` / inactive)
+  - `status`: enum `PENDING | IN_PROGRESS | COMPLETED | CANCELLED`, optional, default `PENDING`
   - `followUpRequired`: boolean, optional, default `false`
   - `followUpNote`: string, บังคับระบุและห้ามว่าง เมื่อ `followUpRequired == true`
   - `attachmentNotes`: string, optional
@@ -90,6 +103,15 @@
       "email": "michael.chen@toktickit.com",
       "role": "IT_STAFF"
     },
+    "assigneeId": 3,
+    "assignee": {
+      "id": 3,
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@toktickit.com",
+      "role": "IT_STAFF",
+      "isActive": true
+    },
+    "status": "PENDING",
     "followUpRequired": true,
     "followUpNote": "Check memory dump logs after 48 hours of user operation",
     "attachmentNotes": "memtest-pass-screen.jpg",
@@ -102,6 +124,7 @@
   - `401 Unauthorized`: ไม่ได้เข้าสู่ระบบ
   - `403 Forbidden`: ผู้ใช้เป็นบทบาท Requester
   - `404 Not Found`: ไม่พบตั๋วงานที่ระบุ
+  - `422 Unprocessable Entity`: `assigneeId` อ้างอิงผู้ใช้ที่ `isActive = false` หรือมีบทบาท `REQUESTER` ไม่สามารถเป็นผู้รับผิดชอบ Action Taken ได้
 
 ---
 
@@ -116,6 +139,8 @@
   {
     "actionDescription": "Updated description with serial number of replaced component",
     "result": "System working as expected",
+    "assigneeId": 4,
+    "status": "COMPLETED",
     "followUpRequired": false,
     "followUpNote": null,
     "attachmentNotes": "updated-notes.png"
@@ -123,12 +148,16 @@
   ```
 - **Validation Rules**:
   - หาก `followUpRequired` ถูกปรับเป็น `true` จะต้องมี `followUpNote` ที่ไม่ว่าง
-- **Success Response (`200 OK`)**: ส่งคืนอ็อบเจกต์ ActionTaken ที่อัปเดตแล้ว
+  - `assigneeId`: integer, optional, หากส่งมาต้องเป็นผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่ `isActive = true`
+  - `status`: enum `PENDING | IN_PROGRESS | COMPLETED | CANCELLED`, optional, หากส่งมาต้องเปลี่ยนได้ตาม Action Taken Status Matrix (BR-14) มิฉะนั้นตอบกลับ `400 Bad Request`
+  - `performedById` ยังคงถูกเพิกเฉยจาก client และไม่สามารถแก้ไขได้
+- **Success Response (`200 OK`)**: ส่งคืนอ็อบเจกต์ ActionTaken ที่อัปเดตแล้ว (รวม `assignee` และ `status`)
 - **Error Responses**:
-  - `400 Bad Request`: ข้อมูลไม่ถูกต้องตามเกณฑ์
+  - `400 Bad Request`: ข้อมูลไม่ถูกต้องตามเกณฑ์ หรือการเปลี่ยนสถานะ Action Taken ผิดกฎ Action Taken Status Matrix
   - `401 Unauthorized`: ไม่ได้เข้าสู่ระบบ
   - `403 Forbidden`: สิทธิ์ไม่เพียงพอ
   - `404 Not Found`: ไม่พบตั๋วหรือ Action Taken นั้น
+  - `422 Unprocessable Entity`: `assigneeId` อ้างอิงผู้ใช้ที่ `isActive = false` หรือมีบทบาท `REQUESTER`
 
 ---
 
@@ -244,6 +273,7 @@
      - หาก Requester พยายามส่งฟิลด์ `status` เพื่อเปลี่ยนสถานะตั๋วโดยตรง เซิร์ฟเวอร์จะตอบกลับ `403 Forbidden`
   2. หากผู้ส่งเป็น `IT_STAFF` หรือ `ADMINISTRATOR`:
      - ตรวจสอบสถานะปัจจุบันเทียบกับสถานะใหม่ตาม Transition Matrix หากไม่ถูกต้อง ตอบกลับ `400 Bad Request` พร้อมเหตุผล
+     - **Resolution Gate**: หากสถานะใหม่คือ `Resolved` เซิร์ฟเวอร์ต้อง query จำนวน Action Taken ของตั๋วที่มี `status in ('PENDING', 'IN_PROGRESS')` ก่อน หากพบอย่างน้อย 1 รายการ ต้องปฏิเสธด้วย `409 Conflict` พร้อม `code: "UNRESOLVED_ACTIONS_EXIST"` และจำนวนรายการที่ค้าง และต้องไม่แก้ไขสถานะตั๋วใดๆ
   3. **Concurrency / Stale Update Check**:
      - หาก Client แนบ `expectedUpdatedAt` และค่าไม่ตรงกับ `ticket.updatedAt` ในฐานข้อมูล เซิร์ฟเวอร์จะตอบกลับ `409 Conflict` เพื่อป้องกันการเขียนทับโดยไม่รู้ตัว
 - **Success Response (`200 OK`)**: ส่งคืนอ็อบเจกต์ Ticket ที่อัปเดตแล้ว
@@ -252,7 +282,7 @@
   - `401 Unauthorized`: ไม่ได้ล็อกอิน
   - `403 Forbidden`: สิทธิ์ไม่ถูกต้อง
   - `404 Not Found`: ไม่พบตั๋วงาน
-  - `409 Conflict`: ข้อมูลตั๋วถูกแก้ไขไปแล้วโดยผู้ใช้อื่น (Stale Update)
+  - `409 Conflict`: ข้อมูลตั๋วถูกแก้ไขไปแล้วโดยผู้ใช้อื่น (Stale Update) หรือพยายามเปลี่ยนสถานะเป็น `Resolved` ขณะยังมี Action Taken สถานะ `PENDING` / `IN_PROGRESS` ค้างอยู่ (`UNRESOLVED_ACTIONS_EXIST`)
 
 ---
 
@@ -261,9 +291,11 @@
 | :--- | :--- | :--- |
 | **200 OK** | สำเร็จ | ดึงข้อมูล Dashboard, ดึง Actions Taken, แก้ไขตั๋ว/Action สำเร็จ |
 | **201 Created** | สร้างสำเร็จ | สร้าง Action Taken ใหม่สำเร็จ |
-| **400 Bad Request** | ข้อมูลไม่ถูกต้อง | `followUpRequired = true` แต่ไม่ระบุ note, เปลี่ยนสถานะขัด Transition Matrix |
+| **400 Bad Request** | ข้อมูลไม่ถูกต้อง | `followUpRequired = true` แต่ไม่ระบุ note, เปลี่ยนสถานะขัด Transition Matrix, เปลี่ยนสถานะ Action Taken ผิด Action Taken Status Matrix |
 | **401 Unauthorized** | ไม่ได้ยืนยันตัวตน | ไม่ได้แนบ Token, Token หมดอายุ หรือไม่ถูกต้อง |
 | **403 Forbidden** | ปฏิเสธสิทธิ์ | Requester พยายามสร้าง Action Taken, เปลี่ยนสถานะตั๋ว หรือเข้า Staff Dashboard |
 | **404 Not Found** | ไม่พบข้อมูล | ไม่พบ Ticket/Action หรือ Requester พยายามเปิดดูข้อมูลของผู้อื่น (Data Isolation) |
-| **409 Conflict** | ข้อมูลขัดแย้ง | เกิด Stale Update จากการแก้ไขข้อมูลตั๋วพร้อมกัน |
+| **409 Conflict** | ข้อมูลขัดแย้ง | เกิด Stale Update จากการแก้ไขข้อมูลตั๋วพร้อมกัน หรือพยายาม Resolve ตั๋วที่ยังมี Action Taken ค้าง (`PENDING` / `IN_PROGRESS`) |
+| **422 Unprocessable Entity** | ข้อมูลผ่านรูปแบบแต่ผิดกฎธุรกิจ | `assigneeId` เป็นผู้ใช้ `REQUESTER` หรือ `isActive = false` ซึ่งไม่สามารถเป็นผู้รับผิดชอบ Action Taken ได้ |
 | **500 Internal Server Error** | ข้อผิดพลาดฝั่งเซิร์ฟเวอร์ | ข้อผิดพลาดที่ไม่คาดคิด ตอบกลับด้วย Safe Error Message เสมอ |
+
