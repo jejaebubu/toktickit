@@ -56,6 +56,7 @@ describe("GET /api/categories", () => {
     const attachments = await prisma.attachment.findMany({ where: { ticketId: { in: ticketIds } } });
     const publicComments = await prisma.publicComment.findMany({ where: { ticketId: { in: ticketIds } } });
     const internalNotes = await prisma.internalNote.findMany({ where: { ticketId: { in: ticketIds } } });
+    const actionsTaken = await prisma.actionTaken.findMany({ where: { ticketId: { in: ticketIds } } });
 
     try {
       await prisma.internalNote.deleteMany({});
@@ -82,6 +83,9 @@ describe("GET /api/categories", () => {
       }
       for (const n of internalNotes) {
         await prisma.internalNote.create({ data: { ...n } });
+      }
+      for (const a of actionsTaken) {
+        await prisma.actionTaken.create({ data: { ...a } });
       }
     }
   });

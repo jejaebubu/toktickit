@@ -1,4 +1,5 @@
 import { getPrisma } from "../src/prisma.js";
+import { ActionTakenStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 // Seed initial categories, users, related systems, tickets, comments, and internal notes.
@@ -142,6 +143,132 @@ const TICKETS = [
   },
 ];
 
+type SeedAction = {
+  ticketNumber: string;
+  performedByEmail: string;
+  assigneeEmail: string;
+  actionDateTime: string;
+  actionDescription: string;
+  result: string;
+  status: ActionTakenStatus;
+  followUpRequired?: boolean;
+  followUpNote?: string | null;
+  attachmentNotes?: string | null;
+};
+
+// Covers tickets with zero, one, and multiple Actions Taken, every ActionTakenStatus,
+// and cases where the performer differs from the assignee.
+const ACTIONS: SeedAction[] = [
+  {
+    ticketNumber: "TKT-2026-001234",
+    performedByEmail: "alex.it@toktickit.com",
+    assigneeEmail: "alex.it@toktickit.com",
+    actionDateTime: "2026-05-13T10:35:00Z",
+    actionDescription: "Ran battery health diagnostic and captured report",
+    result: "Battery health reported at 68%, replacement recommended",
+    status: ActionTakenStatus.COMPLETED,
+    followUpRequired: true,
+    followUpNote: "Monitor battery behaviour after replacement",
+    attachmentNotes: "battery-report.png",
+  },
+  {
+    ticketNumber: "TKT-2026-001234",
+    performedByEmail: "kevin.it@toktickit.com",
+    assigneeEmail: "kevin.it@toktickit.com",
+    actionDateTime: "2026-05-14T09:10:00Z",
+    actionDescription: "Ordered replacement battery under hardware warranty",
+    result: "Replacement approved, ETA five business days",
+    status: ActionTakenStatus.IN_PROGRESS,
+    followUpRequired: false,
+    attachmentNotes: "warranty-approval.pdf",
+  },
+  {
+    ticketNumber: "TKT-2026-001234",
+    performedByEmail: "alex.it@toktickit.com",
+    assigneeEmail: "emily.it@toktickit.com",
+    actionDateTime: "2026-05-15T14:00:00Z",
+    actionDescription: "Prepared device for battery replacement",
+    result: "User data backed up, awaiting replacement part",
+    status: ActionTakenStatus.PENDING,
+    followUpRequired: true,
+    followUpNote: "Notify user as soon as the new battery arrives",
+  },
+  {
+    ticketNumber: "TKT-2026-001233",
+    performedByEmail: "kevin.it@toktickit.com",
+    assigneeEmail: "kevin.it@toktickit.com",
+    actionDateTime: "2026-05-16T08:45:00Z",
+    actionDescription: "Requested VPN client logs from the user",
+    result: "Awaiting logs before continuing troubleshooting",
+    status: ActionTakenStatus.PENDING,
+    followUpRequired: true,
+    followUpNote: "Follow up if logs are not received within 24 hours",
+  },
+  {
+    ticketNumber: "TKT-2026-001232",
+    performedByEmail: "emily.it@toktickit.com",
+    assigneeEmail: "emily.it@toktickit.com",
+    actionDateTime: "2026-05-12T11:20:00Z",
+    actionDescription: "Reconfigured Outlook mobile sync profile",
+    result: "Test email delivered successfully to the device",
+    status: ActionTakenStatus.COMPLETED,
+    followUpRequired: false,
+  },
+  {
+    ticketNumber: "TKT-2026-001232",
+    performedByEmail: "alex.it@toktickit.com",
+    assigneeEmail: "kevin.it@toktickit.com",
+    actionDateTime: "2026-05-12T15:05:00Z",
+    actionDescription: "Attempted mailbox cache rebuild",
+    result: "Cancelled after user reported sync restored",
+    status: ActionTakenStatus.CANCELLED,
+    followUpRequired: false,
+  },
+  {
+    ticketNumber: "TKT-2026-001231",
+    performedByEmail: "emily.it@toktickit.com",
+    assigneeEmail: "emily.it@toktickit.com",
+    actionDateTime: "2026-05-10T09:00:00Z",
+    actionDescription: "Provisioned ERP account and assigned access roles",
+    result: "New employee can sign in and access required modules",
+    status: ActionTakenStatus.COMPLETED,
+    followUpRequired: false,
+    attachmentNotes: "erp-access-checklist.txt",
+  },
+  {
+    ticketNumber: "TKT-2026-001228",
+    performedByEmail: "kevin.it@toktickit.com",
+    assigneeEmail: "kevin.it@toktickit.com",
+    actionDateTime: "2026-05-14T13:30:00Z",
+    actionDescription: "Reproduced attachment hang with a 3MB test file",
+    result: "Issue reproduced; investigating add-in conflict",
+    status: ActionTakenStatus.IN_PROGRESS,
+    followUpRequired: false,
+  },
+  {
+    ticketNumber: "TKT-2026-001228",
+    performedByEmail: "admin@toktickit.com",
+    assigneeEmail: "kevin.it@toktickit.com",
+    actionDateTime: "2026-05-15T10:10:00Z",
+    actionDescription: "Scheduled add-in compatibility review",
+    result: "Review pending with software vendor",
+    status: ActionTakenStatus.PENDING,
+    followUpRequired: true,
+    followUpNote: "Chase vendor response before end of week",
+    attachmentNotes: "addin-inventory.csv",
+  },
+  {
+    ticketNumber: "TKT-2026-001227",
+    performedByEmail: "emily.it@toktickit.com",
+    assigneeEmail: "emily.it@toktickit.com",
+    actionDateTime: "2026-05-09T16:40:00Z",
+    actionDescription: "Replaced USB-C dock and verified peripherals",
+    result: "Monitors, keyboard, and network detected normally",
+    status: ActionTakenStatus.COMPLETED,
+    followUpRequired: false,
+  },
+];
+
 async function main() {
   const prisma = getPrisma();
   const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
@@ -156,6 +283,7 @@ async function main() {
   await prisma.internalNote.deleteMany({});
   await prisma.publicComment.deleteMany({});
   await prisma.attachment.deleteMany({});
+  await prisma.actionTaken.deleteMany({});
   await prisma.ticket.deleteMany({});
   await prisma.user.deleteMany({ where: { email: { notIn: seededEmails } } });
 
@@ -209,6 +337,7 @@ async function main() {
   const userMap = new Map(users.map((u) => [u.email, u.id]));
 
   // 4. Seed Tickets
+  const ticketMap = new Map<string, number>();
   for (const t of TICKETS) {
     const requesterId = userMap.get(t.requesterEmail)!;
     const ownerId = t.ownerEmail ? userMap.get(t.ownerEmail) : null;
@@ -235,6 +364,8 @@ async function main() {
         status: t.status,
       },
     });
+
+    ticketMap.set(t.ticketNumber, ticket.id);
 
     // 5. Seed Public Comments for TKT-2026-001234
     if (t.ticketNumber === "TKT-2026-001234") {
@@ -290,7 +421,27 @@ async function main() {
     }
   }
 
-  console.log("Database seeded successfully with Users, Tickets, Public Comments, and Internal Notes.");
+  // 6. Seed Actions Taken
+  // Ticket rows are recreated on every run, so actions are attached fresh and
+  // never accumulate duplicates. Status, performer, and assignee are explicit.
+  for (const a of ACTIONS) {
+    await prisma.actionTaken.create({
+      data: {
+        ticketId: ticketMap.get(a.ticketNumber)!,
+        actionDateTime: new Date(a.actionDateTime),
+        actionDescription: a.actionDescription,
+        result: a.result,
+        performedById: userMap.get(a.performedByEmail)!,
+        assigneeId: userMap.get(a.assigneeEmail)!,
+        status: a.status,
+        followUpRequired: a.followUpRequired ?? false,
+        followUpNote: a.followUpNote ?? null,
+        attachmentNotes: a.attachmentNotes ?? null,
+      },
+    });
+  }
+
+  console.log("Database seeded successfully with Users, Tickets, Actions Taken, Public Comments, and Internal Notes.");
 }
 
 main()

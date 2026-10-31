@@ -21,6 +21,7 @@
 - **A11Y-xx**: การทดสอบการเข้าถึงอย่างเท่าเทียม (Accessibility)
 - **E2E-xx**: การทดสอบจำลองผู้ใช้งานจริงระดับเบราว์เซอร์ด้วย Playwright
 - **REG-xx**: การทดสอบความเข้ากันได้ย้อนหลัง (Regression Coverage)
+- **MIG-xx**: การทดสอบ Database Migration และความสอดคล้องของ Seed Data
 
 ---
 
@@ -56,6 +57,7 @@
 | **E2E-02** | E2E | AC-07 / AC-08 | Ticket resolution & lifecycle verification | Requester แจ้งแก้ไข $\rightarrow$ Staff ตรวจงาน $\rightarrow$ เปลี่ยนเป็น Resolved | `e2e/lab-04/ticket-resolution.spec.ts` | Planned |
 | **E2E-03** | E2E | AC-04 / AC-05 / FR-10 | Role dashboards navigation & drill-down flow | ตรวจสอบตัวเลข Dashboard ทั้งสองบทบาท และคลิก Drill-down สำเร็จ | `e2e/lab-04/dashboards.spec.ts` | Planned |
 | **REG-01** | Regression | AC-11 / FR-12 | Full regression of Lab 1, Lab 2, and Lab 3 features | ชุดทดสอบเดิมทั้งหมดรันผ่าน 100% | Full Vitest & Playwright Suites | Planned |
+| **MIG-01** | DB / Migration | Data Changes §5 / BR-01 / BR-13 | ActionTaken table, enum, indexes, and idempotent seed integrity | ตาราง/คอลัมน์/Enum ตรงตามสเปก, seed มี 0/1/หลาย Action, assignee/performer เป็น IT Staff/Admin ที่ Active, Resolved ticket ไม่มี Action ค้าง | `server/tests/lab-04/actions-taken-migration.test.ts` | Pass |
 
 ---
 
@@ -65,7 +67,7 @@
 | PR ID | Issue | วันที่ทดสอบ | ชุดทดสอบที่เกี่ยวข้อง | จำนวนเทสต์ที่ผ่าน | สถานะผลลัพธ์ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-01** | Issue #1 | 2026-10-30 | Engineering Contract & Spec Review | - | Review in progress |
-| **PR-02** | Issue #2 | - | DB Migration & Seed Verification | - | Pending |
+| **PR-02** | Issue #2 | 2026-10-31 | DB Migration, Seed Verification, and Lab 1–3 Regression Smoke | 9 new + 83 existing = 92 | **Pass** |
 | **PR-03** | Issue #3 | - | Actions Taken API Tests (`actions-taken.api.test.ts`) | - | Pending |
 | **PR-04** | Issue #4 | - | Actions Taken UI Tests (`ActionsTaken.test.tsx`) | - | Pending |
 | **PR-05** | Issue #5 | - | Ticket Workflow Tests (`ticket-workflow.api.test.ts`, `TicketWorkflow.test.tsx`) | - | Pending |

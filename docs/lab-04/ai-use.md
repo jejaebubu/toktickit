@@ -20,7 +20,10 @@
 4. **Prompt 4 (PR-01 Spec Review Feedback & Hardening)**:
    > "วิเคราะห์ข้อเสนอแนะจาก Reviewer (titayaaa) ใน PR-01 และปรับปรุงเอกสารทั้ง 4 ไฟล์: (1) เพิ่ม assigneeId และ status (ActionTakenStatus enum) ใน ActionTaken model (2) กำหนด BR-13/14/15 และ AC-12/13/14 รองรับ inactive assignee rejection (422) และ Resolution Gate บล็อกการ Resolve ตั๋วที่มี pending actions (409) (3) เพิ่ม UI controls สำหรับ assignee dropdown และ status transition modal (4) เพิ่มเทสต์ API-12..14, UI-06..07 ใน tests.md สถานะ Planned"
 
-*(Prompts 5 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #2 ถึง #11)*
+5. **Prompt 5 (Issue #2 — Migration & Idempotent Seed)**:
+   > "เพิ่มโมเดล ActionTaken พร้อม ActionTakenStatus enum, assigneeId/assignee และ performedById/performedBy (named relations) ลงใน Prisma schema โดยไม่ทำลายข้อมูล Lab 1–3 สร้าง migration แบบ non-destructive และขยาย seed ให้ idempotent ครอบคลุม ticket ที่มี 0/1/หลาย Actions, ครบทั้ง 4 สถานะ, performer ต่างจาก assignee และ Resolved ticket ต้องไม่มี Action ค้าง พร้อมเพิ่ม DB migration/seed test ใน server/tests/lab-04/actions-taken-migration.test.ts"
+
+*(Prompts 6 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #3 ถึง #11)*
 
 ---
 
