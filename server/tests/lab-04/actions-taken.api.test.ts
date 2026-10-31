@@ -165,6 +165,42 @@ describe("Lab 4 Actions Taken API Suite (actions-taken.api.test.ts)", () => {
       .send({ actionDescription: "Follow-up blank note", assigneeId: staffId, followUpRequired: true, followUpNote: "   " });
 
     expect(blankNote.status).toBe(400);
+
+    const tooLong = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ actionDescription: "x".repeat(1001), assigneeId: staffId });
+
+    expect(tooLong.status).toBe(400);
+  });
+
+  it("API-03b: disabling followUpRequired clears the stale followUpNote", async () => {
+    const created = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({
+        actionDescription: "Follow-up hygiene action",
+        assigneeId: staffId,
+        followUpRequired: true,
+        followUpNote: "Temporary note that should be cleared",
+      });
+    expect(created.status).toBe(201);
+    expect(created.body.followUpNote).toBe("Temporary note that should be cleared");
+
+    const cleared = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${created.body.id}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ followUpRequired: false });
+
+    expect(cleared.status).toBe(200);
+    expect(cleared.body.followUpRequired).toBe(false);
+    expect(cleared.body.followUpNote).toBeNull();
+
+    const reenableWithoutNote = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${created.body.id}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ followUpRequired: true });
+    expect(reenableWithoutNote.status).toBe(400);
   });
 
   it("API-04: IT Staff updates an existing Action Taken without changing its performer", async () => {

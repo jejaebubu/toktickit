@@ -69,7 +69,7 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-01** | Issue #1 | 2026-10-30 | Engineering Contract & Spec Review | - | Merged (PR #104) |
 | **PR-02** | Issue #2 | 2026-10-31 | DB Migration, Seed Verification, and Lab 1–3 Regression Smoke | 10 new + 83 existing = 93 | **Pass** (PR #105, review addressed) |
-| **PR-03** | Issue #3 | 2026-11-01 | Actions Taken API Tests (`actions-taken.api.test.ts`) | 8 new + 93 existing = 101 | **Pass** (review pending) |
+| **PR-03** | Issue #3 | 2026-11-01 | Actions Taken API Tests (`actions-taken.api.test.ts`) | 9 new + 93 existing = 102 | **Pass** (review addressed) |
 | **PR-04** | Issue #4 | - | Actions Taken UI Tests (`ActionsTaken.test.tsx`) | - | Pending |
 | **PR-05** | Issue #5 | - | Ticket Workflow Tests (`ticket-workflow.api.test.ts`, `TicketWorkflow.test.tsx`) | - | Pending |
 | **PR-06** | Issue #6 | - | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | - | Pending |

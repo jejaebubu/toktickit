@@ -20,8 +20,8 @@
 | PR ID | Title / Feature Scope | Branch Source | Target Branch | Reviewer Status | Comments / Resolution (Merge SHA) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-01 ([GitHub #104](https://github.com/jejaebubu/toktickit/pull/104))** | Specification & Engineering Contract for Lab 4 (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`) | `feature/lab04-issue1-specs` | `lab4-staging` | **Request Changes → Approved** | Review #1 โดย `titayaaa`: ขอเพิ่ม `assigneeId`, `status` บน `ActionTaken`, ตรวจสอบ Resolution Gate ไม่ให้ Resolve ตั๋วที่มี pending actions, เพิ่ม error 422/409, อัปเดต UI controls & test cases → ผู้เขียนแก้ไขครบทั้ง 4 ไฟล์ใน commit `3310ba9` → Reviewer ตรวจซ้ำแล้ว **Approve** (verify: เอกสาร Spec DD ครบถ้วนตาม Handout, BR-01..15 และ AC-01..14) — merged `f242eb3` |
-| **PR-02 ([GitHub #105](https://github.com/jejaebubu/toktickit/pull/105))** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | **Request Changes → Pending re-review** | Review #1 โดย `titayaaa`: อนุมัติทิศทางโดยรวมและชม integration tests 9 เคส แต่ขอให้ (1) เปลี่ยน `ActionTaken.result` เป็น Nullable (`String?`) เพราะงาน `PENDING`/`IN_PROGRESS` ยังไม่มีผลลัพธ์ และให้ API บังคับเฉพาะตอน `COMPLETED`, (2) อัปเดตสถานะ PR-01 ใน `tests.md` เป็น Merged, (3) เพิ่มบันทึก PR #105 ใน reviewer log → ผู้เขียนแก้ไขครบ (migration ใหม่ `20261031172848_lab04_actions_taken` + tests 10 เคส = 93/93) แล้ว รอ Reviewer ตรวจซ้ำ |
-| **PR-03 ([GitHub #106](https://github.com/jejaebubu/toktickit/pull/106))** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | **Review pending** | GET/POST/PATCH Actions Taken + RBAC, assignee 422, result rule (BR-16), status matrix (BR-14); 8 new API tests, full suite 101/101 |
+| **PR-02 ([GitHub #105](https://github.com/jejaebubu/toktickit/pull/105))** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: อนุมัติทิศทางโดยรวมและชม integration tests 9 เคส แต่ขอให้ (1) เปลี่ยน `ActionTaken.result` เป็น Nullable (`String?`) เพราะงาน `PENDING`/`IN_PROGRESS` ยังไม่มีผลลัพธ์ และให้ API บังคับเฉพาะตอน `COMPLETED`, (2) อัปเดตสถานะ PR-01 ใน `tests.md` เป็น Merged, (3) เพิ่มบันทึก PR #105 ใน reviewer log → ผู้เขียนแก้ไขครบ (migration ใหม่ `20261031172848_lab04_actions_taken` + tests 10 เคส = 93/93) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `005b157` |
+| **PR-03 ([GitHub #106](https://github.com/jejaebubu/toktickit/pull/106))** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | **Request Changes → Pending re-review** | Review #1 โดย `titayaaa`: ชม RBAC, JWT performer identity, 404 no-leak และ BR-14 state machine (101/101) แต่ขอให้ (1) อัปเดต PR-02 เป็น Approved & Merged + เพิ่ม review trail ของ PR #105 และหัวข้อ PR-03, (2) ล้าง `followUpNote` เป็น `null` เมื่อ `followUpRequired=false` โดยไม่ส่ง note ใหม่, (3) เพิ่ม max length 1000 ให้ `actionDescription` → ผู้เขียนแก้ไขครบ (9 new + 93 = 102/102) แล้ว รอ Reviewer ตรวจซ้ำ |
 | **PR-04** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | Planned | - |
 | **PR-05** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | Planned | - |
 | **PR-06** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | Planned | - |
@@ -123,3 +123,26 @@ Reviewer ตรวจสอบความถูกต้องของกา�
 > 3. **`reviewer.md`** — เพิ่มแถว PR #105 ใน Master Table และเพิ่มหัวข้อ 3.2 พร้อม Review #1 / Author Response #1 ตามลำดับจริง
 >
 > ตรวจสอบซ้ำ: `npm run build` ผ่าน และ `npm test` ผ่าน **17 ไฟล์ / 93 เทสต์** (seed รันซ้ำได้ค่าเดิม) รบกวนช่วยตรวจอีกรอบนะคะ ขอบคุณค่ะ
+
+#### 3.2.3 Review #2 — Approved (`titayaaa`, 2026-10-31)
+
+Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (nullable result) และ `7d9f326` (review trail) ยืนยันว่า:
+1. `ActionTaken.result` เป็น `String?` / `TEXT` ที่ nullable จริง และ seed มี `result = null` สำหรับงาน `PENDING`/`IN_PROGRESS`
+2. เพิ่มเทสต์ตรวจ nullability + data invariants ครบ เป็น 10 เคส (93/93)
+3. `tests.md` และ `reviewer.md` สะท้อนสถานะจริงครบถ้วน
+
+**คำวินิจฉัย**: **APPROVED** — Reviewer กด Merge PR #105 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `005b157`) — **Closes Issue #2**
+
+---
+
+### 3.3 PR-03: Actions Taken REST API, RBAC, and Status Validation (Issue #3)
+
+#### 3.3.1 Review #1 — Request Changes (`titayaaa`, 2026-11-01)
+
+> ภาพรวม PR #106 ยอดเยี่ยม ทั้ง RBAC, การดึง `performedById` จาก JWT เพื่อป้องกัน token spoofing, การตอบ `404` เพื่อซ่อนข้อมูลเมื่อ Requester เข้าถึงตั๋วคนอื่น และ Action Status Finite State Machine ตาม BR-14 รันเทสต์ 101/101 ผ่าน
+>
+> **ข้อเสนอแนะ:**
+>
+> 1. **อัปเดต Review Trail ของ PR #105 และเพิ่ม PR #106 ใน `reviewer.md`** — แถว PR-02 ยังเป็น `Request Changes → Pending re-review` ทั้งที่ merge แล้ว (`005b157`) ขอให้ปรับเป็น `Approved & Merged`, เพิ่มหัวข้อ `3.2.3 Review #2 — Approved` และเพิ่มหัวข้อ `3.3 PR-03` สำหรับ Issue #3
+> 2. **ล้าง `followUpNote = null` เมื่อ `followUpRequired` ถูกปรับเป็น `false` ใน PATCH** — หาก Action เดิมมี note ค้างอยู่และ client ส่งมาแค่ `{ followUpRequired: false }` ต้องล้าง note เดิมเป็น `null` อัตโนมัติตาม BR-07/BR-04 เพื่อ Data Hygiene
+> 3. **เพิ่ม Max Length Validation (nice to have)** — ตรวจ `actionDescription` ยาวเกิน 1000 ตัวอักษรและตอบ `400` ตาม `api-spec.md`

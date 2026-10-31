@@ -861,8 +861,8 @@ app.post(
 
       const body = req.body ?? {};
       const description = typeof body.actionDescription === "string" ? body.actionDescription.trim() : "";
-      if (description.length < 3) {
-        return res.status(400).json({ error: "Bad Request", message: "actionDescription is required (min 3 characters)." });
+      if (description.length < 3 || description.length > 1000) {
+        return res.status(400).json({ error: "Bad Request", message: "actionDescription must be between 3 and 1000 characters." });
       }
 
       let status: ActionStatus = "PENDING";
@@ -974,8 +974,8 @@ app.patch(
 
       if (body.actionDescription !== undefined) {
         const description = typeof body.actionDescription === "string" ? body.actionDescription.trim() : "";
-        if (description.length < 3) {
-          return res.status(400).json({ error: "Bad Request", message: "actionDescription is required (min 3 characters)." });
+        if (description.length < 3 || description.length > 1000) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDescription must be between 3 and 1000 characters." });
         }
         data.actionDescription = description;
       }
@@ -1041,6 +1041,10 @@ app.patch(
         }
         nextFollowUpNote = followUpNoteField.value ?? null;
         data.followUpNote = nextFollowUpNote;
+      }
+      if (body.followUpRequired === false && body.followUpNote === undefined) {
+        nextFollowUpNote = null;
+        data.followUpNote = null;
       }
       if (nextFollowUpRequired && !nextFollowUpNote) {
         return res.status(400).json({ error: "Bad Request", message: "followUpNote is required when followUpRequired is true." });
