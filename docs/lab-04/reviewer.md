@@ -146,3 +146,13 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > 1. **อัปเดต Review Trail ของ PR #105 และเพิ่ม PR #106 ใน `reviewer.md`** — แถว PR-02 ยังเป็น `Request Changes → Pending re-review` ทั้งที่ merge แล้ว (`005b157`) ขอให้ปรับเป็น `Approved & Merged`, เพิ่มหัวข้อ `3.2.3 Review #2 — Approved` และเพิ่มหัวข้อ `3.3 PR-03` สำหรับ Issue #3
 > 2. **ล้าง `followUpNote = null` เมื่อ `followUpRequired` ถูกปรับเป็น `false` ใน PATCH** — หาก Action เดิมมี note ค้างอยู่และ client ส่งมาแค่ `{ followUpRequired: false }` ต้องล้าง note เดิมเป็น `null` อัตโนมัติตาม BR-07/BR-04 เพื่อ Data Hygiene
 > 3. **เพิ่ม Max Length Validation (nice to have)** — ตรวจ `actionDescription` ยาวเกิน 1000 ตัวอักษรและตอบ `400` ตาม `api-spec.md`
+
+#### 3.3.2 Author Response #1 (`jejaebubu`, commit `782d54e`)
+
+> ขอบคุณสำหรับรีวิวค่ะ แก้ไขครบทั้ง 3 จุดแล้วใน commit `782d54e`
+>
+> 1. **Review Trail** — ปรับแถว PR-02 เป็น `Request Changes → Approved & Merged` (merge `005b157`), เพิ่มหัวข้อ **3.2.3 Review #2 — Approved** และเพิ่มหัวข้อ **3.3 PR-03** พร้อม Review #1 / Author Response #1
+> 2. **`followUpNote` Data Hygiene** — ใน PATCH หาก `followUpRequired === false` และ client ไม่ได้ส่ง `followUpNote` ใหม่มา ระบบจะตั้ง `followUpNote = null` อัตโนมัติ (BR-04/BR-07) พร้อมเทสต์ `API-03b` ตรวจว่าปิด follow-up แล้ว note เดิมถูกล้าง และการเปิดกลับโดยไม่มี note ใหม่ถูกปฏิเสธ `400`
+> 3. **Max Length Validation** — `actionDescription` ต้องยาว 3–1000 ตัวอักษรทั้ง POST และ PATCH (เกิน 1000 → `400`) อัปเดต `api-spec.md` + BR-04 และเพิ่มเทสต์ payload 1001 ตัวอักษร
+>
+> ตรวจสอบซ้ำ: `npm run build` ผ่าน และ `npm test` ผ่าน **18 ไฟล์ / 102 เทสต์** (9 new + 93 existing) รบกวนช่วยตรวจอีกรอบนะคะ ขอบคุณค่ะ
