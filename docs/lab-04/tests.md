@@ -29,21 +29,21 @@
 
 | Test ID | Type | Requirement / AC | What It Tests | Expected Result | Automated Test File | Final Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **API-01** | API | AC-01 / FR-01 / BR-01 | Create valid Action Taken by IT Staff | บันทึกสำเร็จ ส่งคืน HTTP 201 พร้อมผูก `performedById` กับผู้ใช้จริง | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
-| **API-02** | API | AC-02 / FR-04 / BR-05 | Requester attempts to create Action Taken | ปฏิเสธด้วย HTTP 403 Forbidden | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
-| **API-03** | API | AC-03 / FR-05 / BR-04 | Create Action Taken with `followUpRequired=true` but missing `followUpNote` | ปฏิเสธด้วย HTTP 400 Bad Request | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
-| **API-04** | API | AC-01 / FR-02 | Update existing Action Taken by IT Staff | แก้ไขข้อมูลสำเร็จ ส่งคืน HTTP 200 พร้อมอัปเดต timestamp | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
-| **API-05** | API | BR-06 / FR-04 | Requester requests Actions Taken of another user's ticket | ตอบกลับ HTTP 404 Not Found (Data leakage prevention) | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
+| **API-01** | API | AC-01 / FR-01 / BR-01 | Create valid Action Taken by IT Staff | บันทึกสำเร็จ ส่งคืน HTTP 201 พร้อมผูก `performedById` กับผู้ใช้จริง | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
+| **API-02** | API | AC-02 / FR-04 / BR-05 | Requester attempts to create Action Taken | ปฏิเสธด้วย HTTP 403 Forbidden | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
+| **API-03** | API | AC-03 / FR-05 / BR-04 | Create Action Taken with `followUpRequired=true` but missing `followUpNote` | ปฏิเสธด้วย HTTP 400 Bad Request | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
+| **API-04** | API | AC-01 / FR-02 | Update existing Action Taken by IT Staff | แก้ไขข้อมูลสำเร็จ ส่งคืน HTTP 200 พร้อมอัปเดต timestamp | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
+| **API-05** | API | BR-06 / FR-04 | Requester requests Actions Taken of another user's ticket | ตอบกลับ HTTP 404 Not Found (Data leakage prevention) | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
 | **API-06** | API | AC-07 / FR-06 / BR-08 | Invalid status transition (e.g. New $\rightarrow$ Closed) | ปฏิเสธด้วย HTTP 400 Bad Request ตาม Transition Matrix | `server/tests/lab-04/ticket-workflow.api.test.ts` | Planned |
 | **API-07** | API | AC-08 / FR-07 / BR-09 | Requester sends "Problem Appears Resolved" flag | บันทึก advisory flag สำเร็จ แต่สถานะตั๋วไม่เปลี่ยนเป็น Resolved | `server/tests/lab-04/ticket-workflow.api.test.ts` | Planned |
 | **API-08** | API | AC-09 / FR-11 / BR-12 | Stale update detection on Ticket update | ตรวจพบ mismatch ของ updatedAt และตอบกลับ HTTP 409 Conflict | `server/tests/lab-04/ticket-workflow.api.test.ts` | Planned |
 | **API-09** | API | AC-04 / FR-08 / BR-10 | IT Staff Dashboard metrics calculation | ส่งคืน metrics ถูกต้องตรงกับฐานข้อมูล และมีรายการ recent tickets | `server/tests/lab-04/staff-dashboard.api.test.ts` | Planned |
 | **API-10** | API | AC-06 / FR-08 | Requester requests IT Staff Dashboard API | ปฏิเสธด้วย HTTP 403 Forbidden | `server/tests/lab-04/staff-dashboard.api.test.ts` | Planned |
 | **API-11** | API | AC-05 / FR-09 / BR-11 | Requester Dashboard metrics calculation | ส่งคืนเฉพาะตัวเลขและรายการตั๋วที่เป็นของ Requester ผู้เรียกดู | `server/tests/lab-04/requester-dashboard.api.test.ts` | Planned |
-| **API-12** | API | AC-12 / FR-13 / BR-13 | Create/Update Action Taken with inactive or Requester assignee | ปฏิเสธด้วย HTTP 422 Unprocessable Entity และไม่บันทึกข้อมูล | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
+| **API-12** | API | AC-12 / FR-13 / BR-13 | Create/Update Action Taken with inactive or Requester assignee | ปฏิเสธด้วย HTTP 422 Unprocessable Entity และไม่บันทึกข้อมูล | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
 | **API-13** | API | AC-13 / FR-15 / BR-15 | Resolve a Ticket while unresolved Actions Taken exist | ปฏิเสธด้วย HTTP 409 Conflict (`UNRESOLVED_ACTIONS_EXIST`) และสถานะตั๋วไม่เปลี่ยน | `server/tests/lab-04/ticket-workflow.api.test.ts` | Planned |
-| **API-14** | API | AC-14 / FR-14 / BR-14 | Action Taken status transitions (PENDING → IN_PROGRESS → COMPLETED/CANCELLED) | เปลี่ยนสถานะที่อนุญาตสำเร็จ HTTP 200 และปฏิเสธ transition จาก Final state ด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
-| **API-15** | API | AC-15 / FR-13 / BR-16 | Result validation depends on Action status | สร้าง/แก้ Action ที่ `PENDING`/`IN_PROGRESS` โดยไม่ส่ง `result` สำเร็จ (201/200, `result = null`) แต่ `COMPLETED` ที่ไม่มี `result` ถูกปฏิเสธด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Planned |
+| **API-14** | API | AC-14 / FR-14 / BR-14 | Action Taken status transitions (PENDING → IN_PROGRESS → COMPLETED/CANCELLED) | เปลี่ยนสถานะที่อนุญาตสำเร็จ HTTP 200 และปฏิเสธ transition จาก Final state ด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
+| **API-15** | API | AC-15 / FR-13 / BR-16 | Result validation depends on Action status | สร้าง/แก้ Action ที่ `PENDING`/`IN_PROGRESS` โดยไม่ส่ง `result` สำเร็จ (201/200, `result = null`) แต่ `COMPLETED` ที่ไม่มี `result` ถูกปฏิเสธด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
 | **UI-01** | UI | AC-01 / AC-03 | Actions Taken form input & dynamic follow-up note validation | สลับแสดงช่อง note และแสดง validation error เมื่อเว้นว่าง | `client/tests/lab-04/ActionsTaken.test.tsx` | Planned |
 | **UI-02** | UI | AC-02 / FR-04 | Actions Taken list rendering under Requester view | แสดงรายการแบบ Read-only และซ่อนปุ่ม Create/Edit | `client/tests/lab-04/ActionsTaken.test.tsx` | Planned |
 | **UI-03** | UI | AC-07 / AC-08 | Ticket workflow transition controls & advisory indicator | แสดงเฉพาะปุ่มสถานะที่อนุญาต และแสดงป้าย advisory เมื่อผู้ใช้แจ้งแก้แล้ว | `client/tests/lab-04/TicketWorkflow.test.tsx` | Planned |
@@ -69,7 +69,7 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-01** | Issue #1 | 2026-10-30 | Engineering Contract & Spec Review | - | Merged (PR #104) |
 | **PR-02** | Issue #2 | 2026-10-31 | DB Migration, Seed Verification, and Lab 1–3 Regression Smoke | 10 new + 83 existing = 93 | **Pass** (PR #105, review addressed) |
-| **PR-03** | Issue #3 | - | Actions Taken API Tests (`actions-taken.api.test.ts`) | - | Pending |
+| **PR-03** | Issue #3 | 2026-11-01 | Actions Taken API Tests (`actions-taken.api.test.ts`) | 9 new + 93 existing = 102 | **Pass** (review addressed) |
 | **PR-04** | Issue #4 | - | Actions Taken UI Tests (`ActionsTaken.test.tsx`) | - | Pending |
 | **PR-05** | Issue #5 | - | Ticket Workflow Tests (`ticket-workflow.api.test.ts`, `TicketWorkflow.test.tsx`) | - | Pending |
 | **PR-06** | Issue #6 | - | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | - | Pending |

@@ -55,7 +55,7 @@
 - **BR-01**: Action Taken แต่ละรายการต้องสังกัดตั๋วงาน (Ticket) เพียงใบเดียวเท่านั้น (Parent-Child relationship)
 - **BR-02**: เจ้าของตั๋วหลัก (Ticket Owner) เป็นผู้ประสานงานภาพรวมของตั๋ว แต่เจ้าหน้าที่ IT Staff คนอื่นที่มีสิทธิ์เข้าถึงสามารถเข้ามาสร้างและบันทึก Actions Taken ในตั๋วนั้นได้
 - **BR-03**: ข้อมูลผู้ปฏิบัติงาน (`performedBy`) ต้องดึงจาก Authenticated Identity ของผู้ใช้ที่กำลังส่ง Request ในขณะนั้นเสมอ ห้ามรับค่า ID ผู้ปฏิบัติงานจาก Client Payload
-- **BR-04**: หากมีการกำหนด `followUpRequired = true` ข้อมูล `followUpNote` ต้องไม่เป็นค่าว่าง (Non-empty string) หาก `followUpRequired = false` ฟิลด์ `followUpNote` สามารถว่างหรือเป็น null ได้
+- **BR-04**: หากมีการกำหนด `followUpRequired = true` ข้อมูล `followUpNote` ต้องไม่เป็นค่าว่าง (Non-empty string) หาก `followUpRequired = false` ฟิลด์ `followUpNote` ต้องเป็น `null` (ระบบต้องล้างข้อความเดิมอัตโนมัติเมื่อปิด follow-up โดยไม่ส่ง note ใหม่มา) และ `actionDescription` ต้องมีความยาว 3–1000 ตัวอักษร
 - **BR-05**: สิทธิ์ในการสร้างหรือแก้ไข Actions Taken จำกัดเฉพาะบทบาท `IT_STAFF` และ `ADMINISTRATOR` เท่านั้น สำหรับ `REQUESTER` มีสิทธิ์เปิดอ่านเฉพาะในตั๋วของตนเองเท่านั้น (ห้ามสร้าง/แก้ไข)
 - **BR-06**: การเข้าถึงตั๋วที่ Requester ไม่ได้เป็นเจ้าของ ต้องตอบกลับด้วย `404 Not Found` เสมอ เพื่อป้องกันการรั่วไหลของการมีอยู่ของข้อมูล (Data Leakage Prevention)
 - **BR-07**: วงจรชีวิตของตั๋ว (Ticket Status) ประกอบด้วย 8 สถานะ ได้แก่: `New`, `Open`, `In Progress`, `Waiting for Requester`, `Resolved`, `Closed`, `Reopened`, และ `Cancelled`

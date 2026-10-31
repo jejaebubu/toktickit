@@ -78,7 +78,7 @@
   }
   ```
 - **Validation Rules**:
-  - `actionDescription`: string, required, ห้ามว่าง (min 3 chars)
+  - `actionDescription`: string, required, ความยาว 3–1000 ตัวอักษร
   - `result`: string, optional, nullable — **บังคับให้ไม่เป็นค่าว่างเฉพาะเมื่อ `status == 'COMPLETED'`** (BR-16) สถานะ `PENDING` / `IN_PROGRESS` / `CANCELLED` สามารถละเว้นหรือส่ง `null` ได้
   - `assigneeId`: integer, required, ต้องอ้างอิงผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่ `isActive = true` เท่านั้น (ห้าม `REQUESTER` / inactive)
   - `status`: enum `PENDING | IN_PROGRESS | COMPLETED | CANCELLED`, optional, default `PENDING`
