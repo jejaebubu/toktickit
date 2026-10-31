@@ -17,7 +17,10 @@
 3. **Prompt 3 (Engineering Contract & Specification Generation)**:
    > "ร่างเอกสารข้อกำหนดทางวิศวกรรมของ Sprint 4 ใน `docs/lab-04/` ได้แก่ `specification.md` (FR, BR, Parent-Child structure, Resolution Gate, Authorization Matrix, Data changes justification), `api-spec.md` (Actions Taken CRUD, Dashboards, Stale Update detection 409), `ui-spec.md` (Zen Green tokens, Metric cards, Drill-down behavior, 3 Viewports responsive), และ `tests.md` (AC Traceability Matrix สถานะ Planned)"
 
-*(Prompts 4 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #2 ถึง #11)*
+4. **Prompt 4 (PR-01 Spec Review Feedback & Hardening)**:
+   > "วิเคราะห์ข้อเสนอแนะจาก Reviewer (titayaaa) ใน PR-01 และปรับปรุงเอกสารทั้ง 4 ไฟล์: (1) เพิ่ม assigneeId และ status (ActionTakenStatus enum) ใน ActionTaken model (2) กำหนด BR-13/14/15 และ AC-12/13/14 รองรับ inactive assignee rejection (422) และ Resolution Gate บล็อกการ Resolve ตั๋วที่มี pending actions (409) (3) เพิ่ม UI controls สำหรับ assignee dropdown และ status transition modal (4) เพิ่มเทสต์ API-12..14, UI-06..07 ใน tests.md สถานะ Planned"
+
+*(Prompts 5 ถึง 10 จะถูกบันทึกเพิ่มเติมตามลำดับการพัฒนาจริงใน Issue #2 ถึง #11)*
 
 ---
 
@@ -31,3 +34,4 @@
 
 ### 3.3 สรุป
 *(จะสรุปภาพรวมของทั้งสปรินต์เมื่อรวมโค้ดเข้าสู่สาขา main สำเร็จ)*
+
