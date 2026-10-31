@@ -110,3 +110,16 @@ Reviewer ตรวจสอบความถูกต้องของกา�
 > 1. **`ActionTaken.result` ควรเป็น Nullable (`String?`) ในระดับ Database** — ปัจจุบัน schema และ migration กำหนด `result String @db.Text` / `TEXT NOT NULL` แต่ค่าเริ่มต้นของ `status` คือ `PENDING` ซึ่งงานยังไม่เสร็จและยังไม่มีผลลัพธ์ หาก DB บังคับ NOT NULL จะทำให้ `POST /api/tickets/:id/actions-taken` ใน Issue #3 ล้มเหลวเมื่อไม่ส่ง `result` หรือต้องส่งข้อความหลอก แนะนำให้แก้ schema เป็น `result String? @db.Text`, เอา `NOT NULL` ออกจาก migration, และไปบังคับ required ใน Backend Validation เฉพาะเมื่อ `status === 'COMPLETED'`
 > 2. **อัปเดตสถานะ PR-01 ใน `docs/lab-04/tests.md`** — แถว PR-01 ยังระบุ `Review in progress` แต่ PR #104 ถูก approve และ merge เข้า `lab4-staging` แล้ว (`f242eb3`) ควรปรับเป็น `Pass` หรือ `Merged`
 > 3. **อัปเดต `docs/lab-04/reviewer.md`** — เพิ่มแถว PR #105 ในตาราง Master Table และเพิ่มหัวข้อบันทึกประวัติการตรวจทานของ PR-02 ให้เป็นไปตามลำดับจริงทีละ PR
+
+#### 3.2.2 Author Response #1 (`jejaebubu`, commit `8750764`)
+
+> ขอบคุณสำหรับรีวิวค่ะ แก้ไขครบทั้ง 3 จุดแล้วใน commit `8750764`
+>
+> 1. **`result` เป็น Nullable** — เปลี่ยน schema เป็น `result String? @db.Text` และสร้าง migration ใหม่ `20261031172848_lab04_actions_taken` ที่มีคอลัมน์ `"result" TEXT` (ไม่มี `NOT NULL`) แทนไฟล์เดิม เพื่อไม่ให้มี checksum ค้างจาก migration ที่ถูก apply ไปแล้ว
+>    - ปรับ seed ให้ Action ที่ `PENDING`/`IN_PROGRESS` มี `result = null` จริง และงานที่ `COMPLETED`/`CANCELLED` มี `result` ครบ
+>    - เพิ่มเทสต์ที่ 10 ตรวจ `is_nullable = YES`, open work มี `result = null`, และ finished work ต้องมี `result`
+>    - เพิ่ม **BR-16** และ **AC-15** ใน `specification.md`, อัปเดต validation ใน `api-spec.md` (บังคับ `result` เฉพาะ `COMPLETED`) และ `ui-spec.md` (ดอกจันเฉพาะตอน `COMPLETED`), เพิ่ม **API-15** เป็น `Planned` สำหรับ Issue #3
+> 2. **`tests.md`** — ปรับแถว PR-01 เป็น `Merged (PR #104)` และอัปเดต PR-02 เป็น `10 new + 83 existing = 93` พร้อมอ้างอิง PR #105
+> 3. **`reviewer.md`** — เพิ่มแถว PR #105 ใน Master Table และเพิ่มหัวข้อ 3.2 พร้อม Review #1 / Author Response #1 ตามลำดับจริง
+>
+> ตรวจสอบซ้ำ: `npm run build` ผ่าน และ `npm test` ผ่าน **17 ไฟล์ / 93 เทสต์** (seed รันซ้ำได้ค่าเดิม) รบกวนช่วยตรวจอีกรอบนะคะ ขอบคุณค่ะ
