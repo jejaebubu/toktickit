@@ -124,7 +124,7 @@ Reviewer ตรวจสอบความถูกต้องของกา�
 >
 > ตรวจสอบซ้ำ: `npm run build` ผ่าน และ `npm test` ผ่าน **17 ไฟล์ / 93 เทสต์** (seed รันซ้ำได้ค่าเดิม) รบกวนช่วยตรวจอีกรอบนะคะ ขอบคุณค่ะ
 
-#### 3.2.3 Review #2 — Approved (`titayaaa`, 2026-10-31)
+#### 3.2.3 Review #2 — Approved (`titayaaa`, 2026-11-01 01:15 UTC+7)
 
 Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (nullable result) และ `7d9f326` (review trail) ยืนยันว่า:
 1. `ActionTaken.result` เป็น `String?` / `TEXT` ที่ nullable จริง และ seed มี `result = null` สำหรับงาน `PENDING`/`IN_PROGRESS`
