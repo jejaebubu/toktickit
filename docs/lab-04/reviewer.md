@@ -21,7 +21,7 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-01 ([GitHub #104](https://github.com/jejaebubu/toktickit/pull/104))** | Specification & Engineering Contract for Lab 4 (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`) | `feature/lab04-issue1-specs` | `lab4-staging` | **Request Changes → Approved** | Review #1 โดย `titayaaa`: ขอเพิ่ม `assigneeId`, `status` บน `ActionTaken`, ตรวจสอบ Resolution Gate ไม่ให้ Resolve ตั๋วที่มี pending actions, เพิ่ม error 422/409, อัปเดต UI controls & test cases → ผู้เขียนแก้ไขครบทั้ง 4 ไฟล์ใน commit `3310ba9` → Reviewer ตรวจซ้ำแล้ว **Approve** (verify: เอกสาร Spec DD ครบถ้วนตาม Handout, BR-01..15 และ AC-01..14) — merged `f242eb3` |
 | **PR-02 ([GitHub #105](https://github.com/jejaebubu/toktickit/pull/105))** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: อนุมัติทิศทางโดยรวมและชม integration tests 9 เคส แต่ขอให้ (1) เปลี่ยน `ActionTaken.result` เป็น Nullable (`String?`) เพราะงาน `PENDING`/`IN_PROGRESS` ยังไม่มีผลลัพธ์ และให้ API บังคับเฉพาะตอน `COMPLETED`, (2) อัปเดตสถานะ PR-01 ใน `tests.md` เป็น Merged, (3) เพิ่มบันทึก PR #105 ใน reviewer log → ผู้เขียนแก้ไขครบ (migration ใหม่ `20261031172848_lab04_actions_taken` + tests 10 เคส = 93/93) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `005b157` |
-| **PR-03 ([GitHub #106](https://github.com/jejaebubu/toktickit/pull/106))** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | **Request Changes → Pending re-review** | Review #1 โดย `titayaaa`: ชม RBAC, JWT performer identity, 404 no-leak และ BR-14 state machine (101/101) แต่ขอให้ (1) อัปเดต PR-02 เป็น Approved & Merged + เพิ่ม review trail ของ PR #105 และหัวข้อ PR-03, (2) ล้าง `followUpNote` เป็น `null` เมื่อ `followUpRequired=false` โดยไม่ส่ง note ใหม่, (3) เพิ่ม max length 1000 ให้ `actionDescription` → ผู้เขียนแก้ไขครบ (9 new + 93 = 102/102) แล้ว รอ Reviewer ตรวจซ้ำ |
+| **PR-03 ([GitHub #106](https://github.com/jejaebubu/toktickit/pull/106))** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชม RBAC, JWT performer identity, 404 no-leak และ BR-14 state machine (101/101) แต่ขอให้ (1) อัปเดต PR-02 เป็น Approved & Merged + เพิ่ม review trail ของ PR #105 และหัวข้อ PR-03, (2) ล้าง `followUpNote` เป็น `null` เมื่อ `followUpRequired=false` โดยไม่ส่ง note ใหม่, (3) เพิ่ม max length 1000 ให้ `actionDescription` → ผู้เขียนแก้ไขครบ (9 new + 93 = 102/102) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `23166db` |
 | **PR-04** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | Planned | - |
 | **PR-05** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | Planned | - |
 | **PR-06** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | Planned | - |
@@ -156,3 +156,17 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > 3. **Max Length Validation** — `actionDescription` ต้องยาว 3–1000 ตัวอักษรทั้ง POST และ PATCH (เกิน 1000 → `400`) อัปเดต `api-spec.md` + BR-04 และเพิ่มเทสต์ payload 1001 ตัวอักษร
 >
 > ตรวจสอบซ้ำ: `npm run build` ผ่าน และ `npm test` ผ่าน **18 ไฟล์ / 102 เทสต์** (9 new + 93 existing) รบกวนช่วยตรวจอีกรอบนะคะ ขอบคุณค่ะ
+
+#### 3.3.3 Review #2 — Approved (`titayaaa`, 2026-11-01 03:03 UTC+7)
+
+> ### 🌟 ผลการตรวจทานรอบที่ 2 (Final Verification)
+> ตรวจสอบการแก้ไขตาม commit `782d54e` และเอกสารใน `db7e326` ครบถ้วนสมบูรณ์ 100% ทุกประเด็นแล้วค่ะ:
+>
+> 1. **Data Hygiene ของ `followUpNote` ใน PATCH** — มีการดัก `if (body.followUpRequired === false && body.followUpNote === undefined)` แล้วรีเซ็ต `followUpNote = null` อัตโนมัติตาม BR-07 พร้อมเทสต์ `API-03b` ครบวงจร (สร้างพร้อม note → ปิด follow-up แล้ว note เป็น null → เปิดกลับโดยไม่มี note ได้ `400`)
+> 2. **Max Length Validation (3–1000 chars)** — ดัก `description.length > 1000` ทั้ง `POST` และ `PATCH` ตอบ `400 Bad Request` อัปเดต `api-spec.md` และ BR-04 สอดคล้องกัน พร้อมเทสต์ payload 1001 ตัวอักษร
+> 3. **Review Trail ครบถ้วน** — Master Table ปรับ PR-02 เป็น `Approved & Merged (merge 005b157)` และเพิ่ม Section 3.2.3 / 3.3 ตามลำดับ
+> 4. **ชุดทดสอบผ่านสมบูรณ์** — 18 ไฟล์ / 102 เทสต์ (9 new + 93 existing) ผ่านทั้งหมด
+>
+> โค้ด REST API และเอกสารมีคุณภาพระดับ Production พร้อม Merge เข้าสู่ `lab4-staging` เพื่อเริ่ม Issue #4
+
+**คำวินิจฉัย**: **APPROVED** — Reviewer กด Merge PR #106 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `23166db`) — **Closes Issue #3 (#95)**
