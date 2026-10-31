@@ -85,6 +85,7 @@
   - `CANCELLED` $\rightarrow$ ไม่มีสถานะถัดไป (Final state)
   - การเปลี่ยนสถานะ Action Taken ต้องกระทำโดย `IT_STAFF` หรือ `ADMINISTRATOR` เท่านั้น และห้ามลบรายการ Action Taken (Append-only audit trail)
 - **BR-15 (Resolution Gate — Unresolved Actions Block)**: ระบบต้องปฏิเสธการเปลี่ยนสถานะตั๋วเป็น `Resolved` ด้วย `409 Conflict` หากตั๋วนั้นยังมี Action Taken ที่มีสถานะ `PENDING` หรือ `IN_PROGRESS` อยู่แม้แต่รายการเดียว ผู้ใช้ต้องเปลี่ยน Action Taken เหล่านั้นเป็น `COMPLETED` หรือ `CANCELLED` ให้ครบก่อนจึงจะ Resolve ตั๋วได้ การตรวจสอบนี้ต้องกระทำที่ฝั่ง Backend แม้ Client จะข้ามหน้าจอไปก็ตาม (ดู BR-09 สำหรับ Requester Advisory Flag)
+- **BR-16 (Result Required Only When Completed)**: ฟิลด์ `result` ของ Action Taken เป็น Nullable ในฐานข้อมูล (`String?`) เนื่องจากงานที่ยังไม่เสร็จ (`PENDING`, `IN_PROGRESS`) ยังไม่มีผลลัพธ์ Backend API ต้องบังคับให้ `result` ไม่เป็นค่าว่างเฉพาะเมื่อ `status == 'COMPLETED'` เท่านั้น การสร้างหรือแก้ไข Action ที่ยังไม่เสร็จสามารถละเว้น `result` ได้โดยไม่ต้องส่งข้อความหลอก
 
 ### Authorization Matrix (ตารางสิทธิ์การเข้าถึงตามบทบาท)
 | ฟังก์ชัน / การทำงาน | REQUESTER | IT_STAFF | ADMINISTRATOR |
@@ -146,7 +147,7 @@ model ActionTaken {
   ticket            Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   actionDateTime    DateTime          @default(now())
   actionDescription String            @db.Text
-  result            String            @db.Text
+  result            String?           @db.Text
   performedById     Int
   performedBy       User              @relation("ActionTakenPerformer", fields: [performedById], references: [id])
   assigneeId        Int
@@ -206,6 +207,7 @@ model ActionTaken {
 - **AC-12**: Given ผู้ใช้มีบทบาท IT Staff หรือ Admin, When ส่งคำขอสร้างหรือแก้ไข Action Taken โดยระบุ `assigneeId` ของผู้ใช้ที่ `isActive = false` หรือมีบทบาท `REQUESTER`, Then เซิร์ฟเวอร์ปฏิเสธด้วย `422 Unprocessable Entity` พร้อมข้อความแจ้งว่า assignee ไม่ถูกต้อง และไม่บันทึกข้อมูลใดๆ ลงฐานข้อมูล
 - **AC-13**: Given ตั๋วมี Action Taken อย่างน้อย 1 รายการที่มีสถานะ `PENDING` หรือ `IN_PROGRESS`, When IT Staff/Admin พยายามเปลี่ยนสถานะตั๋วเป็น `Resolved` (แม้จะข้ามหน้าจอ UI มาที่ API โดยตรง), Then เซิร์ฟเวอร์ปฏิเสธด้วย `409 Conflict` พร้อมระบุจำนวน Action ที่ยังค้าง และสถานะตั๋วยังคงเดิม
 - **AC-14**: Given Action Taken อยู่ในสถานะ `PENDING`, When IT Staff/Admin เปลี่ยนสถานะเป็น `IN_PROGRESS` แล้ว `COMPLETED` หรือ `CANCELLED`, Then การเปลี่ยนสถานะสำเร็จและส่งคืน HTTP 200 แต่เมื่อพยายามเปลี่ยนจาก `COMPLETED` หรือ `CANCELLED` ไปสถานะอื่น ระบบต้องปฏิเสธด้วย `400 Bad Request` ตาม Action Taken Status Matrix (BR-14)
+- **AC-15**: Given IT Staff/Admin สร้าง Action Taken ด้วยสถานะ `PENDING` หรือ `IN_PROGRESS`, When ไม่ส่ง `result`, Then ระบบบันทึกสำเร็จด้วย `result = null` (HTTP 201) แต่ถ้าสถานะเป็น `COMPLETED` และไม่ส่ง `result` หรือส่งเป็นค่าว่าง ระบบต้องปฏิเสธด้วย `400 Bad Request` (BR-16)
 
 ## 10. Definition of Done (นิยามความสำเร็จของสปรินต์)
 - [ ] เอกสารข้อกำหนดทั้งหมดใน `docs/lab-04/` (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`) ครบถ้วนและสอดคล้องกัน

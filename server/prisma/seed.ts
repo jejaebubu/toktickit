@@ -149,7 +149,7 @@ type SeedAction = {
   assigneeEmail: string;
   actionDateTime: string;
   actionDescription: string;
-  result: string;
+  result?: string | null;
   status: ActionTakenStatus;
   followUpRequired?: boolean;
   followUpNote?: string | null;
@@ -177,7 +177,6 @@ const ACTIONS: SeedAction[] = [
     assigneeEmail: "kevin.it@toktickit.com",
     actionDateTime: "2026-05-14T09:10:00Z",
     actionDescription: "Ordered replacement battery under hardware warranty",
-    result: "Replacement approved, ETA five business days",
     status: ActionTakenStatus.IN_PROGRESS,
     followUpRequired: false,
     attachmentNotes: "warranty-approval.pdf",
@@ -188,7 +187,6 @@ const ACTIONS: SeedAction[] = [
     assigneeEmail: "emily.it@toktickit.com",
     actionDateTime: "2026-05-15T14:00:00Z",
     actionDescription: "Prepared device for battery replacement",
-    result: "User data backed up, awaiting replacement part",
     status: ActionTakenStatus.PENDING,
     followUpRequired: true,
     followUpNote: "Notify user as soon as the new battery arrives",
@@ -199,7 +197,6 @@ const ACTIONS: SeedAction[] = [
     assigneeEmail: "kevin.it@toktickit.com",
     actionDateTime: "2026-05-16T08:45:00Z",
     actionDescription: "Requested VPN client logs from the user",
-    result: "Awaiting logs before continuing troubleshooting",
     status: ActionTakenStatus.PENDING,
     followUpRequired: true,
     followUpNote: "Follow up if logs are not received within 24 hours",
@@ -251,7 +248,6 @@ const ACTIONS: SeedAction[] = [
     assigneeEmail: "kevin.it@toktickit.com",
     actionDateTime: "2026-05-15T10:10:00Z",
     actionDescription: "Scheduled add-in compatibility review",
-    result: "Review pending with software vendor",
     status: ActionTakenStatus.PENDING,
     followUpRequired: true,
     followUpNote: "Chase vendor response before end of week",
@@ -430,7 +426,7 @@ async function main() {
         ticketId: ticketMap.get(a.ticketNumber)!,
         actionDateTime: new Date(a.actionDateTime),
         actionDescription: a.actionDescription,
-        result: a.result,
+        result: a.result ?? null,
         performedById: userMap.get(a.performedByEmail)!,
         assigneeId: userMap.get(a.assigneeEmail)!,
         status: a.status,

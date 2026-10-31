@@ -10,7 +10,7 @@ CREATE TABLE "ActionTaken" (
     "ticketId" INTEGER NOT NULL,
     "actionDateTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "actionDescription" TEXT NOT NULL,
-    "result" TEXT NOT NULL,
+    "result" TEXT,
     "performedById" INTEGER NOT NULL,
     "assigneeId" INTEGER NOT NULL,
     "status" "ActionTakenStatus" NOT NULL DEFAULT 'PENDING',

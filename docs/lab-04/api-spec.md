@@ -69,8 +69,7 @@
   ```json
   {
     "actionDateTime": "2026-10-30T10:00:00.000Z",
-    "actionDescription": "Replaced faulty RAM stick in slot 2",
-    "result": "System boots normally and passes 15-minute memory diagnostic",
+    "actionDescription": "Diagnosing faulty RAM module in slot 2",
     "assigneeId": 3,
     "status": "PENDING",
     "followUpRequired": true,
@@ -80,7 +79,7 @@
   ```
 - **Validation Rules**:
   - `actionDescription`: string, required, ห้ามว่าง (min 3 chars)
-  - `result`: string, required, ห้ามว่าง (min 3 chars)
+  - `result`: string, optional, nullable — **บังคับให้ไม่เป็นค่าว่างเฉพาะเมื่อ `status == 'COMPLETED'`** (BR-16) สถานะ `PENDING` / `IN_PROGRESS` / `CANCELLED` สามารถละเว้นหรือส่ง `null` ได้
   - `assigneeId`: integer, required, ต้องอ้างอิงผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่ `isActive = true` เท่านั้น (ห้าม `REQUESTER` / inactive)
   - `status`: enum `PENDING | IN_PROGRESS | COMPLETED | CANCELLED`, optional, default `PENDING`
   - `followUpRequired`: boolean, optional, default `false`
@@ -94,8 +93,8 @@
     "id": "d2e8b1c3-5e9f-4a2b-8c3d-9f4a5b6c7d8e",
     "ticketId": 12,
     "actionDateTime": "2026-10-30T10:00:00.000Z",
-    "actionDescription": "Replaced faulty RAM stick in slot 2",
-    "result": "System boots normally and passes 15-minute memory diagnostic",
+    "actionDescription": "Diagnosing faulty RAM module in slot 2",
+    "result": null,
     "performedById": 2,
     "performedBy": {
       "id": 2,
@@ -148,6 +147,7 @@
   ```
 - **Validation Rules**:
   - หาก `followUpRequired` ถูกปรับเป็น `true` จะต้องมี `followUpNote` ที่ไม่ว่าง
+  - `result`: string, optional, nullable — หากสถานะหลังแก้ไขเป็น `COMPLETED` ต้องมี `result` ที่ไม่ว่าง (BR-16)
   - `assigneeId`: integer, optional, หากส่งมาต้องเป็นผู้ใช้บทบาท `IT_STAFF` หรือ `ADMINISTRATOR` ที่ `isActive = true`
   - `status`: enum `PENDING | IN_PROGRESS | COMPLETED | CANCELLED`, optional, หากส่งมาต้องเปลี่ยนได้ตาม Action Taken Status Matrix (BR-14) มิฉะนั้นตอบกลับ `400 Bad Request`
   - `performedById` ยังคงถูกเพิกเฉยจาก client และไม่สามารถแก้ไขได้

@@ -4,8 +4,8 @@ import { getPrisma } from "../../src/prisma.js";
 describe("Lab 4 Actions Taken Migration & Seed (Issue #2)", () => {
   it("applies the ActionTaken table with assignee and status columns", async () => {
     const prisma = getPrisma();
-    const columns = await prisma.$queryRaw<Array<{ column_name: string }>>`
-      SELECT column_name
+    const columns = await prisma.$queryRaw<Array<{ column_name: string; is_nullable: string }>>`
+      SELECT column_name, is_nullable
       FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = 'ActionTaken'
     `;
@@ -25,6 +25,7 @@ describe("Lab 4 Actions Taken Migration & Seed (Issue #2)", () => {
         "attachmentNotes",
       ]),
     );
+    expect(columns.find((c) => c.column_name === "result")?.is_nullable).toBe("YES");
   });
 
   it("defines the ActionTakenStatus enum with all four values", async () => {
@@ -61,6 +62,22 @@ describe("Lab 4 Actions Taken Migration & Seed (Issue #2)", () => {
     expect(new Set(rows.map((r) => r.status))).toEqual(
       new Set(["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"]),
     );
+  });
+
+  it("stores a null result for open work and a result for finished work", async () => {
+    const prisma = getPrisma();
+    const openWithoutResult = await prisma.actionTaken.count({
+      where: { status: { in: ["PENDING", "IN_PROGRESS"] }, result: null },
+    });
+    expect(openWithoutResult).toBeGreaterThan(0);
+
+    const finishedMissingResult = await prisma.actionTaken.count({
+      where: {
+        status: { in: ["COMPLETED", "CANCELLED"] },
+        OR: [{ result: null }, { result: "" }],
+      },
+    });
+    expect(finishedMissingResult).toBe(0);
   });
 
   it("only assigns Actions Taken to active IT Staff or Administrators", async () => {

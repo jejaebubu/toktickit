@@ -98,7 +98,7 @@
 - **Create / Edit Form Controls**:
   - `Action Date/Time`: Input ชนิด datetime-local (ค่าเริ่มต้นคือเวลาปัจจุบัน)
   - `Action Description`: Textarea (บังคับกรอก มีดอกจันสีแดง `*`)
-  - `Result`: Textarea สำหรับบันทึกผลการปฏิบัติงาน (บังคับกรอก `*`)
+  - `Result`: Textarea สำหรับบันทึกผลการปฏิบัติงาน (บังคับกรอก `*` **เฉพาะเมื่อ `Action Status = COMPLETED`**) หากสถานะเป็น `PENDING`, `IN_PROGRESS` หรือ `CANCELLED` สามารถเว้นว่างได้ และ UI ต้องไม่บล็อกการบันทึก (BR-16)
   - `Assignee`: Dropdown (Select) สำหรับเลือกผู้รับผิดชอบงาน
     - แสดงเฉพาะผู้ใช้บทบาท `IT_STAFF` และ `ADMINISTRATOR` ที่มีสถานะ `isActive = true`
     - **บังคับเลือก** (มีดอกจันสีแดง `*`) และต้องแสดงชื่อพร้อม Badge บทบาทในตัวเลือก

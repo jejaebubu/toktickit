@@ -20,7 +20,7 @@
 | PR ID | Title / Feature Scope | Branch Source | Target Branch | Reviewer Status | Comments / Resolution (Merge SHA) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-01 ([GitHub #104](https://github.com/jejaebubu/toktickit/pull/104))** | Specification & Engineering Contract for Lab 4 (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`) | `feature/lab04-issue1-specs` | `lab4-staging` | **Request Changes → Approved** | Review #1 โดย `titayaaa`: ขอเพิ่ม `assigneeId`, `status` บน `ActionTaken`, ตรวจสอบ Resolution Gate ไม่ให้ Resolve ตั๋วที่มี pending actions, เพิ่ม error 422/409, อัปเดต UI controls & test cases → ผู้เขียนแก้ไขครบทั้ง 4 ไฟล์ใน commit `3310ba9` → Reviewer ตรวจซ้ำแล้ว **Approve** (verify: เอกสาร Spec DD ครบถ้วนตาม Handout, BR-01..15 และ AC-01..14) — merged `f242eb3` |
-| **PR-02** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | Planned | - |
+| **PR-02 ([GitHub #105](https://github.com/jejaebubu/toktickit/pull/105))** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | **Request Changes → Pending re-review** | Review #1 โดย `titayaaa`: อนุมัติทิศทางโดยรวมและชม integration tests 9 เคส แต่ขอให้ (1) เปลี่ยน `ActionTaken.result` เป็น Nullable (`String?`) เพราะงาน `PENDING`/`IN_PROGRESS` ยังไม่มีผลลัพธ์ และให้ API บังคับเฉพาะตอน `COMPLETED`, (2) อัปเดตสถานะ PR-01 ใน `tests.md` เป็น Merged, (3) เพิ่มบันทึก PR #105 ใน reviewer log → ผู้เขียนแก้ไขครบ (migration ใหม่ `20261031172848_lab04_actions_taken` + tests 10 เคส = 93/93) แล้ว รอ Reviewer ตรวจซ้ำ |
 | **PR-03** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | Planned | - |
 | **PR-04** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | Planned | - |
 | **PR-05** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | Planned | - |
@@ -98,3 +98,15 @@ Reviewer ตรวจสอบความถูกต้องของกา�
 
 **คำวินิจฉัย**: **APPROVED** — Reviewer กด Merge PR #104 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `f242eb3`) — **Closes Issue #1**
 
+
+### 3.2 PR-02: Database Migration, Prisma Model, and Idempotent Seed (Issue #2)
+
+#### 3.2.1 Review #1 — Request Changes (`titayaaa`, 2026-10-31)
+
+> ภาพรวม PR #105 ขยายฐานข้อมูลของ Lab 4 (Actions Taken Model, Migration และ Idempotent Seed) ได้อย่างเป็นระเบียบ ตรงตามข้อกำหนด และมี Integration Tests 9 เคสที่ตรวจ Data Invariants ได้รัดกุม (role ของ assignee/performer, performer ≠ assignee, การกระจายตัว 0/1/หลาย actions, การดักไม่ให้ Resolved ticket ค้าง open actions) รันเทสต์ผ่าน 92/92
+>
+> **ข้อเสนอแนะ:**
+>
+> 1. **`ActionTaken.result` ควรเป็น Nullable (`String?`) ในระดับ Database** — ปัจจุบัน schema และ migration กำหนด `result String @db.Text` / `TEXT NOT NULL` แต่ค่าเริ่มต้นของ `status` คือ `PENDING` ซึ่งงานยังไม่เสร็จและยังไม่มีผลลัพธ์ หาก DB บังคับ NOT NULL จะทำให้ `POST /api/tickets/:id/actions-taken` ใน Issue #3 ล้มเหลวเมื่อไม่ส่ง `result` หรือต้องส่งข้อความหลอก แนะนำให้แก้ schema เป็น `result String? @db.Text`, เอา `NOT NULL` ออกจาก migration, และไปบังคับ required ใน Backend Validation เฉพาะเมื่อ `status === 'COMPLETED'`
+> 2. **อัปเดตสถานะ PR-01 ใน `docs/lab-04/tests.md`** — แถว PR-01 ยังระบุ `Review in progress` แต่ PR #104 ถูก approve และ merge เข้า `lab4-staging` แล้ว (`f242eb3`) ควรปรับเป็น `Pass` หรือ `Merged`
+> 3. **อัปเดต `docs/lab-04/reviewer.md`** — เพิ่มแถว PR #105 ในตาราง Master Table และเพิ่มหัวข้อบันทึกประวัติการตรวจทานของ PR-02 ให้เป็นไปตามลำดับจริงทีละ PR

@@ -118,7 +118,7 @@ model ActionTaken {
   ticket            Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   actionDateTime    DateTime          @default(now())
   actionDescription String            @db.Text
-  result            String            @db.Text
+  result            String?           @db.Text
   performedById     Int
   performedBy       User              @relation("ActionTakenPerformer", fields: [performedById], references: [id])
   assigneeId        Int
