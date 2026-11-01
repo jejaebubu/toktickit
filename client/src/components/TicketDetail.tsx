@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ApiError, TicketDetail as TicketDetailData, fetchTicketDetail } from "../api.js";
 import { useAuth } from "../context/AuthContext.js";
 import { AttachmentSection } from "./AttachmentSection.js";
+import { ActionsTaken } from "./ActionsTaken.js";
 
 interface TicketDetailProps {
   ticketId: number;
@@ -173,6 +174,14 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               ✅ {notice}
             </div>
           )}
+
+          <ActionsTaken
+            ticketId={ticket.id}
+            actions={ticket.actionsTaken}
+            onActionsChange={(updatedActions) =>
+              setTicket((prev) => (prev ? { ...prev, actionsTaken: updatedActions } : prev))
+            }
+          />
 
           <h3 className="h5 fw-bold text-dark mb-3">Attachments</h3>
           <AttachmentSection

@@ -14,6 +14,7 @@ import {
 } from "../api.js";
 import { useAuth } from "../context/AuthContext.js";
 import { AttachmentSection } from "./AttachmentSection.js";
+import { ActionsTaken } from "./ActionsTaken.js";
 import { PriorityBadge, RoleBadge, StatusBadge } from "./ui/Badges.js";
 
 const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
@@ -424,6 +425,15 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </button>
         </form>
       </div>
+
+      {/* Actions Taken */}
+      <ActionsTaken
+        ticketId={ticket.id}
+        actions={ticket.actionsTaken}
+        onActionsChange={(updatedActions) =>
+          setTicket((prev) => (prev ? { ...prev, actionsTaken: updatedActions } : prev))
+        }
+      />
 
       {/* Attachments */}
       <h3 className="h5 fw-bold text-dark mb-3">Attachments</h3>

@@ -310,6 +310,90 @@ export interface TicketDetail {
   attachments: Attachment[];
   publicComments?: ConversationEntry[];
   internalNotes?: ConversationEntry[];
+  actionsTaken?: ActionTaken[];
+}
+
+export type ActionTakenStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+
+export interface ActionTakenUser {
+  id: number;
+  name: string;
+  email: string;
+  role: "REQUESTER" | "IT_STAFF" | "ADMINISTRATOR";
+  isActive?: boolean;
+}
+
+export interface ActionTaken {
+  id: string;
+  ticketId: number;
+  actionDateTime: string;
+  actionDescription: string;
+  result: string | null;
+  performedById: number;
+  performedBy: ActionTakenUser;
+  assigneeId: number;
+  assignee: ActionTakenUser;
+  status: ActionTakenStatus;
+  followUpRequired: boolean;
+  followUpNote: string | null;
+  attachmentNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ActionTakenPayload {
+  actionDescription: string;
+  result?: string | null;
+  assigneeId: number;
+  status?: ActionTakenStatus;
+  followUpRequired?: boolean;
+  followUpNote?: string | null;
+  attachmentNotes?: string | null;
+  actionDateTime?: string;
+}
+
+export async function fetchActionsTaken(ticketId: number): Promise<ActionTaken[]> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/actions-taken`, { headers: authHeaders() });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
+  return res.json();
+}
+
+export async function createActionTaken(ticketId: number, payload: ActionTakenPayload): Promise<ActionTaken> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/actions-taken`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
+  return res.json();
+}
+
+export async function updateActionTaken(
+  ticketId: number,
+  actionId: string,
+  payload: Partial<ActionTakenPayload>,
+): Promise<ActionTaken> {
+  const res = await fetch(`${API_URL}/api/tickets/${ticketId}/actions-taken/${actionId}`, {
+    method: "PATCH",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
+  return res.json();
+}
+
+export async function fetchAssignableStaff(): Promise<ActionTakenUser[]> {
+  const res = await fetch(`${API_URL}/api/users/assignable`, { headers: authHeaders() });
+  if (!res.ok) {
+    await parseApiError(res);
+  }
+  return res.json();
 }
 
 export interface RemoveAttachmentResult {
