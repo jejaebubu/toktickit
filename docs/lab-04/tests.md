@@ -59,7 +59,7 @@
 | **E2E-01** | E2E | AC-01 / AC-02 | Actions Taken complete user workflow | Staff สร้าง/แก้ไข Action $\rightarrow$ Requester เข้าดูเห็นเป็น Read-only | `e2e/lab-04/actions-taken-flow.spec.ts` | Pass |
 | **E2E-02** | E2E | AC-07 / AC-08 | Ticket resolution & lifecycle verification | Requester แจ้งแก้ไข $\rightarrow$ Staff ตรวจงาน $\rightarrow$ เปลี่ยนเป็น Resolved | `e2e/lab-04/ticket-resolution.spec.ts` | Pass |
 | **E2E-03** | E2E | AC-04 / AC-05 / FR-10 | Role dashboards navigation & drill-down flow | ตรวจสอบตัวเลข Dashboard ทั้งสองบทบาท และคลิก Drill-down สำเร็จ | `e2e/lab-04/dashboards.spec.ts` | Pass |
-| **REG-01** | Regression | AC-11 / FR-12 | Full regression of Lab 1, Lab 2, and Lab 3 features | ชุดทดสอบเดิมทั้งหมดรันผ่าน 100% | Full Vitest & Playwright Suites | Planned |
+| **REG-01** | Regression | AC-11 / FR-12 | Full regression of Lab 1, Lab 2, and Lab 3 features | ชุดทดสอบเดิมทั้งหมดรันผ่าน 100% | Full Vitest & Playwright Suites | Pass |
 | **MIG-01** | DB / Migration | Data Changes §5 / BR-01 / BR-13 / BR-16 | ActionTaken table, enum, indexes, and idempotent seed integrity | ตาราง/คอลัมน์/Enum ตรงตามสเปก, `result` เป็น Nullable, seed มี 0/1/หลาย Action, open work มี `result = null`, งานที่จบแล้วมี `result`, assignee/performer เป็น IT Staff/Admin ที่ Active, Resolved ticket ไม่มี Action ค้าง | `server/tests/lab-04/actions-taken-migration.test.ts` | Pass |
 
 ---
@@ -76,8 +76,8 @@
 | **PR-05** | Issue #5 | 2026-11-01 | Ticket Workflow Tests (`ticket-workflow.api.test.ts`, `TicketWorkflow.test.tsx`) | 8 new + 187 existing = 195 (108 server / 87 client) | **Pass** (PR #109, review addressed & merged `468a7ca`) |
 | **PR-06** | Issue #6 | 2026-11-01 | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | 6 new + 195 existing = 201 (110 server / 91 client) | **Pass** (PR #110, review addressed & merged `c11da67`) |
 | **PR-07** | Issue #7 | 2026-11-02 | Requester Dashboard Tests (`requester-dashboard.api.test.ts`, `RequesterDashboard.test.tsx`) | 6 new + 201 existing = 207 (112 server / 95 client) | **Pass** (PR #111, approved & merged `927862f`) |
-| **PR-08** | Issue #8 | 2026-11-02 | Playwright E2E Tests (`e2e/lab-04/*.spec.ts`) | 9 new E2E (3 specs × 3 viewports) + 207 unit/integration = 216 | **Pass** (review pending) |
-| **PR-09** | Issue #9 | - | Full Regression Test Suite (Lab 1–3) | - | Pending |
+| **PR-08** | Issue #8 | 2026-11-02 | Playwright E2E Tests (`e2e/lab-04/*.spec.ts`) | 9 new E2E (3 specs × 3 viewports) + 207 unit/integration = 216 | **Pass** (PR #112, approved & merged `0ce99e8`) |
+| **PR-09** | Issue #9 | 2026-11-02 | Full Regression Test Suite (Lab 1–3 + Lab 4) | 112 server + 95 client + 27 Playwright E2E = 234 total tests | **Pass** (review pending) |
 | **PR-10** | Issue #10 | - | Accessibility & Responsive Inspection | - | Pending |
 | **PR-11** | Issue #11 | - | Release Verification on `main` branch | - | Pending |
 

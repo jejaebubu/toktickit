@@ -26,8 +26,8 @@
 | **PR-05 ([GitHub #109](https://github.com/jejaebubu/toktickit/pull/109))** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมโครงสร้าง State Transition, Resolution Gate Modal, Concurrency Check และเทสต์ 195/195 แต่ขอให้ (1) นำ `"Resolved"` ออกจาก `Open` transitions และเพิ่ม `"Pending"` ใน `TICKET_STATUS_TRANSITIONS`, (2) ลบการแอบเปลี่ยนสถานะตั๋วเมื่อ Requester ส่ง `requesterIndicatedResolved: true` เพื่อให้คงสถานะเดิม 100%, (3) ปรับ 500 catch block ของ `handleTicketPatch` ตาม SAFE-01 ไม่ส่ง `err?.message` พร้อม minor suggestions (`If-Unmodified-Since` precision ระดับวินาที, ซ่อน advisory banner บนตั๋วที่จบแล้ว, เพิ่มปุ่ม Dismiss ใน Stale Modal, สีปุ่ม `Cancelled` เป็น `btn-outline-danger`) → ผู้เขียนแก้ไขครบทุกข้อใน commit `45b424d` / `8f8c8e6` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `468a7ca` |
 | **PR-06 ([GitHub #110](https://github.com/jejaebubu/toktickit/pull/110))** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการออกแบบการ์ดตัวชี้วัด 5 ใบ, ระบบ Drill-down, Responsive Desktop Table + Mobile Cards และชุดทดสอบ 6 เคสใหม่ (201/201) แต่ขอให้ (1) นำเมนู `Dashboard` ออกจาก `REQUESTER` ใน `Header.tsx` เพื่อป้องกันหน้าว่างก่อนทำ Issue #7, (2) เปลี่ยนหัวข้อแผงจาก `"My Recent Tickets"` เป็น `"Recent Queue Tickets"` ให้สอดคล้องกับ query, (3) เพิ่มลิงก์ PR #110 ใน `reviewer.md` → ผู้เขียนแก้ไขครบทุกข้อใน commit `1419b97` / `512cbab` / `8bc213c` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `c11da67` |
 | **PR-07 ([GitHub #111](https://github.com/jejaebubu/toktickit/pull/111))** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Approved & Merged** | Review #1 โดย `titayaaa`: ชมการรักษาความปลอดภัย RBAC และ Data Isolation (`requesterId === req.user.id`, `SAFE-01`), ดีไซน์ Zen Green + Responsive Desktop/Mobile + Accessibility, Empty State CTA `"Submit a new request"` + Quick Actions, ระบบ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 207/207 พร้อมให้คำแนะนำเชิงพัฒนาเพิ่มเติมเรื่องกลุ่มสถานะของการ์ด `My Open Tickets` → Reviewer **Approve** ในรอบแรก — merged `927862f` |
-| **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Addressed (Awaiting Re-review)** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้ (1) เพิ่มลิงก์ GitHub PR #112 ในตาราง Section 2 และหัวข้อ Section 3.8 ของ `reviewer.md` พร้อมข้อเสนอแนะเพิ่มเติม (2) เพิ่ม negative validation test ของช่อง `Result` ตอนกด Complete Action ใน `actions-taken-flow.spec.ts` และ (3) เพิ่มการคลิก Quick Actions บน Requester Dashboard ใน `dashboards.spec.ts` → ผู้เขียนแก้ไขครบทั้ง 3 ข้อ — รอ Reviewer ตรวจซ้ำ |
-| **PR-09** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | Planned | - |
+| **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้เพิ่มลิงก์ PR #112, เพิ่ม negative validation test ช่อง Result, และเพิ่มการคลิก Quick Actions บน Requester Dashboard → ผู้เขียนแก้ไขครบใน commit `6ba5ed1` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `0ce99e8`) |
+| **PR-09** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Review pending** | รันชุดทดสอบ Regression ทั้งหมดครอบคลุม Lab 1, Lab 2, Lab 3 และ Lab 4 (Server 112 tests, Client 95 tests, Playwright E2E 27 tests บน 3 viewports รวม 234/234 tests ผ่าน 100%) พร้อมปรับปรุง `staff-ticket-flow.spec.ts` ให้สอดคล้องกับ State Transition Matrix (`Open -> In Progress -> Resolved`) — รอ Reviewer ตรวจทาน |
 | **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | Planned | - |
 | **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | Planned | - |
 
@@ -487,7 +487,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
 - **Objective:** พัฒนาชุดทดสอบอัตโนมัติระดับเบราว์เซอร์ด้วย Playwright (`e2e/lab-04/actions-taken-flow.spec.ts`, `e2e/lab-04/ticket-resolution.spec.ts`, `e2e/lab-04/dashboards.spec.ts`) ครอบคลุม Customer Journeys หลักทั้ง 3 ส่วน (`E2E-01`, `E2E-02`, `E2E-03`) บนทั้ง 3 Viewports (`desktop` 1280×800, `tablet` 820×1180, `mobile` 393×851 รวม 9 E2E test runs) พร้อมตรวจสอบ `expectNoHorizontalOverflow` และปรับ `whiteSpace: "normal"` บน Advisory Badge ใน `TicketDetail.tsx` และ `StaffTicketDetail.tsx` เพื่อป้องกันการล้นขอบบนหน้าจอ Mobile (393px)
-- **Status:** แก้ไขตาม Review #1 ครบถ้วนแล้ว รอการตรวจซ้ำจาก Reviewer (`@titayaaa`)
+- **Status:** Approved & Merged (`0ce99e8`)
 
 #### 3.8.1 Review #1 — Request Changes (`titayaaa`, 2026-11-02)
 > ### PR-08 Review: Changes Requested (ขอฝากเก็บรายละเอียด 2 จุดก่อน Approve ค่ะ)
@@ -520,6 +520,44 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >    - เพิ่ม Step 6 ทดสอบการคลิกปุ่ม `requester-quick-action-create-ticket` (`+ Create Ticket` นำทางไปยังหน้าฟอร์มสร้างตั๋ว `submit-ticket-btn`) และปุ่ม `requester-quick-action-view-tickets` (`View My Tickets` นำทางไปยังหน้า `my-tickets-card` พร้อมตัวกรองสถานะเริ่มต้นเป็น `""`) ครบทั้งสองปุ่มครับ
 > 4. **ผลการรันทดสอบซ้ำ**:
 >    - `npx playwright test e2e/lab-04`: **9 passed (9)** ครบทั้ง `desktop`, `tablet`, และ `mobile`
+
+#### 3.8.3 Review #2 — Approved (`titayaaa`, 2026-11-02)
+> ### ✅ การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+>
+> ขอบคุณ @jejaebubu ที่ดำเนินการแก้ไขปรับปรุงครบถ้วนสมบูรณ์ทั้งประเด็น Required Change และข้อเสนอแนะเพิ่มเติมใน commit `6ba5ed1` อย่างรวดเร็วและประณีตมากค่ะ ตรวจสอบโค้ดและชุดทดสอบซ้ำอย่างละเอียดแล้ว:
+>
+> 1. **ความสมบูรณ์ของการบันทึกเอกสารและลิงก์ PR (Required 1)**:
+>    - มีการเพิ่มลิงก์ `[GitHub #112](https://github.com/jejaebubu/toktickit/pull/112)` ในตาราง Section 2 แถวของ `PR-08` ครบถ้วนตามมาตรฐานเดียวกันกับ PR ก่อนหน้า
+>    - มีการระบุ `- **PR URL:** [jejaebubu/toktickit#112](https://github.com/jejaebubu/toktickit/pull/112)` ใน Section 3.8 ชัดเจน
+>    - บันทึกการรีวิวรอบที่ 1 และ Author Response ไว้อย่างเป็นระเบียบเรียบร้อย
+>
+> 2. **Negative Validation Test สำหรับ Result ตอน Complete Action (`e2e/lab-04/actions-taken-flow.spec.ts` — Minor 2)**:
+>    - เพิ่ม Step 7 กดปุ่ม `action-save` ในขณะที่ช่อง Result ยังว่างอยู่ พร้อมตรวจสอบว่ามีข้อความแจ้งเตือน `action-result-error` (`/Result is required/i`) แสดงขึ้นมาก่อนกรอกข้อความจริง
+>    - ยืนยันการบังคับใช้กฎ `BR-16` และ `AC-15` ในระดับ End-to-End ได้อย่างรัดกุมและสมบูรณ์แบบมากค่ะ
+>
+> 3. **E2E Quick Actions Test บน Requester Dashboard (`e2e/lab-04/dashboards.spec.ts` — Minor 3)**:
+>    - เพิ่ม Step 6 ทดสอบการคลิกปุ่ม Quick Actions ของฝั่ง Requester ครบทั้ง 2 ปุ่ม:
+>      - `requester-quick-action-create-ticket`: นำทางไปยังฟอร์มสร้างตั๋ว (`submit-ticket-btn`)
+>      - `requester-quick-action-view-tickets`: นำทางไปยังหน้าตั๋วของฉัน (`my-tickets-card`) พร้อมรีเซ็ตตัวกรองสถานะเป็นค่าว่าง
+>    - มีการเรียก `expectNoHorizontalOverflow(page)` ตรวจสอบความถูกต้องของเลย์เอาต์หลังคลิกทุกจุด
+>
+> 4. **ความครอบคลุมของการทดสอบและ Responsive Audit**:
+>    - ชุดทดสอบ Playwright E2E รันผ่านครบทั้ง 9 เทสต์ (3 flow × 3 responsive viewports: Desktop 1280×800, Tablet 820×1180, Mobile 393×851)
+>    - แบ็กเอนด์และคอมโพเนนต์อื่น ๆ ทำงานสอดคล้องกันได้อย่างไร้รอยต่อ
+>
+> ภาพรวมโค้ดและชุดทดสอบมีคุณภาพสูงมาก ยอดเยี่ยมมากค่ะ ขออนุมัติ (Approve) ให้ทันที และพร้อมให้ดำเนินการ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ! 🎉🚀
+
+**คำวินิจฉัย**: **APPROVED & MERGED** — Reviewer กด Merge PR #112 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `0ce99e8`) — **Closes Issue #8**
+
+---
+
+### 3.9 PR-09: Lab 1–3 Regression Test Suite and System Hardening (Issue #9)
+
+- **Branch:** `feature/lab04-issue9-regression` → `lab4-staging`
+- **Author:** `@jejaebubu`
+- **Reviewer:** `@titayaaa`
+- **Objective:** ตรวจสอบความเข้ากันได้ย้อนหลังและการทำงานร่วมกันของทั้งระบบ (Zero Regression ตาม `AC-11`, `FR-12`) ครอบคลุมชุดทดสอบเดิมทั้งหมดของ Lab 1, Lab 2, Lab 3 ร่วมกับโมดูลใหม่ของ Lab 4 (Server Vitest 112 tests, Client Vitest 95 tests, และ Playwright E2E 27 tests บนทั้ง 3 Viewports: Desktop, Tablet, Mobile) รวม 234/234 tests ผ่าน 100% พร้อมปรับปรุงสคริปต์ `e2e/lab-03/staff-ticket-flow.spec.ts` ให้สเต็ปการเปลี่ยนสถานะเป็นไปตาม 9-state Transition Matrix (`Open -> In Progress -> Resolved`)
+- **Status:** เปิด PR รอการตรวจทานจาก Reviewer (`@titayaaa`)
 
 ---
 

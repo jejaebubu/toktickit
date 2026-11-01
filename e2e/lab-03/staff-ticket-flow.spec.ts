@@ -87,8 +87,10 @@ test.describe("E2E-03: IT Staff ticket queue, claim & update flow (AC-05)", () =
     await expect(page.getByTestId("detail-claim")).toBeDisabled();
     await expect(page.getByTestId("detail-claim")).toContainText(/Claimed by you/i);
 
-    // --- 6. Update IT priority and status ---
+    // --- 6. Update IT priority and status (transition from Open -> In Progress -> Resolved per transition matrix) ---
     await page.selectOption('[data-testid="detail-priority-select"]', "URGENT");
+    await page.selectOption('[data-testid="detail-status-select"]', "In Progress");
+    await expect(page.getByTestId("detail-notice")).toContainText(/updated successfully/i);
     await page.selectOption('[data-testid="detail-status-select"]', "Resolved");
     await expect(page.getByTestId("detail-notice")).toContainText(/updated successfully/i);
     await page.screenshot({ path: shot(project, "staff-ticket-detail", "claimed-updated"), fullPage: true });
