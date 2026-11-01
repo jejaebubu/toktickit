@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ApiError, TicketDetail as TicketDetailData, fetchTicketDetail } from "../api.js";
+import { ApiError, TicketDetail as TicketDetailData, fetchTicketDetail, updateTicket } from "../api.js";
 import { useAuth } from "../context/AuthContext.js";
 import { AttachmentSection } from "./AttachmentSection.js";
 import { ActionsTaken } from "./ActionsTaken.js";
@@ -37,6 +37,33 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
+  const [showResolveConfirm, setShowResolveConfirm] = useState(false);
+  const [isIndicatingResolved, setIsIndicatingResolved] = useState(false);
+
+  const handleIndicateResolved = async () => {
+    if (!ticket || isIndicatingResolved) return;
+    setIsIndicatingResolved(true);
+    setNotice(null);
+    try {
+      const updated = await updateTicket(ticket.id, { requesterIndicatedResolved: true });
+      setTicket((prev) =>
+        prev
+          ? {
+              ...prev,
+              ...updated,
+              attachments: prev.attachments ?? [],
+              actionsTaken: updated.actionsTaken ?? prev.actionsTaken ?? [],
+            }
+          : updated,
+      );
+      setShowResolveConfirm(false);
+      setNotice("IT Staff has been notified that your problem appears resolved.");
+    } catch (err: any) {
+      setError(err instanceof ApiError ? err.message : "Failed to submit resolution indication.");
+    } finally {
+      setIsIndicatingResolved(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -174,6 +201,79 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               ✅ {notice}
             </div>
           )}
+
+          {/* Requester Resolution Gate Advisory UI (BR-09, AC-08, ui-spec §2.5) */}
+          {!["Resolved", "Closed", "Cancelled"].includes(ticket.status) &&
+            (ticket.requesterIndicatedResolved ? (
+              <div
+                className="alert border-0 shadow-sm d-flex flex-wrap align-items-center gap-2 mb-4"
+                role="status"
+                style={{ backgroundColor: "#EAF6EF", color: "#006B3C", border: "1px solid #B4D7C5" }}
+                data-testid="requester-resolved-advisory"
+              >
+                <span
+                  className="badge rounded-pill fw-semibold px-2 py-1"
+                  style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }}
+                  data-testid="requester-resolved-advisory-badge"
+                >
+                  Requester indicated problem resolved - Pending Staff Review
+                </span>
+                <span className="small">
+                  IT Staff will verify the work performed and officially resolve the ticket.
+                </span>
+              </div>
+            ) : (
+              <div
+                className="border rounded-3 p-3 mb-4"
+                style={{ backgroundColor: "#F8FBF9", borderColor: "#B4D7C5" }}
+                data-testid="requester-resolution-gate"
+              >
+                {!showResolveConfirm ? (
+                  <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <span className="small text-dark">
+                      Is your issue fixed? Let IT Staff know so they can verify and close this ticket.
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-sm text-white fw-semibold"
+                      style={{ backgroundColor: "#006B3C", borderColor: "#006B3C", minHeight: 44 }}
+                      onClick={() => setShowResolveConfirm(true)}
+                      data-testid="requester-indicate-resolved-btn"
+                    >
+                      My problem is resolved
+                    </button>
+                  </div>
+                ) : (
+                  <div data-testid="requester-indicate-resolved-confirm-box">
+                    <p className="small text-dark mb-2">
+                      This will notify IT Staff that your issue is resolved. IT Staff will verify and officially close the ticket.
+                    </p>
+                    <div className="d-flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-sm text-white fw-semibold"
+                        style={{ backgroundColor: "#006B3C", borderColor: "#006B3C", minHeight: 44 }}
+                        disabled={isIndicatingResolved}
+                        onClick={handleIndicateResolved}
+                        data-testid="requester-indicate-resolved-confirm"
+                      >
+                        {isIndicatingResolved ? "Submitting…" : "Confirm"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary fw-semibold"
+                        style={{ minHeight: 44 }}
+                        disabled={isIndicatingResolved}
+                        onClick={() => setShowResolveConfirm(false)}
+                        data-testid="requester-indicate-resolved-cancel"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
 
           <ActionsTaken
             ticketId={ticket.id}

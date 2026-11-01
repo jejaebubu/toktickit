@@ -36,10 +36,23 @@ const TICKET_STATUSES: Record<string, string> = {
   OPEN: "Open",
   "IN PROGRESS": "In Progress",
   "WAITING FOR REQUESTER": "Waiting for Requester",
+  PENDING: "Pending",
   RESOLVED: "Resolved",
   CLOSED: "Closed",
   REOPENED: "Reopened",
   CANCELLED: "Cancelled",
+};
+
+const TICKET_STATUS_TRANSITIONS: Record<string, string[]> = {
+  New: ["Open", "Cancelled"],
+  Open: ["In Progress", "Waiting for Requester", "Pending", "Cancelled"],
+  "In Progress": ["Waiting for Requester", "Pending", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Pending", "Resolved", "Cancelled"],
+  Pending: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  Resolved: ["Closed", "Reopened"],
+  Reopened: ["In Progress", "Waiting for Requester", "Pending", "Resolved", "Cancelled"],
+  Closed: [],
+  Cancelled: [],
 };
 
 function validatePasswordComplexity(password: string): string | null {
@@ -1087,11 +1100,11 @@ app.patch(
 );
 
 // ---------------------------------------------------------------------------
-// Lab 3 (Issue 7) — IT Staff Ticket Operations
-// PATCH /api/tickets/:id (claim/assign owner, IT priority, status,
-// requester "Waiting for Requester" resolution indication)
+// Lab 3 (Issue 7) & Lab 4 (Issue 5) — Ticket Workflow, Transition Matrix,
+// Resolution Gate, and Optimistic Concurrency Check
+// PATCH /api/tickets/:id (and alias PATCH /api/tickets/:id/status)
 // ---------------------------------------------------------------------------
-app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+async function handleTicketPatch(req: AuthenticatedRequest, res: Response) {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
@@ -1103,27 +1116,62 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
       return res.status(404).json({ error: "Ticket not found" });
     }
 
-    const { ownerId, itPriority, status, requesterIndicatedResolved } = req.body;
+    const { ownerId, itPriority, status, requesterIndicatedResolved, expectedUpdatedAt } = req.body ?? {};
+    const currentCanonicalStatus = TICKET_STATUSES[String(ticket.status).toUpperCase()] ?? ticket.status;
 
-    // Requester special action: Indicate problem appears resolved (AC-08, FR-09)
+    // Requester special action: Indicate problem appears resolved (AC-08, BR-09)
     if (req.user!.role === "REQUESTER") {
       if (ticket.requesterId !== req.user!.id) {
         return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
       }
-      if (requesterIndicatedResolved === true) {
-        const updated = await getPrisma().ticket.update({
-          where: { id },
-          data: { requesterIndicatedResolved: true, status: "Waiting for Requester" },
-          include: {
-            category: true,
-            relatedSystem: true,
-            requester: { select: { id: true, name: true, email: true } },
-            owner: { select: { id: true, name: true, email: true } },
-          },
+      if (status !== undefined || ownerId !== undefined || itPriority !== undefined || requesterIndicatedResolved !== true) {
+        return res.status(403).json({
+          error: "Forbidden",
+          message: "Requesters cannot formally update ticket status or assignment.",
         });
-        return res.status(200).json(updated);
       }
-      return res.status(403).json({ error: "Forbidden", message: "Requesters cannot formally update ticket status or assignment." });
+      if (["Resolved", "Closed", "Cancelled"].includes(currentCanonicalStatus)) {
+        return res.status(400).json({
+          error: "Bad Request",
+          message: "Cannot indicate resolution on a resolved, closed, or cancelled ticket.",
+        });
+      }
+
+      const updated = await getPrisma().ticket.update({
+        where: { id },
+        data: { requesterIndicatedResolved: true },
+        include: {
+          category: true,
+          relatedSystem: true,
+          requester: { select: { id: true, name: true, email: true } },
+          owner: { select: { id: true, name: true, email: true } },
+          actionsTaken: {
+            orderBy: [{ actionDateTime: "desc" }, { createdAt: "desc" }],
+            include: ACTION_TAKEN_INCLUDE,
+          },
+        },
+      });
+      return res.status(200).json(updated);
+    }
+
+    // Optimistic Concurrency Check (BR-12, AC-09)
+    const headerUnmodifiedSince = req.header("if-unmodified-since");
+    const hasBodyExpected = expectedUpdatedAt !== undefined && expectedUpdatedAt !== null && String(expectedUpdatedAt).trim() !== "";
+    const rawExpectedUpdatedAt = hasBodyExpected ? expectedUpdatedAt : headerUnmodifiedSince;
+    if (rawExpectedUpdatedAt !== undefined && rawExpectedUpdatedAt !== null && String(rawExpectedUpdatedAt).trim() !== "") {
+      const expectedTime = new Date(String(rawExpectedUpdatedAt)).getTime();
+      const actualTime = new Date(ticket.updatedAt).getTime();
+      const isMismatch = hasBodyExpected
+        ? expectedTime !== actualTime
+        : Math.floor(expectedTime / 1000) !== Math.floor(actualTime / 1000);
+      if (Number.isNaN(expectedTime) || isMismatch) {
+        return res.status(409).json({
+          error: "Conflict",
+          code: "STALE_UPDATE",
+          message: "Ticket has been updated by another user. Please refresh.",
+          currentUpdatedAt: ticket.updatedAt.toISOString(),
+        });
+      }
     }
 
     // IT Staff / Admin ticket workflow updates
@@ -1142,6 +1190,9 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
           return res.status(400).json({ error: "Bad Request", message: "Owner must be an active IT Staff or Administrator." });
         }
         dataToUpdate.ownerId = ownerIdNum;
+        if (currentCanonicalStatus === "New" && status === undefined) {
+          dataToUpdate.status = "Open";
+        }
       }
     }
     if (itPriority !== undefined) {
@@ -1157,6 +1208,37 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
       if (!canonicalStatus) {
         return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${Object.values(TICKET_STATUSES).join(", ")}` });
       }
+
+      if (canonicalStatus !== currentCanonicalStatus) {
+        const allowedNext = TICKET_STATUS_TRANSITIONS[currentCanonicalStatus] ?? [];
+        if (!allowedNext.includes(canonicalStatus)) {
+          return res.status(400).json({
+            error: "Bad Request",
+            code: "INVALID_STATUS_TRANSITION",
+            message: `Invalid status transition from ${currentCanonicalStatus} to ${canonicalStatus}.`,
+          });
+        }
+      }
+
+      // Resolution Gate (BR-15, AC-13): block transitioning to Resolved when open Actions Taken exist
+      if (canonicalStatus === "Resolved") {
+        const unresolvedCount = await getPrisma().actionTaken.count({
+          where: {
+            ticketId: id,
+            status: { in: ["PENDING", "IN_PROGRESS"] },
+          },
+        });
+        if (unresolvedCount > 0) {
+          return res.status(409).json({
+            error: "Conflict",
+            code: "UNRESOLVED_ACTIONS_EXIST",
+            unresolvedCount,
+            openActionsCount: unresolvedCount,
+            message: `Cannot resolve ticket while ${unresolvedCount} action(s) are still open (PENDING or IN_PROGRESS). Complete or cancel them before resolving the ticket.`,
+          });
+        }
+      }
+
       dataToUpdate.status = canonicalStatus;
       // Staff-initiated status change clears any stale requester resolution intent
       dataToUpdate.requesterIndicatedResolved = false;
@@ -1170,14 +1252,22 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
         relatedSystem: true,
         requester: { select: { id: true, name: true, email: true } },
         owner: { select: { id: true, name: true, email: true } },
+        actionsTaken: {
+          orderBy: [{ actionDateTime: "desc" }, { createdAt: "desc" }],
+          include: ACTION_TAKEN_INCLUDE,
+        },
       },
     });
 
     res.status(200).json(updatedTicket);
   } catch (err: any) {
-    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    console.error("Failed to update ticket:", err);
+    res.status(500).json({ error: "Internal Server Error", message: "Failed to update ticket." });
   }
-});
+}
+
+app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, handleTicketPatch);
+app.patch("/api/tickets/:id/status", authenticateToken, checkPasswordChangeState, handleTicketPatch);
 
 // ---------------------------------------------------------------------------
 // Public Comments & Internal Notes APIs
