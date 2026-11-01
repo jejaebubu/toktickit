@@ -203,26 +203,26 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           )}
 
           {/* Requester Resolution Gate Advisory UI (BR-09, AC-08, ui-spec §2.5) */}
-          {ticket.requesterIndicatedResolved ? (
-            <div
-              className="alert border-0 shadow-sm d-flex flex-wrap align-items-center gap-2 mb-4"
-              role="status"
-              style={{ backgroundColor: "#EAF6EF", color: "#006B3C", border: "1px solid #B4D7C5" }}
-              data-testid="requester-resolved-advisory"
-            >
-              <span
-                className="badge rounded-pill fw-semibold px-2 py-1"
-                style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }}
-                data-testid="requester-resolved-advisory-badge"
+          {!["Resolved", "Closed", "Cancelled"].includes(ticket.status) &&
+            (ticket.requesterIndicatedResolved ? (
+              <div
+                className="alert border-0 shadow-sm d-flex flex-wrap align-items-center gap-2 mb-4"
+                role="status"
+                style={{ backgroundColor: "#EAF6EF", color: "#006B3C", border: "1px solid #B4D7C5" }}
+                data-testid="requester-resolved-advisory"
               >
-                Requester indicated problem resolved - Pending Staff Review
-              </span>
-              <span className="small">
-                IT Staff will verify the work performed and officially resolve the ticket.
-              </span>
-            </div>
-          ) : (
-            !["Resolved", "Closed", "Cancelled"].includes(ticket.status) && (
+                <span
+                  className="badge rounded-pill fw-semibold px-2 py-1"
+                  style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }}
+                  data-testid="requester-resolved-advisory-badge"
+                >
+                  Requester indicated problem resolved - Pending Staff Review
+                </span>
+                <span className="small">
+                  IT Staff will verify the work performed and officially resolve the ticket.
+                </span>
+              </div>
+            ) : (
               <div
                 className="border rounded-3 p-3 mb-4"
                 style={{ backgroundColor: "#F8FBF9", borderColor: "#B4D7C5" }}
@@ -273,8 +273,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                   </div>
                 )}
               </div>
-            )
-          )}
+            ))}
 
           <ActionsTaken
             ticketId={ticket.id}

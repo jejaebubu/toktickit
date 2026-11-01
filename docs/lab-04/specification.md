@@ -58,14 +58,15 @@
 - **BR-04**: หากมีการกำหนด `followUpRequired = true` ข้อมูล `followUpNote` ต้องไม่เป็นค่าว่าง (Non-empty string) หาก `followUpRequired = false` ฟิลด์ `followUpNote` ต้องเป็น `null` (ระบบต้องล้างข้อความเดิมอัตโนมัติเมื่อปิด follow-up โดยไม่ส่ง note ใหม่มา) และ `actionDescription` ต้องมีความยาว 3–1000 ตัวอักษร
 - **BR-05**: สิทธิ์ในการสร้างหรือแก้ไข Actions Taken จำกัดเฉพาะบทบาท `IT_STAFF` และ `ADMINISTRATOR` เท่านั้น สำหรับ `REQUESTER` มีสิทธิ์เปิดอ่านเฉพาะในตั๋วของตนเองเท่านั้น (ห้ามสร้าง/แก้ไข)
 - **BR-06**: การเข้าถึงตั๋วที่ Requester ไม่ได้เป็นเจ้าของ ต้องตอบกลับด้วย `404 Not Found` เสมอ เพื่อป้องกันการรั่วไหลของการมีอยู่ของข้อมูล (Data Leakage Prevention)
-- **BR-07**: วงจรชีวิตของตั๋ว (Ticket Status) ประกอบด้วย 8 สถานะ ได้แก่: `New`, `Open`, `In Progress`, `Waiting for Requester`, `Resolved`, `Closed`, `Reopened`, และ `Cancelled`
+- **BR-07**: วงจรชีวิตของตั๋ว (Ticket Status) ประกอบด้วยสถานะหลักและสถานะรองรับเดิม (`Pending`) ได้แก่: `New`, `Open`, `In Progress`, `Waiting for Requester`, `Pending`, `Resolved`, `Closed`, `Reopened`, และ `Cancelled`
 - **BR-08**: การเปลี่ยนสถานะตั๋วต้องเป็นไปตาม Transition Matrix:
   - `New` $\rightarrow$ `Open`, `Cancelled`
-  - `Open` $\rightarrow$ `In Progress`, `Waiting for Requester`, `Resolved`, `Cancelled`
-  - `In Progress` $\rightarrow$ `Waiting for Requester`, `Resolved`, `Cancelled`
-  - `Waiting for Requester` $\rightarrow$ `In Progress`, `Resolved`, `Cancelled`
+  - `Open` $\rightarrow$ `In Progress`, `Waiting for Requester`, `Pending`, `Cancelled` (ห้ามข้ามไป `Resolved` โดยตรง ต้องผ่านสถานะปฏิบัติงานก่อน)
+  - `In Progress` $\rightarrow$ `Waiting for Requester`, `Pending`, `Resolved`, `Cancelled`
+  - `Waiting for Requester` $\rightarrow$ `In Progress`, `Pending`, `Resolved`, `Cancelled`
+  - `Pending` $\rightarrow$ `In Progress`, `Waiting for Requester`, `Resolved`, `Cancelled`
   - `Resolved` $\rightarrow$ `Closed`, `Reopened`
-  - `Reopened` $\rightarrow$ `In Progress`, `Waiting for Requester`, `Resolved`, `Cancelled`
+  - `Reopened` $\rightarrow$ `In Progress`, `Waiting for Requester`, `Pending`, `Resolved`, `Cancelled`
   - `Closed` $\rightarrow$ ไม่มีสถานะถัดไป (Final state)
   - `Cancelled` $\rightarrow$ ไม่มีสถานะถัดไป (Final state)
 - **BR-09 (Resolution Gate)**: การระบุเจตนาว่าปัญหาได้รับการแก้ไขแล้วโดย Requester (`requesterIndicatedResolved = true`) เป็นเพียงคำแนะนำ (Advisory Flag) และจะไม่เปลี่ยนสถานะตั๋วเป็น `Resolved` โดยตรง เจ้าหน้าที่ไอทีต้องตรวจสอบผลการปฏิบัติงานใน Actions Taken แล้วเป็นผู้อัปเดตสถานะเป็น `Resolved` ด้วยตนเอง

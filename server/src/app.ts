@@ -36,6 +36,7 @@ const TICKET_STATUSES: Record<string, string> = {
   OPEN: "Open",
   "IN PROGRESS": "In Progress",
   "WAITING FOR REQUESTER": "Waiting for Requester",
+  PENDING: "Pending",
   RESOLVED: "Resolved",
   CLOSED: "Closed",
   REOPENED: "Reopened",
@@ -44,11 +45,12 @@ const TICKET_STATUSES: Record<string, string> = {
 
 const TICKET_STATUS_TRANSITIONS: Record<string, string[]> = {
   New: ["Open", "Cancelled"],
-  Open: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
-  "In Progress": ["Waiting for Requester", "Resolved", "Cancelled"],
-  "Waiting for Requester": ["In Progress", "Resolved", "Cancelled"],
+  Open: ["In Progress", "Waiting for Requester", "Pending", "Cancelled"],
+  "In Progress": ["Waiting for Requester", "Pending", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Pending", "Resolved", "Cancelled"],
+  Pending: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
   Resolved: ["Closed", "Reopened"],
-  Reopened: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  Reopened: ["In Progress", "Waiting for Requester", "Pending", "Resolved", "Cancelled"],
   Closed: [],
   Cancelled: [],
 };
@@ -1135,12 +1137,9 @@ async function handleTicketPatch(req: AuthenticatedRequest, res: Response) {
         });
       }
 
-      // Preserve Lab 3 compatibility when legacy uppercase "OPEN" is used in tests,
-      // while keeping canonical ticket status unchanged per Lab 4 BR-09 / AC-08.
-      const nextStatusForRequester = ticket.status === "OPEN" ? "Waiting for Requester" : ticket.status;
       const updated = await getPrisma().ticket.update({
         where: { id },
-        data: { requesterIndicatedResolved: true, status: nextStatusForRequester },
+        data: { requesterIndicatedResolved: true },
         include: {
           category: true,
           relatedSystem: true,
@@ -1156,11 +1155,16 @@ async function handleTicketPatch(req: AuthenticatedRequest, res: Response) {
     }
 
     // Optimistic Concurrency Check (BR-12, AC-09)
-    const rawExpectedUpdatedAt = expectedUpdatedAt ?? req.header("if-unmodified-since");
+    const headerUnmodifiedSince = req.header("if-unmodified-since");
+    const hasBodyExpected = expectedUpdatedAt !== undefined && expectedUpdatedAt !== null && String(expectedUpdatedAt).trim() !== "";
+    const rawExpectedUpdatedAt = hasBodyExpected ? expectedUpdatedAt : headerUnmodifiedSince;
     if (rawExpectedUpdatedAt !== undefined && rawExpectedUpdatedAt !== null && String(rawExpectedUpdatedAt).trim() !== "") {
       const expectedTime = new Date(String(rawExpectedUpdatedAt)).getTime();
       const actualTime = new Date(ticket.updatedAt).getTime();
-      if (Number.isNaN(expectedTime) || expectedTime !== actualTime) {
+      const isMismatch = hasBodyExpected
+        ? expectedTime !== actualTime
+        : Math.floor(expectedTime / 1000) !== Math.floor(actualTime / 1000);
+      if (Number.isNaN(expectedTime) || isMismatch) {
         return res.status(409).json({
           error: "Conflict",
           code: "STALE_UPDATE",
@@ -1257,7 +1261,8 @@ async function handleTicketPatch(req: AuthenticatedRequest, res: Response) {
 
     res.status(200).json(updatedTicket);
   } catch (err: any) {
-    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    console.error("Failed to update ticket:", err);
+    res.status(500).json({ error: "Internal Server Error", message: "Failed to update ticket." });
   }
 }
 

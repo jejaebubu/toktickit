@@ -108,20 +108,29 @@ describe("Lab 4 Ticket Workflow, Resolution Gate & Concurrency API Suite (ticket
     expect(toOpen.status).toBe(200);
     expect(toOpen.body.status).toBe("Open");
 
-    // Illegal jump: Open -> Closed
+    // Illegal jump: Open -> Closed and Open -> Resolved (must go through In Progress / Waiting / Pending first)
     const illegalOpenToClosed = await request(app)
       .patch(`/api/tickets/${ticket.id}`)
       .set("Authorization", `Bearer ${staffToken}`)
       .send({ status: "Closed" });
     expect(illegalOpenToClosed.status).toBe(400);
 
-    // Valid: Open -> In Progress -> Waiting for Requester -> In Progress -> Resolved -> Reopened -> Resolved -> Closed
+    const illegalOpenToResolved = await request(app)
+      .patch(`/api/tickets/${ticket.id}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ status: "Resolved" });
+    expect(illegalOpenToResolved.status).toBe(400);
+    expect(illegalOpenToResolved.body.code).toBe("INVALID_STATUS_TRANSITION");
+
+    // Valid: Open -> Pending -> In Progress -> Waiting for Requester -> In Progress -> Resolved -> Reopened -> Pending -> Resolved -> Closed
     for (const nextStatus of [
+      "Pending",
       "In Progress",
       "Waiting for Requester",
       "In Progress",
       "Resolved",
       "Reopened",
+      "Pending",
       "Resolved",
       "Closed",
     ]) {
@@ -224,6 +233,16 @@ describe("Lab 4 Ticket Workflow, Resolution Gate & Concurrency API Suite (ticket
       });
     expect(freshRes.status).toBe(200);
     expect(freshRes.body.status).toBe("In Progress");
+
+    // Matching RFC 7231 If-Unmodified-Since header (second-level precision) -> 200 OK
+    const afterInProgress = await prisma.ticket.findUniqueOrThrow({ where: { id: ticket.id } });
+    const headerFreshRes = await request(app)
+      .patch(`/api/tickets/${ticket.id}`)
+      .set("Authorization", `Bearer ${staffToken}`)
+      .set("If-Unmodified-Since", afterInProgress.updatedAt.toUTCString())
+      .send({ status: "Waiting for Requester" });
+    expect(headerFreshRes.status).toBe(200);
+    expect(headerFreshRes.body.status).toBe("Waiting for Requester");
   });
 
   it("API-13: Resolution Gate blocks resolving a ticket with PENDING or IN_PROGRESS Actions Taken (409 Conflict) until all actions are completed or cancelled", async () => {
@@ -292,3 +311,4 @@ describe("Lab 4 Ticket Workflow, Resolution Gate & Concurrency API Suite (ticket
     expect(resolvedRes.body.status).toBe("Resolved");
   });
 });
+

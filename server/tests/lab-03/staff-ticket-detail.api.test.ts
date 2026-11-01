@@ -90,7 +90,8 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
 
     expect(res.status).toBe(200);
     expect(res.body.requesterIndicatedResolved).toBe(true);
-    expect(res.body.status).toBe("Waiting for Requester");
+    expect(res.body.status).toBe("OPEN");
+    expect(res.body.status).not.toBe("Resolved");
   });
 
   it("API-11: Requester cannot view or update another user's ticket — 404 no-leak (§6.2)", async () => {

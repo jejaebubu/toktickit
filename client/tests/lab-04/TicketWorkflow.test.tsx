@@ -129,13 +129,15 @@ describe("Ticket Workflow & Resolution Gate UI (UI-03, UI-07)", () => {
     expect(optionValues).not.toContain("Closed");
     expect(optionValues).not.toContain("Resolved");
 
-    // Workflow Action Bar shows only Open and Cancelled buttons
+    // Workflow Action Bar shows only Open and Cancelled buttons, with Cancelled styled as btn-outline-danger
     const actionBar = screen.getByTestId("workflow-action-bar");
     expect(within(actionBar).getByTestId("workflow-transition-open")).toBeInTheDocument();
-    expect(within(actionBar).getByTestId("workflow-transition-cancelled")).toBeInTheDocument();
+    const cancelBtn = within(actionBar).getByTestId("workflow-transition-cancelled");
+    expect(cancelBtn).toBeInTheDocument();
+    expect(cancelBtn).toHaveClass("btn-outline-danger");
     expect(within(actionBar).queryByTestId("workflow-resolve-btn")).toBeNull();
 
-    // Advisory banner is visible
+    // Advisory banner is visible on non-terminal ticket
     expect(screen.getByTestId("detail-resolved-intent")).toHaveTextContent(
       /Requester indicated problem resolved - Pending Staff Review/i,
     );
@@ -278,6 +280,7 @@ describe("Ticket Workflow & Resolution Gate UI (UI-03, UI-07)", () => {
 
     const staleModal = await screen.findByTestId("stale-update-modal");
     expect(staleModal).toHaveTextContent(/Ticket has been updated by another user\. Please refresh\./i);
+    expect(screen.getByTestId("stale-update-dismiss")).toBeInTheDocument();
 
     await user.click(screen.getByTestId("stale-update-refresh"));
     await waitFor(() => expect(screen.queryByTestId("stale-update-modal")).toBeNull());

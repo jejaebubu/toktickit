@@ -20,11 +20,12 @@ import { PriorityBadge, RoleBadge, StatusBadge } from "./ui/Badges.js";
 const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
 export const TICKET_STATUS_TRANSITIONS: Record<string, string[]> = {
   New: ["Open", "Cancelled"],
-  Open: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
-  "In Progress": ["Waiting for Requester", "Resolved", "Cancelled"],
-  "Waiting for Requester": ["In Progress", "Resolved", "Cancelled"],
+  Open: ["In Progress", "Waiting for Requester", "Pending", "Cancelled"],
+  "In Progress": ["Waiting for Requester", "Pending", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Pending", "Resolved", "Cancelled"],
+  Pending: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
   Resolved: ["Closed", "Reopened"],
-  Reopened: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  Reopened: ["In Progress", "Waiting for Requester", "Pending", "Resolved", "Cancelled"],
   Closed: [],
   Cancelled: [],
 };
@@ -262,7 +263,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         </div>
       )}
 
-      {ticket.requesterIndicatedResolved && (
+      {ticket.requesterIndicatedResolved && !["Resolved", "Closed", "Cancelled"].includes(ticket.status) && (
         <div className="alert border-0 shadow-sm d-flex flex-wrap align-items-center gap-2" role="alert" data-testid="detail-resolved-intent" style={{ backgroundColor: "#EAF6EF", color: "#006B3C", border: "1px solid #B4D7C5" }}>
           <span className="badge rounded-pill fw-semibold px-2 py-1" style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }} data-testid="staff-resolved-advisory-badge">
             Requester indicated problem resolved - Pending Staff Review
@@ -404,13 +405,19 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           ) : (
             allowedTransitions.map((nextStatus) => {
               const isResolveBtn = nextStatus === "Resolved";
+              const isCancelBtn = nextStatus === "Cancelled";
               const hasOpenActions = isResolveBtn && openActionsCount > 0;
               const slug = nextStatus.toLowerCase().replace(/\s+/g, "-");
+              const btnClass = hasOpenActions
+                ? "btn btn-sm fw-semibold"
+                : isCancelBtn
+                  ? "btn btn-sm btn-outline-danger fw-semibold"
+                  : "btn btn-sm btn-outline-success fw-semibold";
               return (
                 <button
                   key={nextStatus}
                   type="button"
-                  className={hasOpenActions ? "btn btn-sm fw-semibold" : "btn btn-sm btn-outline-success fw-semibold"}
+                  className={btnClass}
                   style={
                     hasOpenActions
                       ? { backgroundColor: "#FEF3C7", color: "#92400E", border: "1px solid #F59E0B", minHeight: 44 }
@@ -509,19 +516,30 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           <p className="small text-dark mb-3" data-testid="stale-update-modal-message">
             Ticket has been updated by another user. Please refresh.
           </p>
-          <button
-            type="button"
-            className="btn text-white fw-semibold"
-            style={{ backgroundColor: "#006B3C", borderColor: "#006B3C", minHeight: 44 }}
-            onClick={() => {
-              setShowStaleModal(false);
-              setActionError(null);
-              load();
-            }}
-            data-testid="stale-update-refresh"
-          >
-            Refresh Ticket
-          </button>
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn text-white fw-semibold"
+              style={{ backgroundColor: "#006B3C", borderColor: "#006B3C", minHeight: 44 }}
+              onClick={() => {
+                setShowStaleModal(false);
+                setActionError(null);
+                load();
+              }}
+              data-testid="stale-update-refresh"
+            >
+              Refresh Ticket
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary fw-semibold"
+              style={{ minHeight: 44 }}
+              onClick={() => setShowStaleModal(false)}
+              data-testid="stale-update-dismiss"
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
       )}
 

@@ -23,7 +23,7 @@
 | **PR-02 ([GitHub #105](https://github.com/jejaebubu/toktickit/pull/105))** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: อนุมัติทิศทางโดยรวมและชม integration tests 9 เคส แต่ขอให้ (1) เปลี่ยน `ActionTaken.result` เป็น Nullable (`String?`) เพราะงาน `PENDING`/`IN_PROGRESS` ยังไม่มีผลลัพธ์ และให้ API บังคับเฉพาะตอน `COMPLETED`, (2) อัปเดตสถานะ PR-01 ใน `tests.md` เป็น Merged, (3) เพิ่มบันทึก PR #105 ใน reviewer log → ผู้เขียนแก้ไขครบ (migration ใหม่ `20261031172848_lab04_actions_taken` + tests 10 เคส = 93/93) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `005b157` |
 | **PR-03 ([GitHub #106](https://github.com/jejaebubu/toktickit/pull/106))** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชม RBAC, JWT performer identity, 404 no-leak และ BR-14 state machine (101/101) แต่ขอให้ (1) อัปเดต PR-02 เป็น Approved & Merged + เพิ่ม review trail ของ PR #105 และหัวข้อ PR-03, (2) ล้าง `followUpNote` เป็น `null` เมื่อ `followUpRequired=false` โดยไม่ส่ง note ใหม่, (3) เพิ่ม max length 1000 ให้ `actionDescription` → ผู้เขียนแก้ไขครบ (9 new + 93 = 102/102) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `23166db` |
 | **PR-04 ([GitHub #108](https://github.com/jejaebubu/toktickit/pull/108))** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชม UI, Follow-up toggle, Requester read-only, Quick Complete/Cancel และเทสต์ 187/187 แต่ขอให้ (1) เพิ่มหัวข้อ `3.4 PR-04` ใน `reviewer.md`, (2) ส่ง `onActionsChange` ใน `StaffTicketDetail.tsx` และ `TicketDetail.tsx` เพื่อ sync state แม่รองรับ Resolution Gate, (3) ปรับสี badge `COMPLETED` (`#f0fdf4`/`#166534`) และ `CANCELLED` (`#fef2f2`/`#991b1b`) ตาม Zen Green tokens พร้อม minor suggestions (min 2 chars result, `maxLength`, A11Y `role="alert"` + `aria-hidden` emoji, safe 500 error ใน `/api/users/assignable`, wording §4.1.7) → ผู้เขียนแก้ไขครบทุกข้อใน commit `ce25314` / `3f029b7` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `2425b2d` |
-| **PR-05** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | **Review pending** | Opened; awaiting reviewer verification of API-06/07/08/13 and UI-03/07 |
+| **PR-05 ([GitHub #109](https://github.com/jejaebubu/toktickit/pull/109))** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | **Request Changes → Pending re-review** | Review #1 โดย `titayaaa`: ชมโครงสร้าง State Transition, Resolution Gate Modal, Concurrency Check และเทสต์ 195/195 แต่ขอให้ (1) นำ `"Resolved"` ออกจาก `Open` transitions และเพิ่ม `"Pending"` ใน `TICKET_STATUS_TRANSITIONS`, (2) ลบการแอบเปลี่ยนสถานะตั๋วเมื่อ Requester ส่ง `requesterIndicatedResolved: true` เพื่อให้คงสถานะเดิม 100%, (3) ปรับ 500 catch block ของ `handleTicketPatch` ตาม SAFE-01 ไม่ส่ง `err?.message` พร้อม minor suggestions (`If-Unmodified-Since` precision ระดับวินาที, ซ่อน advisory banner บนตั๋วที่จบแล้ว, เพิ่มปุ่ม Dismiss ใน Stale Modal, สีปุ่ม `Cancelled` เป็น `btn-outline-danger`) → ผู้เขียนแก้ไขครบทุกข้อ รอตรวจซ้ำ |
 | **PR-06** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | Planned | - |
 | **PR-07** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | Planned | - |
 | **PR-08** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | Planned | - |
@@ -273,12 +273,70 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ### 3.5 PR-05: Ticket Workflow State Machine, Resolution Gate, and Transition Enforcement (Issue #5)
 
+- **PR URL:** [GitHub #109](https://github.com/jejaebubu/toktickit/pull/109)
 - **Branch:** `feature/lab04-issue5-workflow` → `lab4-staging`
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
-- **Objective:** บังคับใช้ Ticket Status Transition Matrix 8 สถานะ (`BR-08` / `AC-07`), บังคับใช้ Resolution Gate ที่ฝั่ง Backend (`409 Conflict` `UNRESOLVED_ACTIONS_EXIST` เมื่อพยายาม Resolve ตั๋วที่ยังมี Action Taken สถานะ `PENDING` หรือ `IN_PROGRESS` ตาม `BR-15` / `AC-13`) และฝั่ง UI (ปุ่มเตือน `"N action(s) still open"`, Modal ยืนยันพร้อมรายการ Action ที่ค้าง), รองรับการตรวจจับ Stale Update (`expectedUpdatedAt` / `If-Unmodified-Since` → `409 Conflict` `STALE_UPDATE` ตาม `BR-12` / `AC-09`), และเพิ่มส่วนแจ้งเจตนา `"My problem is resolved"` พร้อมป้าย Advisory `"Requester indicated problem resolved - Pending Staff Review"` สำหรับ Requester (`BR-09` / `AC-08`)
+- **Objective:** บังคับใช้ Ticket Status Transition Matrix (`BR-08` / `AC-07`), บังคับใช้ Resolution Gate ที่ฝั่ง Backend (`409 Conflict` `UNRESOLVED_ACTIONS_EXIST` เมื่อพยายาม Resolve ตั๋วที่ยังมี Action Taken สถานะ `PENDING` หรือ `IN_PROGRESS` ตาม `BR-15` / `AC-13`) และฝั่ง UI (ปุ่มเตือน `"N action(s) still open"`, Modal ยืนยันพร้อมรายการ Action ที่ค้าง), รองรับการตรวจจับ Stale Update (`expectedUpdatedAt` / `If-Unmodified-Since` → `409 Conflict` `STALE_UPDATE` ตาม `BR-12` / `AC-09`), และเพิ่มส่วนแจ้งเจตนา `"My problem is resolved"` พร้อมป้าย Advisory `"Requester indicated problem resolved - Pending Staff Review"` สำหรับ Requester (`BR-09` / `AC-08`)
 
-*(รอผลการตรวจทานจาก Reviewer `@titayaaa`)*
+#### 3.5.1 Review #1 — Request Changes (`titayaaa`, 2026-11-01)
+
+> ขอบคุณสำหรับ PR #109 ที่ครอบคลุมการทำงานของ Ticket Workflow, Resolution Gate และ Optimistic Concurrency Check สำหรับ **Issue #5 (PR-05)** ได้อย่างเป็นระบบมากค่ะ โดยเฉพาะ:
+> - การวางโครงสร้าง State Transition ควบคุมทั้งปุ่มใน UI และ Guard ใน Backend
+> - การทำ Resolution Gate Confirmation Modal เมื่อยังมี Action ค้าง (`PENDING`/`IN_PROGRESS`) พร้อม fallback ลอง resolve เพื่อรับ error 409
+> - การดักจับ Concurrency Mismatch (`STALE_UPDATE`) ทั้งจาก Body `expectedUpdatedAt` และ Header `If-Unmodified-Since`
+> - ชุดทดสอบครบทั้ง Server (108 tests) และ Client (87 tests) รวม 195/195 tests ผ่าน 100%
+>
+> อย่างไรก็ตาม จากการตรวจสอบอย่างละเอียดเปรียบเทียบกับข้อกำหนดใน `specification.md`, `api-spec.md` และหลักความปลอดภัยของระบบ พบจุดบกพร่องและข้อขัดแย้งกับสเปกที่จำเป็นต้องปรับปรุงแก้ไข 3 จุดสำคัญ (Required Changes) และข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Minor Suggestions) ดังนี้ค่ะ:
+>
+> ---
+>
+> ### 🛑 1. ประเด็นที่ต้องแก้ไขให้ถูกต้อง (Required Changes — Blocking)
+>
+> #### 1.1 State Transition Matrix: สถานะ `Open` ข้ามไป `Resolved` โดยตรงไม่ได้ และสถานะ `Pending` หายไป
+> - **ไฟล์ที่พบ:** `server/src/app.ts` และ `client/src/components/StaffTicketDetail.tsx`
+> - **ปัญหา:**
+>   1. ตั๋วที่อยู่ในสถานะ `Open` ห้ามข้ามไป `Resolved` โดยตรง งานจะต้องถูกส่งเข้าสู่สถานะปฏิบัติงานจริงก่อน (`In Progress`, `Waiting for Requester` หรือ `Pending`) ดังนั้นในอาร์เรย์ของ `Open` จะต้องไม่มี `"Resolved"`
+>   2. สถานะ **`Pending`** หายไปจาก Matrix ส่งผลให้หากมีตั๋วค้างอยู่ในสถานะ `Pending` จะถูกล็อกตายกลายเป็น Terminal state ทันที
+> - **แนวทางแก้ไข:**
+>   - ปรับ `Open` เป็น `["In Progress", "Waiting for Requester", "Pending", "Cancelled"]`
+>   - เพิ่มคีย์ `"Pending": ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"]` พร้อมอนุญาตให้ `In Progress`, `Waiting for Requester` และ `Reopened` ย้ายไป `Pending` ได้
+>
+> #### 1.2 Side-effect การเปลี่ยนสถานะตั๋วเมื่อ Requester แจ้งว่าปัญหาได้รับการแก้ไข
+> - **ไฟล์ที่พบ:** `server/src/app.ts`
+> - **ปัญหา:** การใส่เงื่อนไข `nextStatusForRequester` เปลี่ยนสถานะเป็น `"Waiting for Requester"` เป็น side-effect ที่ขัดกับข้อกำหนดที่ระบุว่าการแจ้งของ Requester เป็นเพียง advisory และต้องไม่เปลี่ยนสถานะตั๋ว
+> - **แนวทางแก้ไข:** ในการอัปเดต advisory flag ของ Requester ให้ส่งเฉพาะ `data: { requesterIndicatedResolved: true }` คงสถานะเดิมของตั๋วไว้ 100%
+>
+> #### 1.3 ป้องกันข้อมูลภายในรั่วไหลในบล็อก 500 Catch (ตามกฎ SAFE-01)
+> - **ไฟล์ที่พบ:** `server/src/app.ts`
+> - **แนวทางแก้ไข:** บันทึก error ลง `console.error` ฝั่งเซิร์ฟเวอร์ และส่งคืนเฉพาะ `{ error: "Internal Server Error", message: "Failed to update ticket." }` โดยไม่ส่ง `err?.message`
+>
+> ### 💡 2. ข้อเสนอแนะเพิ่มเติม & จุดเก็บตก (Minor Suggestions)
+> - **HTTP Status Code สำหรับ Transition ที่ไม่อนุญาต:** ตรวจสอบความสอดคล้องกับเอกสารสัญญาของโปรเจกต์ (`400 Bad Request` ตาม `specification.md` AC-07, `api-spec.md` §4.1 และ `tests.md` API-06)
+> - **Precision ของ Header `If-Unmodified-Since`:** ตามมาตรฐาน RFC 7231 เวลาใน HTTP Header มีความละเอียดระดับวินาที แนะนำให้ปัดเศษเทียบระดับวินาที `Math.floor(expectedTime / 1000) !== Math.floor(actualTime / 1000)` เมื่อรับมาจาก Header
+> - **การแสดงผล Advisory Banner บนตั๋วที่ Resolve/Closed ไปแล้ว:** ใน `TicketDetail.tsx` และ `StaffTicketDetail.tsx` แนะนำให้เพิ่มเงื่อนไข `!["Resolved", "Closed", "Cancelled"].includes(ticket.status)` เพื่อไม่ให้ข้อความ `"Pending Staff Review"` ค้างบนตั๋วที่จบงานไปแล้ว
+> - **UX ของ Stale Update Modal:** เพิ่มปุ่ม `"Dismiss"` ใน `StaffTicketDetail.tsx` เพื่อให้เจ้าหน้าที่สามารถปิด Modal ชั่วคราวไปคัดลอกข้อความ Note/Comment ที่กำลังพิมพ์ค้างไว้ได้
+> - **สีของปุ่ม `Cancelled` ใน Workflow Action Bar:** เปลี่ยนจาก `btn-outline-success` เป็น `btn-outline-danger` เพื่อความชัดเจนของ UI
+
+#### 3.5.2 Author Response #1 (`jejaebubu`)
+
+> ขอบคุณสำหรับรีวิวที่ละเอียดและรอบคอบมากค่ะ แก้ไขครบทั้ง 3 Required Changes และ Minor Suggestions ทั้งหมดเรียบร้อยแล้วค่ะ:
+>
+> 1. **ปรับปรุง `TICKET_STATUS_TRANSITIONS` (`server/src/app.ts`, `StaffTicketDetail.tsx`, `specification.md`)**:
+>    - นำ `"Resolved"` ออกจากสถานะถัดไปของ `Open` (`Open: ["In Progress", "Waiting for Requester", "Pending", "Cancelled"]`) เพื่อบังคับให้ตั๋วต้องเข้าสู่สถานะปฏิบัติงานจริงก่อนจึงจะ Resolve ได้ พร้อมเพิ่มเทสต์ยืนยันว่า `Open -> Resolved` ถูกปฏิเสธด้วย `INVALID_STATUS_TRANSITION`
+>    - เพิ่มสถานะ `"Pending"` ใน `TICKET_STATUSES` และ `TICKET_STATUS_TRANSITIONS` (`Pending: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"]`) และอนุญาตให้ย้ายไป `Pending` ได้จาก `Open`, `In Progress`, `Waiting for Requester`, `Reopened`
+> 2. **ตัด Side-effect การเปลี่ยนสถานะเมื่อ Requester แจ้งเจตนา (`server/src/app.ts`)**:
+>    - ปรับการอัปเดตเมื่อ Requester ส่ง `{ requesterIndicatedResolved: true }` ให้ส่งเพียง `data: { requesterIndicatedResolved: true }` โดยไม่แก้ไขฟิลด์ `status` ของตั๋ว 100%
+> 3. **Safe Error Response ตามเกณฑ์ `SAFE-01` (`server/src/app.ts`)**:
+>    - ในบล็อก `catch` ของ `handleTicketPatch` เปลี่ยนเป็น `console.error("Failed to update ticket:", err)` และส่งคืนเฉพาะ `{ error: "Internal Server Error", message: "Failed to update ticket." }` โดยไม่ส่ง `err?.message`
+> 4. **Minor Suggestions ที่ปรับปรุงเพิ่มเติมครบทุกข้อ**:
+>    - **RFC 7231 `If-Unmodified-Since` Precision**: ปรับการเทียบเวลาเมื่อรับค่าจาก Header `If-Unmodified-Since` ให้เทียบระดับวินาที (`Math.floor(expectedTime / 1000) !== Math.floor(actualTime / 1000)`) พร้อมเพิ่มเทสต์ส่ง `updatedAt.toUTCString()` ใน `API-08`
+>    - **ซ่อน Advisory Banner เมื่อตั๋วอยู่ในสถานะสิ้นสุด**: เพิ่มเงื่อนไข `!["Resolved", "Closed", "Cancelled"].includes(ticket.status)` ทั้งใน `StaffTicketDetail.tsx` และ `TicketDetail.tsx`
+>    - **เพิ่มปุ่ม `Dismiss` ใน Stale Update Modal**: เพิ่มปุ่ม `Dismiss` (`data-testid="stale-update-dismiss"`) คู่กับปุ่ม `Refresh Ticket` ใน `StaffTicketDetail.tsx`
+>    - **สีปุ่ม `Cancelled` ใน Workflow Action Bar**: เปลี่ยนคลาสของปุ่ม `Cancelled` เป็น `btn-outline-danger`
+>    - *(หมายเหตุเรื่อง Status Code ของ Invalid Transition: ในเอกสารสัญญาของโปรเจกต์นี้ `docs/lab-04/specification.md` AC-07, `api-spec.md` §4.1 และ `tests.md` API-06 กำหนดให้ Invalid Transition ตอบ `400 Bad Request` ส่วน `422` ใช้สำหรับ Invalid Assignee ตาม AC-12 จึงคง `400 Bad Request` ไว้ให้ตรงกับสเปกของรีโปนี้ค่ะ)*
+>
+> รบกวนช่วยตรวจซ้ำอีกรอบนะคะ ขอบคุณมากค่ะ
 
 ---
 
