@@ -27,7 +27,7 @@
 | **PR-06 ([GitHub #110](https://github.com/jejaebubu/toktickit/pull/110))** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการออกแบบการ์ดตัวชี้วัด 5 ใบ, ระบบ Drill-down, Responsive Desktop Table + Mobile Cards และชุดทดสอบ 6 เคสใหม่ (201/201) แต่ขอให้ (1) นำเมนู `Dashboard` ออกจาก `REQUESTER` ใน `Header.tsx` เพื่อป้องกันหน้าว่างก่อนทำ Issue #7, (2) เปลี่ยนหัวข้อแผงจาก `"My Recent Tickets"` เป็น `"Recent Queue Tickets"` ให้สอดคล้องกับ query, (3) เพิ่มลิงก์ PR #110 ใน `reviewer.md` → ผู้เขียนแก้ไขครบทุกข้อใน commit `1419b97` / `512cbab` / `8bc213c` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `c11da67` |
 | **PR-07 ([GitHub #111](https://github.com/jejaebubu/toktickit/pull/111))** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Approved & Merged** | Review #1 โดย `titayaaa`: ชมการรักษาความปลอดภัย RBAC และ Data Isolation (`requesterId === req.user.id`, `SAFE-01`), ดีไซน์ Zen Green + Responsive Desktop/Mobile + Accessibility, Empty State CTA `"Submit a new request"` + Quick Actions, ระบบ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 207/207 พร้อมให้คำแนะนำเชิงพัฒนาเพิ่มเติมเรื่องกลุ่มสถานะของการ์ด `My Open Tickets` → Reviewer **Approve** ในรอบแรก — merged `927862f` |
 | **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้เพิ่มลิงก์ PR #112, เพิ่ม negative validation test ช่อง Result, และเพิ่มการคลิก Quick Actions บน Requester Dashboard → ผู้เขียนแก้ไขครบใน commit `6ba5ed1` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `0ce99e8`) |
-| **PR-09** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Review pending** | รันชุดทดสอบ Regression ทั้งหมดครอบคลุม Lab 1, Lab 2, Lab 3 และ Lab 4 (Server 112 tests, Client 95 tests, Playwright E2E 27 tests บน 3 viewports รวม 234/234 tests ผ่าน 100%) พร้อมปรับปรุง `staff-ticket-flow.spec.ts` ให้สอดคล้องกับ State Transition Matrix (`Open -> In Progress -> Resolved`) — รอ Reviewer ตรวจทาน |
+| **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Request Changes → Addressed** | Review #1 โดย `titayaaa`: ชมความครบถ้วนของ Regression suite 234/234 tests (Server 112, Client 95, E2E 27 บน 3 viewports) แต่ขอให้ (1) เพิ่มลิงก์ PR #113 ใน Section 2, (2) เพิ่ม `- **PR URL:**` ใน Section 3.9, (3) ป้องกัน race condition ใน `staff-ticket-flow.spec.ts` โดย assert `toHaveValue("Resolved")`, (4) เติม PR #113 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วน — รอ Reviewer ตรวจซ้ำรอบที่ 2 |
 | **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | Planned | - |
 | **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | Planned | - |
 
@@ -553,11 +553,61 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ### 3.9 PR-09: Lab 1–3 Regression Test Suite and System Hardening (Issue #9)
 
+- **PR URL:** [jejaebubu/toktickit#113](https://github.com/jejaebubu/toktickit/pull/113)
 - **Branch:** `feature/lab04-issue9-regression` → `lab4-staging`
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
 - **Objective:** ตรวจสอบความเข้ากันได้ย้อนหลังและการทำงานร่วมกันของทั้งระบบ (Zero Regression ตาม `AC-11`, `FR-12`) ครอบคลุมชุดทดสอบเดิมทั้งหมดของ Lab 1, Lab 2, Lab 3 ร่วมกับโมดูลใหม่ของ Lab 4 (Server Vitest 112 tests, Client Vitest 95 tests, และ Playwright E2E 27 tests บนทั้ง 3 Viewports: Desktop, Tablet, Mobile) รวม 234/234 tests ผ่าน 100% พร้อมปรับปรุงสคริปต์ `e2e/lab-03/staff-ticket-flow.spec.ts` ให้สเต็ปการเปลี่ยนสถานะเป็นไปตาม 9-state Transition Matrix (`Open -> In Progress -> Resolved`)
-- **Status:** เปิด PR รอการตรวจทานจาก Reviewer (`@titayaaa`)
+- **Status:** Request Changes → Addressed (รอบที่ 1 แก้ไขเรียบร้อย รอ Reviewer ตรวจซ้ำ)
+
+#### 3.9.1 Review #1 — Request Changes (`titayaaa`, 2026-11-02)
+
+**Verdict:** Changes Requested
+
+**Review Comments:**
+
+> ## 🔍 ผลการตรวจทาน PR #113: Full Regression of Lab 1–3 Suites with Lab 4 Features (Issue #9)
+> ขอบคุณ @jejaebubu สำหรับการรวบรวมและรันชุดทดสอบ Full Regression Test Suite ทั้งหมดของระบบค่ะ ยอดเยี่ยมมากที่ผลการทดสอบผ่านครบ **234/234 tests (100%)** ครอบคลุมทั้ง Server Vitest (112 tests), Client Vitest (95 tests) และ Playwright E2E (27 runs บน Desktop, Tablet, Mobile) รวมทั้งการปรับสคริปต์ `e2e/lab-03/staff-ticket-flow.spec.ts` ให้สอดคล้องกับ 9-state transition matrix (`Open -> In Progress -> Resolved`)
+> ภาพรวมถือว่าสมบูรณ์มากค่ะ แต่ขอส่งเป็น **Changes Requested** ก่อนเพื่อให้เพื่อนเก็บรายละเอียดความถูกต้องของเอกสารและชุดทดสอบให้เนี้ยบที่สุด 4 จุดดังนี้ค่ะ:
+> ---
+> ### 🔴 จุดที่ต้องแก้ไขก่อนอนุมัติ (Required Changes)
+> #### 1. เพิ่มลิงก์ GitHub PR #113 ในตาราง Section 2 ของ `docs/lab-04/reviewer.md`
+> - ในตาราง Section 2 (Master Review Table) แถวของ `PR-09` ในคอลัมน์แรก ปัจจุบันระบุเป็น:
+>   ```markdown
+>   | **PR-09** | Lab 1–3 regression test suite and system hardening | ...
+>   ```
+>   ซึ่ง PR อื่นๆ ทั้งหมดตั้งแต่ PR-01 ถึง PR-08 มีการใส่ลิงก์ GitHub PR ไว้อย่างสม่ำเสมอ รบกวนปรับให้เป็นรูปแบบเดียวกันดังนี้ค่ะ:
+>   ```markdown
+>   | **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | ...
+>   ```
+> #### 2. เพิ่มฟิลด์ `- **PR URL:**` ในหัวข้อ Section 3.9 ของ `docs/lab-04/reviewer.md`
+> - ใน Section 3.9 บรรทัด Metadata เริ่มต้นที่ `- **Branch:**` ทันที โดยขาดลิงก์ PR URL:
+>   รบกวนเพิ่ม `- **PR URL:** [jejaebubu/toktickit#113](https://github.com/jejaebubu/toktickit/pull/113)` ใต้หัวข้อให้ครบถ้วนเหมือนกับ Section 3.8 ค่ะ
+>
+> ### 🟠 ข้อสังเกตและจุดแนะนำเพิ่มเติม (Improvement Suggestions)
+> #### 3. ป้องกัน Race Condition และ False Pass ใน `e2e/lab-03/staff-ticket-flow.spec.ts` (บรรทัด 91–95)
+> - เนื่องจากข้อความแจ้งเตือน detail-notice ("Ticket updated successfully.") แสดงขึ้นมาตั้งแต่ตอนเปลี่ยนเป็น In Progress แล้ว การสั่ง expect ข้อความเดิมซ้ำที่บรรทัด 95 จะกลายเป็น Immediate Pass (False Positive) ทันที โดยที่ Playwright อาจจะยังไม่ได้รอให้ Request การเปลี่ยนเป็น Resolved ส่งถึงเซิร์ฟเวอร์เสร็จสิ้นจริง แนะนำให้เพิ่มการตรวจสอบค่าของ `<select>` เช่น `await expect(page.locator('[data-testid="detail-status-select"]')).toHaveValue("Resolved");` จะช่วยให้ชุดทดสอบแข็งแกร่งและป้องกัน Flaky test บนเครื่องที่มีความหน่วงได้ดีขึ้นมากค่ะ
+> #### 4. เติมหมายเลข PR ในตารางผลการทดสอบ `docs/lab-04/tests.md`
+> - ในตาราง Section 2 แถว PR-09 ปัจจุบันบันทึกเป็น `**Pass** (review pending)` แนะนำให้ระบุเป็น `**Pass** (PR #113, review pending)` เพื่อให้สอดคล้องกับแถว PR-05 ถึง PR-08 ค่ะ
+
+#### 3.9.2 Author Response & Resolution (`jejaebubu`)
+
+> ขอบคุณ @titayaaa สำหรับรีวิวและการตรวจทานอย่างละเอียดรอบคอบมากครับ ดำเนินการปรับปรุงแก้ไขครบถ้วนทั้ง 4 จุดเรียบร้อยแล้วครับ:
+>
+> 1. **เพิ่มลิงก์ GitHub PR #113 ใน Section 2 Master Review Table (`docs/lab-04/reviewer.md` — Required 1)**:
+>    - อัปเดตคอลัมน์แรกของแถว `PR-09` เป็น `**PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))**` เรียบร้อยตามรูปแบบมาตรฐานเดียวกับ PR-01 ถึง PR-08 ครับ
+> 2. **เพิ่มฟิลด์ PR URL ใน Section 3.9 (`docs/lab-04/reviewer.md` — Required 2)**:
+>    - เพิ่ม `- **PR URL:** [jejaebubu/toktickit#113](https://github.com/jejaebubu/toktickit/pull/113)` ภายใต้หัวข้อ Section 3.9 ครบถ้วนตามมาตรฐานเดียวกันกับ Section 3.8 ครับ
+> 3. **ป้องกัน Race Condition และ False Positive ใน `e2e/lab-03/staff-ticket-flow.spec.ts` (Improvement 3)**:
+>    - เพิ่มการตรวจสอบค่า `<select>` ชัดเจนทั้ง 2 สเต็ป:
+>      - `await expect(page.locator('[data-testid="detail-status-select"]')).toHaveValue("In Progress");`
+>      - `await expect(page.locator('[data-testid="detail-status-select"]')).toHaveValue("Resolved");`
+>      ก่อนรอ notice และจับภาพหน้าจอ ยืนยันว่าค่าใน DOM ถูกอัปเดตตรงกับ State ของเครื่องเซิร์ฟเวอร์จริงและกำจัดโอกาสเกิด Flaky test เรียบร้อยครับ
+> 4. **อัปเดตตารางผลการทดสอบใน `docs/lab-04/tests.md` (Improvement 4)**:
+>    - ปรับสถานะแถว `PR-09` เป็น `**Pass** (PR #113, review addressed)` เรียบร้อยครับ
+> 5. **ผลการรันทดสอบ Regression ซ้ำ**:
+>    - E2E Lab 3 (`e2e/lab-03/staff-ticket-flow.spec.ts`): รันผ่านครบ 3/3 runs บนทุก Viewports (Desktop, Tablet, Mobile)
+>    - ชุดทดสอบทั้งหมดยังคงผ่านครบถ้วนสมบูรณ์ **234/234 tests (100% Pass)** ปราศจาก regression ครับ
 
 ---
 
