@@ -265,7 +265,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
       {ticket.requesterIndicatedResolved && !["Resolved", "Closed", "Cancelled"].includes(ticket.status) && (
         <div className="alert border-0 shadow-sm d-flex flex-wrap align-items-center gap-2" role="alert" data-testid="detail-resolved-intent" style={{ backgroundColor: "#EAF6EF", color: "#006B3C", border: "1px solid #B4D7C5" }}>
-          <span className="badge rounded-pill fw-semibold px-2 py-1" style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }} data-testid="staff-resolved-advisory-badge">
+          <span className="badge rounded-pill fw-semibold px-2 py-1" style={{ backgroundColor: "#006B3C", color: "#FFFFFF", whiteSpace: "normal", textAlign: "left" }} data-testid="staff-resolved-advisory-badge">
             Requester indicated problem resolved - Pending Staff Review
           </span>
           <span>🙋 Requester indicated the problem appears resolved. Review the ticket and update its status.</span>

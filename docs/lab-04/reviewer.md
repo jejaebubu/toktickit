@@ -25,8 +25,8 @@
 | **PR-04 ([GitHub #108](https://github.com/jejaebubu/toktickit/pull/108))** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชม UI, Follow-up toggle, Requester read-only, Quick Complete/Cancel และเทสต์ 187/187 แต่ขอให้ (1) เพิ่มหัวข้อ `3.4 PR-04` ใน `reviewer.md`, (2) ส่ง `onActionsChange` ใน `StaffTicketDetail.tsx` และ `TicketDetail.tsx` เพื่อ sync state แม่รองรับ Resolution Gate, (3) ปรับสี badge `COMPLETED` (`#f0fdf4`/`#166534`) และ `CANCELLED` (`#fef2f2`/`#991b1b`) ตาม Zen Green tokens พร้อม minor suggestions (min 2 chars result, `maxLength`, A11Y `role="alert"` + `aria-hidden` emoji, safe 500 error ใน `/api/users/assignable`, wording §4.1.7) → ผู้เขียนแก้ไขครบทุกข้อใน commit `ce25314` / `3f029b7` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `2425b2d` |
 | **PR-05 ([GitHub #109](https://github.com/jejaebubu/toktickit/pull/109))** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมโครงสร้าง State Transition, Resolution Gate Modal, Concurrency Check และเทสต์ 195/195 แต่ขอให้ (1) นำ `"Resolved"` ออกจาก `Open` transitions และเพิ่ม `"Pending"` ใน `TICKET_STATUS_TRANSITIONS`, (2) ลบการแอบเปลี่ยนสถานะตั๋วเมื่อ Requester ส่ง `requesterIndicatedResolved: true` เพื่อให้คงสถานะเดิม 100%, (3) ปรับ 500 catch block ของ `handleTicketPatch` ตาม SAFE-01 ไม่ส่ง `err?.message` พร้อม minor suggestions (`If-Unmodified-Since` precision ระดับวินาที, ซ่อน advisory banner บนตั๋วที่จบแล้ว, เพิ่มปุ่ม Dismiss ใน Stale Modal, สีปุ่ม `Cancelled` เป็น `btn-outline-danger`) → ผู้เขียนแก้ไขครบทุกข้อใน commit `45b424d` / `8f8c8e6` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `468a7ca` |
 | **PR-06 ([GitHub #110](https://github.com/jejaebubu/toktickit/pull/110))** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการออกแบบการ์ดตัวชี้วัด 5 ใบ, ระบบ Drill-down, Responsive Desktop Table + Mobile Cards และชุดทดสอบ 6 เคสใหม่ (201/201) แต่ขอให้ (1) นำเมนู `Dashboard` ออกจาก `REQUESTER` ใน `Header.tsx` เพื่อป้องกันหน้าว่างก่อนทำ Issue #7, (2) เปลี่ยนหัวข้อแผงจาก `"My Recent Tickets"` เป็น `"Recent Queue Tickets"` ให้สอดคล้องกับ query, (3) เพิ่มลิงก์ PR #110 ใน `reviewer.md` → ผู้เขียนแก้ไขครบทุกข้อใน commit `1419b97` / `512cbab` / `8bc213c` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `c11da67` |
-| **PR-07** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Review pending** | พัฒนา `GET /api/dashboard/requester` (คำนวณตัวชี้วัดเฉพาะตั๋วของตนเอง `myOpen`, `inProgress`, `resolved`, `closed`, รายการ `recentTickets` 5 รายการล่าสุด และ `quickActions`), สร้างหน้าจอ `RequesterDashboard.tsx` พร้อมลิงก์ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 6 เคสใหม่ (รวม 207/207 เทสต์) — รอ Reviewer ตรวจทาน |
-| **PR-08** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | Planned | - |
+| **PR-07 ([GitHub #111](https://github.com/jejaebubu/toktickit/pull/111))** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Approved & Merged** | Review #1 โดย `titayaaa`: ชมการรักษาความปลอดภัย RBAC และ Data Isolation (`requesterId === req.user.id`, `SAFE-01`), ดีไซน์ Zen Green + Responsive Desktop/Mobile + Accessibility, Empty State CTA `"Submit a new request"` + Quick Actions, ระบบ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 207/207 พร้อมให้คำแนะนำเชิงพัฒนาเพิ่มเติมเรื่องกลุ่มสถานะของการ์ด `My Open Tickets` → Reviewer **Approve** ในรอบแรก — merged `927862f` |
+| **PR-08** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Review pending** | พัฒนาชุดทดสอบ Playwright E2E ทั้ง 3 flows (`e2e/lab-04/actions-taken-flow.spec.ts`, `ticket-resolution.spec.ts`, `dashboards.spec.ts`) ครอบคลุม 3 viewports (`desktop`, `tablet`, `mobile` = 9 E2E test runs) พร้อมแก้ไขการตัดบรรทัดของ Advisory Badge บนหน้าจอ Mobile ไม่ให้เกิด Horizontal Overflow — รอ Reviewer ตรวจทาน |
 | **PR-09** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | Planned | - |
 | **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | Planned | - |
 | **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | Planned | - |
@@ -432,12 +432,60 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ---
 
-### 3.7 PR-07: Requester Dashboard API, Owned Ticket Metrics, and UI Screen (Issue #7)
+### 3.7 PR-07: Requester Dashboard API, Owned Ticket Metrics, and UI Screen (Issue #7 — [PR #111](https://github.com/jejaebubu/toktickit/pull/111))
 
+- **PR URL:** [jejaebubu/toktickit#111](https://github.com/jejaebubu/toktickit/pull/111)
 - **Branch:** `feature/lab04-issue7-requester-dashboard` → `lab4-staging`
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
 - **Objective:** พัฒนา `GET /api/dashboard/requester` สำหรับ Requester ผู้ล็อกอิน โดยจำกัดขอบเขตข้อมูลเฉพาะตั๋วที่ `requesterId == req.user.id` อย่างเคร่งครัด (`AC-05`, `FR-09`, `BR-11`), คำนวณตัวชี้วัด 4 หมวด (`myOpen`, `inProgress`, `resolved`, `closed`), ส่งคืน `recentTickets` 5 รายการล่าสุดของตนเองพร้อม `quickActions`, สร้างคอมโพเนนต์ `RequesterDashboard.tsx` พร้อมการ์ดตัวชี้วัด 4 ใบที่คลิก Drill-down ไปยัง `MyTicketsList` ตามสถานะได้ (`FR-10`), และเปิดเมนู `Dashboard` สำหรับบทบาท `REQUESTER` ใน `Header.tsx` และ `App.tsx`
+- **Status:** Approved & Merged (`927862f`)
+
+#### 3.7.1 Review #1 — Approved (`titayaaa`, 2026-11-02)
+> ### ✅ การตรวจประเมิน PR #111: Requester Dashboard API and UI (Issue #7) — APPROVED
+>
+> ตรวจทานโค้ดใน PR #111 อย่างละเอียดครบถ้วนทั้ง 11 ไฟล์ เทียบกับข้อกำหนดใน `specification.md`, `api-spec.md` และ `ui-spec.md` เรียบร้อยแล้วค่ะ ขอชื่นชมที่พัฒนาโมดูล Requester Dashboard ออกมาได้อย่างสมบูรณ์แบบ สวยงาม และปลอดภัยมากค่ะ 👍
+>
+> #### 🌟 จุดเด่นที่น่าประทับใจ:
+> 1. **การรักษาความปลอดภัยและ Data Isolation ที่รัดกุม (`app.ts`)**:
+>    - บังคับใช้ RBAC ตรวจสอบ `req.user.role === 'REQUESTER'` (คืน `403 Forbidden` สำหรับเจ้าหน้าที่และแอดมิน ป้องกันการเข้าถึงข้ามบทบาท)
+>    - การนับตัวชี้วัด (Metrics) และการดึง 5 ตั๋วล่าสุด (`recentTickets`) ถูกจำกัดขอบเขตด้วย `requesterId = req.user.id` อย่างเคร่งครัด ป้องกันการรั่วไหลของข้อมูลระหว่าง Requester ได้ 100% ตามเกณฑ์ `AC-05`, `FR-09`, และ `BR-11`
+>    - จัดการข้อผิดพลาดตามหลัก `SAFE-01` ส่ง generic 500 error message ให้ client โดยไม่เปิดเผย stack trace
+> 2. **ดีไซน์ Zen Green และการจัดวางที่ประณีต (`RequesterDashboard.tsx`)**:
+>    - การเลือกใช้สีสอดคล้องกับ Zen Green tokens (`#006B3C`, `#EAF6EF`, `#1A202C`, `#6C757D`)
+>    - การ์ดตัวชี้วัด 4 ใบ (`My Open Tickets`, `In Progress`, `Resolved`, `Closed`) มีคู่สี Accent ที่สบายตาและอ่านค่าง่าย
+>    - รองรับ Responsive ดีเยี่ยม: สลับระหว่าง Desktop Table และ Mobile Cards (`.d-none.d-md-block` vs `.d-md-none`) ได้อย่างไร้รอยต่อ
+>    - Accessibility ครบถ้วน: ทุกปุ่มและลิงก์มี `minHeight: 44px`, มี `aria-label` บนการ์ด และกำกับ `aria-hidden="true"` บน emoji ทั้งหมด
+> 3. **Empty State & Quick Actions**:
+>    - จัดการเคสที่ Requester ยังไม่มีตั๋วได้เป็นมิตรมาก พร้อมปุ่ม CTA `"Submit a new request"` นำทางไปยังหน้าสร้างตั๋วทันที
+>    - แผง Quick Actions ด้านขวาช่วยให้การนำทางหลักสะดวกและรวดเร็ว
+> 4. **ระบบ Drill-down และ State Handling (`MyTicketsList.tsx`, `App.tsx`, `Header.tsx`)**:
+>    - เชื่อมต่อการกดการ์ดเพื่อนำทางไปยัง `MyTicketsList` พร้อมฟิลเตอร์สถานะเริ่มต้นผ่าน `initialStatus` ได้อย่างถูกต้อง
+>    - มีการรีเซ็ต `initialStatus` เมื่อคลิกเมนูหลักจาก `Header.tsx` เพื่อให้ผู้ใช้สามารถดูตั๋วทั้งหมดได้ตามปกติ
+>    - ขยายตัวเลือก `STATUS_OPTIONS` ใน `MyTicketsList` ให้ครบถ้วนทั้ง 9 สถานะ
+> 5. **ชุดทดสอบครอบคลุมทั้งระบบ**:
+>    - Backend API tests (`API-11`, `API-11b`) ยืนยันความถูกต้องของตัวเลขและการบล็อกสิทธิ์ 401/403
+>    - Frontend Vitest tests (`UI-05a` – `UI-05d`) ทดสอบการเรนเดอร์, Drill-down, Empty state CTA และ Retry reload ครบทุกมิติ
+>
+> ---
+>
+> #### 💡 ข้อคิดเห็นและข้อเสนอแนะเชิงพัฒนา (Minor Suggestion — ไม่บล็อกการ Merge):
+> - **Drill-down ของการ์ด `My Open Tickets`**: การ์ดนี้คำนวณจากสถานะ `New` และ `Open` รวมกัน แต่เมื่อคลิก drill-down ปัจจุบันส่ง `{ status: "Open" }` ไปยัง `MyTicketsList` ทำให้ระบบกรองแสดงเฉพาะตั๋วที่มีสถานะ `Open` (ตั๋วที่เป็น `New` จะไม่แสดงในรายการกรองนี้) ในอนาคตหากต้องการให้เห็นครบทุกตั๋วที่ยังเปิดอยู่ อาจพิจารณาเพิ่ม filter แบบกลุ่มสถานะ (เช่น Active/Open) ใน `MyTicketsList` เพิ่มเติมได้ค่ะ
+>
+> ---
+>
+> **สรุปผลการประเมิน:** โค้ดมีคุณภาพสูงมาก สถาปัตยกรรมสะอาด และผ่านชุดทดสอบทั้งหมดอย่างสมบูรณ์ ขอ **Approve** ให้สามารถ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ ขอบคุณมากค่ะ
+
+**คำวินิจฉัย**: **APPROVED & MERGED** — Reviewer กด Merge PR #111 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `927862f`) — **Closes Issue #7**
+
+---
+
+### 3.8 PR-08: End-to-End Testing Flows — Actions Taken, Resolution Gate, and Dashboards (Issue #8)
+
+- **Branch:** `feature/lab04-issue8-e2e` → `lab4-staging`
+- **Author:** `@jejaebubu`
+- **Reviewer:** `@titayaaa`
+- **Objective:** พัฒนาชุดทดสอบอัตโนมัติระดับเบราว์เซอร์ด้วย Playwright (`e2e/lab-04/actions-taken-flow.spec.ts`, `e2e/lab-04/ticket-resolution.spec.ts`, `e2e/lab-04/dashboards.spec.ts`) ครอบคลุม Customer Journeys หลักทั้ง 3 ส่วน (`E2E-01`, `E2E-02`, `E2E-03`) บนทั้ง 3 Viewports (`desktop` 1280×800, `tablet` 820×1180, `mobile` 393×851 รวม 9 E2E test runs) พร้อมตรวจสอบ `expectNoHorizontalOverflow` และปรับ `whiteSpace: "normal"` บน Advisory Badge ใน `TicketDetail.tsx` และ `StaffTicketDetail.tsx` เพื่อป้องกันการล้นขอบบนหน้าจอ Mobile (393px)
 - **Status:** เปิด PR รอการตรวจทานจาก Reviewer (`@titayaaa`)
 
 ---
