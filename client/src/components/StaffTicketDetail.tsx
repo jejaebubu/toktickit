@@ -18,7 +18,16 @@ import { ActionsTaken } from "./ActionsTaken.js";
 import { PriorityBadge, RoleBadge, StatusBadge } from "./ui/Badges.js";
 
 const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
-const STATUSES = ["New", "Open", "In Progress", "Waiting for Requester", "Resolved", "Closed", "Reopened", "Cancelled"];
+export const TICKET_STATUS_TRANSITIONS: Record<string, string[]> = {
+  New: ["Open", "Cancelled"],
+  Open: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  "In Progress": ["Waiting for Requester", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Resolved", "Cancelled"],
+  Resolved: ["Closed", "Reopened"],
+  Reopened: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  Closed: [],
+  Cancelled: [],
+};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -66,6 +75,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [isPostingComment, setIsPostingComment] = useState(false);
   const [isPostingNote, setIsPostingNote] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showResolutionGateModal, setShowResolutionGateModal] = useState(false);
+  const [showStaleModal, setShowStaleModal] = useState(false);
   const isAdmin = user?.role === "ADMINISTRATOR";
 
   const load = () => {
@@ -125,17 +136,45 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const updated = await updateTicket(ticketId, payload);
+      const requestPayload = ticket?.updatedAt ? { ...payload, expectedUpdatedAt: ticket.updatedAt } : payload;
+      const updated = await updateTicket(ticketId, requestPayload);
       // The PATCH response omits attachments/conversation lists; merge it into the
       // current ticket so those collections are preserved instead of wiped to undefined.
-      setTicket((prev) => (prev ? { ...prev, ...updated, attachments: prev.attachments ?? [] } : { ...updated, attachments: [] }));
+      setTicket((prev) =>
+        prev
+          ? {
+              ...prev,
+              ...updated,
+              attachments: prev.attachments ?? [],
+              actionsTaken: updated.actionsTaken ?? prev.actionsTaken ?? [],
+            }
+          : { ...updated, attachments: [], actionsTaken: updated.actionsTaken ?? [] },
+      );
       notify("Ticket updated successfully.");
       await refreshConversation();
     } catch (err: any) {
+      if (err instanceof ApiError && err.status === 409 && (err.code === "STALE_UPDATE" || /updated by another user/i.test(err.message))) {
+        setShowStaleModal(true);
+      }
       notify(err instanceof ApiError ? err.message : "Failed to update ticket.", true);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const unresolvedActions = useMemo(
+    () => (ticket?.actionsTaken ?? []).filter((a) => a.status === "PENDING" || a.status === "IN_PROGRESS"),
+    [ticket?.actionsTaken],
+  );
+  const openActionsCount = unresolvedActions.length;
+
+  const requestStatusChange = (nextStatus: string) => {
+    if (!ticket || nextStatus === ticket.status) return;
+    if (nextStatus === "Resolved" && openActionsCount > 0) {
+      setShowResolutionGateModal(true);
+      return;
+    }
+    void patchTicket({ status: nextStatus });
   };
 
   const submitComment = async (e: React.FormEvent) => {
@@ -193,6 +232,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   if (!ticket) return null;
   const isOwner = user !== null && user!.id === ticket.owner?.id;
   const isResolved = ["Resolved", "Closed"].includes(ticket.status);
+  const allowedTransitions = TICKET_STATUS_TRANSITIONS[ticket.status] ?? [];
+  const statusOptions = [ticket.status, ...allowedTransitions];
 
   return (
     <div className="card border-0 shadow-sm p-4 mb-4" style={{ borderRadius: "16px", backgroundColor: "#FFFFFF" }} data-testid="staff-detail-card">
@@ -222,8 +263,11 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       )}
 
       {ticket.requesterIndicatedResolved && (
-        <div className="alert border-0 shadow-sm" role="alert" data-testid="detail-resolved-intent" style={{ backgroundColor: "#EBF4FF", color: "#4C51BF" }}>
-          🙋 Requester indicated the problem appears resolved. Review the ticket and update its status.
+        <div className="alert border-0 shadow-sm d-flex flex-wrap align-items-center gap-2" role="alert" data-testid="detail-resolved-intent" style={{ backgroundColor: "#EAF6EF", color: "#006B3C", border: "1px solid #B4D7C5" }}>
+          <span className="badge rounded-pill fw-semibold px-2 py-1" style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }} data-testid="staff-resolved-advisory-badge">
+            Requester indicated problem resolved - Pending Staff Review
+          </span>
+          <span>🙋 Requester indicated the problem appears resolved. Review the ticket and update its status.</span>
         </div>
       )}
 
@@ -334,17 +378,152 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               id="detail-status"
               className="form-select"
               value={ticket.status}
-              onChange={(e) => patchTicket({ status: e.target.value })}
+              onChange={(e) => requestStatusChange(e.target.value)}
               data-testid="detail-status-select"
-              disabled={isSubmitting}
+              disabled={isSubmitting || allowedTransitions.length === 0}
               style={{ minHeight: 44 }}
             >
-              {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {statusOptions.map((s) => (
+                <option key={s} value={s}>
+                  {s === "Resolved" && openActionsCount > 0 && ticket.status !== "Resolved"
+                    ? `Resolved (${openActionsCount} action(s) still open)`
+                    : s}
+                </option>
+              ))}
             </select>
           </div>
         </div>
+
+        {/* Workflow Transition Action Bar */}
+        <div className="mt-3 pt-2 border-top d-flex flex-wrap align-items-center gap-2" data-testid="workflow-action-bar">
+          <span className="small fw-semibold text-dark me-1">Allowed Transitions:</span>
+          {allowedTransitions.length === 0 ? (
+            <span className="small text-muted" data-testid="workflow-final-state">
+              {ticket.status} is a final state (no further status transitions).
+            </span>
+          ) : (
+            allowedTransitions.map((nextStatus) => {
+              const isResolveBtn = nextStatus === "Resolved";
+              const hasOpenActions = isResolveBtn && openActionsCount > 0;
+              const slug = nextStatus.toLowerCase().replace(/\s+/g, "-");
+              return (
+                <button
+                  key={nextStatus}
+                  type="button"
+                  className={hasOpenActions ? "btn btn-sm fw-semibold" : "btn btn-sm btn-outline-success fw-semibold"}
+                  style={
+                    hasOpenActions
+                      ? { backgroundColor: "#FEF3C7", color: "#92400E", border: "1px solid #F59E0B", minHeight: 44 }
+                      : { minHeight: 44 }
+                  }
+                  onClick={() => requestStatusChange(nextStatus)}
+                  disabled={isSubmitting}
+                  data-testid={isResolveBtn ? "workflow-resolve-btn" : `workflow-transition-${slug}`}
+                >
+                  {hasOpenActions ? (
+                    <>
+                      <span aria-hidden="true">⚠️</span> Resolve ({openActionsCount} action(s) still open)
+                    </>
+                  ) : (
+                    nextStatus
+                  )}
+                </button>
+              );
+            })
+          )}
+          {openActionsCount > 0 && allowedTransitions.includes("Resolved") && (
+            <span
+              className="badge rounded-pill fw-semibold px-2 py-1 ms-auto"
+              style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}
+              data-testid="resolution-gate-warning"
+            >
+              <span aria-hidden="true">⚠️</span> {openActionsCount} action(s) still open
+            </span>
+          )}
+        </div>
+
         {isResolved && <div className="small text-muted mt-2">Ticket is {ticket.status}. Change its status via the Status selector above to reopen or continue work.</div>}
       </div>
+
+      {showResolutionGateModal && (
+        <div
+          className="border rounded-3 p-3 mb-4 shadow-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="resolution-gate-modal-title"
+          style={{ backgroundColor: "#FFFBEB", borderColor: "#F59E0B" }}
+          data-testid="resolution-gate-modal"
+        >
+          <h4 id="resolution-gate-modal-title" className="h6 fw-bold mb-2" style={{ color: "#92400E" }}>
+            <span aria-hidden="true">⚠️</span> Unresolved Actions Warning
+          </h4>
+          <p className="small text-dark mb-2" data-testid="resolution-gate-modal-message">
+            This ticket still has {openActionsCount} unresolved action(s). Complete or cancel them before resolving the ticket.
+          </p>
+          <ul className="small text-dark mb-3" data-testid="resolution-gate-open-list">
+            {unresolvedActions.map((act) => (
+              <li key={act.id}>
+                <strong>{act.status}</strong>: {act.actionDescription}
+              </li>
+            ))}
+          </ul>
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn btn-secondary fw-semibold"
+              style={{ minHeight: 44 }}
+              autoFocus
+              onClick={() => setShowResolutionGateModal(false)}
+              data-testid="resolution-gate-cancel"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-danger fw-semibold"
+              style={{ minHeight: 44 }}
+              onClick={() => {
+                setShowResolutionGateModal(false);
+                void patchTicket({ status: "Resolved" });
+              }}
+              data-testid="resolution-gate-confirm"
+            >
+              Attempt Resolve Anyway
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showStaleModal && (
+        <div
+          className="border rounded-3 p-3 mb-4 shadow-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="stale-update-modal-title"
+          style={{ backgroundColor: "#FEF2F2", borderColor: "#DC2626" }}
+          data-testid="stale-update-modal"
+        >
+          <h4 id="stale-update-modal-title" className="h6 fw-bold mb-2" style={{ color: "#991B1B" }}>
+            <span aria-hidden="true">⚠️</span> Concurrent Update Detected
+          </h4>
+          <p className="small text-dark mb-3" data-testid="stale-update-modal-message">
+            Ticket has been updated by another user. Please refresh.
+          </p>
+          <button
+            type="button"
+            className="btn text-white fw-semibold"
+            style={{ backgroundColor: "#006B3C", borderColor: "#006B3C", minHeight: 44 }}
+            onClick={() => {
+              setShowStaleModal(false);
+              setActionError(null);
+              load();
+            }}
+            data-testid="stale-update-refresh"
+          >
+            Refresh Ticket
+          </button>
+        </div>
+      )}
 
       {/* Summary & Description */}
       <div className="row g-3 mb-4">

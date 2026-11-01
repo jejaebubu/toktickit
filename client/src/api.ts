@@ -26,10 +26,14 @@ export function setUnauthorizedHandler(handler: (() => void) | null): void {
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  code?: string;
+  unresolvedCount?: number;
+  constructor(status: number, message: string, code?: string, unresolvedCount?: number) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
+    this.unresolvedCount = unresolvedCount;
   }
 }
 
@@ -38,7 +42,12 @@ async function parseApiError(res: Response): Promise<never> {
     unauthorizedHandler?.();
   }
   const errorData = await res.json().catch(() => ({}));
-  throw new ApiError(res.status, errorData.message || `Request failed with status ${res.status}`);
+  throw new ApiError(
+    res.status,
+    errorData.message || `Request failed with status ${res.status}`,
+    errorData.code,
+    errorData.unresolvedCount ?? errorData.openActionsCount,
+  );
 }
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
@@ -478,6 +487,8 @@ export interface TicketUpdatePayload {
   ownerId?: number | "unassigned" | null;
   itPriority?: string;
   status?: string;
+  requesterIndicatedResolved?: boolean;
+  expectedUpdatedAt?: string;
 }
 
 export async function updateTicket(ticketId: number, payload: TicketUpdatePayload): Promise<TicketDetail> {
@@ -488,7 +499,12 @@ export async function updateTicket(ticketId: number, payload: TicketUpdatePayloa
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, errorData.message || `Failed to update ticket ${ticketId}`);
+    throw new ApiError(
+      res.status,
+      errorData.message || `Failed to update ticket ${ticketId}`,
+      errorData.code,
+      errorData.unresolvedCount ?? errorData.openActionsCount,
+    );
   }
   return res.json();
 }
