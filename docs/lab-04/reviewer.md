@@ -22,7 +22,7 @@
 | **PR-01 ([GitHub #104](https://github.com/jejaebubu/toktickit/pull/104))** | Specification & Engineering Contract for Lab 4 (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`) | `feature/lab04-issue1-specs` | `lab4-staging` | **Request Changes → Approved** | Review #1 โดย `titayaaa`: ขอเพิ่ม `assigneeId`, `status` บน `ActionTaken`, ตรวจสอบ Resolution Gate ไม่ให้ Resolve ตั๋วที่มี pending actions, เพิ่ม error 422/409, อัปเดต UI controls & test cases → ผู้เขียนแก้ไขครบทั้ง 4 ไฟล์ใน commit `3310ba9` → Reviewer ตรวจซ้ำแล้ว **Approve** (verify: เอกสาร Spec DD ครบถ้วนตาม Handout, BR-01..15 และ AC-01..14) — merged `f242eb3` |
 | **PR-02 ([GitHub #105](https://github.com/jejaebubu/toktickit/pull/105))** | Database migration, Prisma model, and idempotent seed for Actions Taken | `feature/lab04-issue2-migration` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: อนุมัติทิศทางโดยรวมและชม integration tests 9 เคส แต่ขอให้ (1) เปลี่ยน `ActionTaken.result` เป็น Nullable (`String?`) เพราะงาน `PENDING`/`IN_PROGRESS` ยังไม่มีผลลัพธ์ และให้ API บังคับเฉพาะตอน `COMPLETED`, (2) อัปเดตสถานะ PR-01 ใน `tests.md` เป็น Merged, (3) เพิ่มบันทึก PR #105 ใน reviewer log → ผู้เขียนแก้ไขครบ (migration ใหม่ `20261031172848_lab04_actions_taken` + tests 10 เคส = 93/93) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `005b157` |
 | **PR-03 ([GitHub #106](https://github.com/jejaebubu/toktickit/pull/106))** | Actions Taken REST API, RBAC authorization, and backend tests | `feature/lab04-issue3-actions-api` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชม RBAC, JWT performer identity, 404 no-leak และ BR-14 state machine (101/101) แต่ขอให้ (1) อัปเดต PR-02 เป็น Approved & Merged + เพิ่ม review trail ของ PR #105 และหัวข้อ PR-03, (2) ล้าง `followUpNote` เป็น `null` เมื่อ `followUpRequired=false` โดยไม่ส่ง note ใหม่, (3) เพิ่ม max length 1000 ให้ `actionDescription` → ผู้เขียนแก้ไขครบ (9 new + 93 = 102/102) → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `23166db` |
-| **PR-04 ([GitHub #108](https://github.com/jejaebubu/toktickit/pull/108))** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | **Review pending** | Opened; awaiting reviewer verification of UI-01/02/06 and API-16/17 |
+| **PR-04 ([GitHub #108](https://github.com/jejaebubu/toktickit/pull/108))** | Actions Taken UI on Ticket Detail (list, create, edit, follow-up) | `feature/lab04-issue4-actions-ui` | `lab4-staging` | **Request Changes → Pending re-review** | Review #1 โดย `titayaaa`: ชม UI, Follow-up toggle, Requester read-only, Quick Complete/Cancel และเทสต์ 187/187 แต่ขอให้ (1) เพิ่มหัวข้อ `3.4 PR-04` ใน `reviewer.md`, (2) ส่ง `onActionsChange` ใน `StaffTicketDetail.tsx` และ `TicketDetail.tsx` เพื่อ sync state แม่รองรับ Resolution Gate, (3) ปรับสี badge `COMPLETED` (`#f0fdf4`/`#166534`) และ `CANCELLED` (`#fef2f2`/`#991b1b`) ตาม Zen Green tokens พร้อม minor suggestions (min 2 chars result, `maxLength`, A11Y `role="alert"` + `aria-hidden` emoji, safe 500 error ใน `/api/users/assignable`, wording §4.1.7) → ผู้เขียนแก้ไขครบทุกข้อ รอตรวจซ้ำ |
 | **PR-05** | Ticket workflow state machine, resolution gate, and transition enforcement | `feature/lab04-issue5-workflow` | `lab4-staging` | Planned | - |
 | **PR-06** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | Planned | - |
 | **PR-07** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | Planned | - |
@@ -177,6 +177,79 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > โค้ด REST API และเอกสารมีคุณภาพระดับ Production พร้อม Merge เข้าสู่ `lab4-staging` เพื่อเริ่ม Issue #4
 
 **คำวินิจฉัย**: **APPROVED** — Reviewer กด Merge PR #106 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `23166db`) — **Closes Issue #3 (#95)**
+
+---
+
+### 3.4 PR-04: Actions Taken UI on Ticket Detail (Issue #4)
+
+- **PR URL:** [GitHub #108](https://github.com/jejaebubu/toktickit/pull/108)
+- **Branch:** `feature/lab04-issue4-actions-ui` → `lab4-staging`
+- **Author:** `@jejaebubu`
+- **Reviewer:** `@titayaaa`
+- **Objective:** พัฒนาคอมโพเนนต์ `ActionsTaken.tsx` สำหรับแสดงประวัติ Actions Taken เรียงลำดับเวลา (`actionDateTime DESC`), ฟอร์มเพิ่ม/แก้ไขสำหรับ IT Staff และ Administrator, การซ่อนปุ่มจัดการสำหรับ Requester (Read-Only), Dynamic Follow-up Note Toggle, Quick Action ปุ่ม Complete/Cancel, การดึงรายชื่อเจ้าหน้าที่ที่ active จาก `GET /api/users/assignable`, และการซิงก์สถานะกลับไปยังหน้า Ticket Detail (`onActionsChange`) เพื่อรองรับ Resolution Gate ใน Issue #5
+
+#### 3.4.1 Review #1 — Request Changes (`titayaaa`, 2026-11-01)
+
+> ### 🌟 ภาพรวมการประเมิน (Executive Summary)
+> PR #108 พัฒนาคอมโพเนนต์ `ActionsTaken.tsx` ได้สวยงาม สะอาดตา และวางโครงสร้างได้ตรงตามข้อกำหนดของ Lab 4 เป็นอย่างดีค่ะ ชื่นชมที่มีการทำ Dynamic Follow-up Toggle, การซ่อนปุ่ม Create/Edit สำหรับ Requester, การจัดการ Loading state ระหว่างบันทึก, การทำ Quick Action Complete/Cancel ได้อย่างรวดเร็ว ตลอดจนเขียนเทสต์ครอบคลุมทั้ง Component UI (4 ข้อ) และ API เพิ่มเติม (2 ข้อ) รันเทสต์ผ่านครบถ้วน 187/187 เทสต์ค่ะ 👍
+> เพื่อให้โค้ดมีความสมบูรณ์แบบระดับ Production และไม่ส่งผลกระทบต่อ Issue #5 (Resolution Gate) ขอฝากปรับปรุง 3 จุดสำคัญ และจุดเก็บตกเล็กน้อยดังนี้ค่ะ:
+>
+> ---
+>
+> ### 🛑 จุดที่ต้องแก้ไขก่อน Merge (Required Changes)
+>
+> #### 1. เพิ่มหัวข้อ `### 3.4 PR-04` ใน `docs/lab-04/reviewer.md` (Document Trail)
+> - ใน Master PR Table (Section 2) มีการเพิ่มแถว PR #108 เรียบร้อยแล้ว แต่ใน **Section 3 (Full Review Trail) ยังขาดหัวข้อ `### 3.4 PR-04: Actions Taken UI on Ticket Detail (Issue #4)`** ทำให้ไม่มีบันทึกรายละเอียดการตรวจทานของ PR นี้ค่ะ
+> - รบกวนเพิ่มหัวข้อ 3.4 พร้อมระบุ Branch, Target, วัตถุประสงค์ และเตรียมพื้นที่สำหรับบันทึกผลการรีวิวด้วยนะคะ
+>
+> #### 2. ส่ง Callback `onActionsChange` ใน `StaffTicketDetail.tsx` และ `TicketDetail.tsx` (State Desynchronization)
+> - ใน `ActionsTaken.tsx` มีการประกาศ prop `onActionsChange?: (actions: ActionTaken[]) => void` และเรียกใช้งานใน `updateItems` ดีแล้ว แต่ในจุดเรียกใช้งานที่ `StaffTicketDetail.tsx` (บรรทัด 429) และ `TicketDetail.tsx` (บรรทัด 178) ใส่เพียง:
+>   ```tsx
+>   <ActionsTaken ticketId={ticket.id} actions={ticket.actionsTaken} />
+>   ```
+> - การไม่ส่ง `onActionsChange` ทำให้เมื่อเจ้าหน้าที่กด Add, Edit หรือกด Quick Complete Action สำเร็จ ข้อมูลใน `ticket.actionsTaken` ของหน้าแม่จะไม่อัปเดตตาม ซึ่งจะทำให้เกิดปัญหาใน Issue #5 (Resolution Gate) ทันที เพราะหน้าแม่จะไม่ทราบว่า Action ถูกเคลียร์เสร็จแล้ว จนกว่าจะกด Refresh หน้าจอ
+> - **วิธีแก้:** รบกวนส่ง callback อัปเดต state แม่:
+>   ```tsx
+>   <ActionsTaken
+>     ticketId={ticket.id}
+>     actions={ticket.actionsTaken}
+>     onActionsChange={(updatedActions) =>
+>       setTicket((prev) => (prev ? { ...prev, actionsTaken: updatedActions } : prev))
+>     }
+>   />
+>   ```
+>
+> #### 3. ปรับสี Status Badge ของ `CANCELLED` และ `COMPLETED` ให้ตรงกับ Zen Green Tokens
+> - ใน `docs/lab-04/ui-spec.md` §1 กำหนดว่าสถานะ `CANCELLED` ต้องใช้คู่สี soft red:
+>   - `--action-cancelled-bg: #fef2f2`, `--action-cancelled-text: #991b1b`
+>   - `--action-completed-bg: #f0fdf4`, `--action-completed-text: #166534`
+> - ใน `ACTION_STATUS_META` ของ `ActionsTaken.tsx` ปัจจุบันใช้สีเทา (`#E5E7EB` / `#374151`) สำหรับ Cancelled และ `#C6F6D5` / `#22543D` สำหรับ Completed ฝากปรับให้ตรงกับ Design System Tokens ของแลปด้วยนะคะ
+>
+> ### 💡 ข้อเสนอแนะเพิ่มเติม (Minor Suggestions)
+> - **Client-side Validation & MaxLength:**
+>   - ในฟังก์ชัน `validate()` แนะนำให้ตรวจ `result` เมื่อสถานะเป็น `COMPLETED` ว่าต้องมีความยาวอย่างน้อย 2 ตัวอักษร (`result.trim().length >= 2`) เพื่อให้ตรงกับ Validation ของ Backend (2–1000 ตัวอักษร) ป้องกันไม่ให้เกิด Error 400 จากเซิร์ฟเวอร์
+>   - เพิ่ม attribute `maxLength={1000}` ให้กับ `action-description` และ `action-result`, และ `maxLength={500}` ให้กับ `action-followup-note` และ `action-attachment-notes`
+> - **Accessibility (A11Y):**
+>   - เพิ่ม `role="alert"` หรือ `aria-live="polite"` ให้กับกล่องข้อความ error ใต้ฟิลด์อินพุต เพื่อให้ Screen Reader แจ้งเตือนผู้ใช้ได้ถูกต้อง
+>   - ครอบ emoji ในป้ายสถานะ (`⏳`, `🔧`, `✅`, `⛔`) ด้วย `<span aria-hidden="true">` เพื่อไม่ให้ Screen Reader อ่านออกเสียง emoji ซ้ำซ้อน
+> - **Safe Error Response ใน `server/src/app.ts`:**
+>   - ใน `GET /api/users/assignable` บล็อก `catch` ไม่ควรส่ง `message: err?.message` ออกไปใน 500 response ตามมาตรฐาน SAFE-01 แนะนำให้ตอบเพียง `{ error: "Failed to fetch assignable staff" }`
+> - **Wording ใน Section 4.1.7 ของ `reviewer.md`:**
+>   - ข้อความเดิมระบุว่า `"Reviewer อนุมัติและผู้เขียน merge PR #75 เข้า lab4-staging เรียบร้อย"` แนะนำปรับเป็น `"Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #75"` เพื่อให้ตรงกับข้อกำหนดวิชาที่ห้าม merge PR ของตนเองค่ะ
+
+#### 3.4.2 Author Response #1 (`jejaebubu`)
+
+> ขอบคุณสำหรับรีวิวที่ละเอียดและครบถ้วนมากค่ะ แก้ไขครบทั้ง 3 Required Changes และ Minor Suggestions ทั้งหมดแล้วค่ะ:
+>
+> 1. **เพิ่มหัวข้อ `### 3.4 PR-04` ใน `docs/lab-04/reviewer.md`** — เพิ่มบันทึก Branch, Target, วัตถุประสงค์, ข้อความรีวิวรอบที่ 1 และคำตอบของผู้เขียนใน Section 3.4 พร้อมอัปเดตตาราง Master PR Table ใน Section 2
+> 2. **ส่ง Callback `onActionsChange` ใน `StaffTicketDetail.tsx` และ `TicketDetail.tsx`** — ผูก `onActionsChange={(updatedActions) => setTicket((prev) => (prev ? { ...prev, actionsTaken: updatedActions } : prev))}` ทั้งสองหน้า เพื่อให้ `ticket.actionsTaken` บน parent state ซิงก์ทันทีเมื่อเพิ่ม/แก้ไข/เปลี่ยนสถานะ Action เตรียมพร้อมสำหรับ Resolution Gate ใน Issue #5
+> 3. **ปรับสี Status Badge ใน `ActionsTaken.tsx` ให้ตรงกับ Zen Green Tokens (`ui-spec.md` §1)** — ปรับ `COMPLETED` เป็น `backgroundColor: "#f0fdf4", color: "#166534"` และ `CANCELLED` เป็น `backgroundColor: "#fef2f2", color: "#991b1b"`
+> 4. **Client-side Validation & `maxLength`** — ปรับ `validate()` ให้ตรวจ `form.result.trim().length < 2` เมื่อสถานะเป็น `COMPLETED` และเพิ่ม `maxLength={1000}` บน `action-description`, `action-result` รวมถึง `maxLength={500}` บน `action-followup-note`, `action-attachment-notes`
+> 5. **Accessibility (A11Y)** — เพิ่ม `role="alert"` ให้กับข้อความ error ใต้ฟิลด์ทุกจุด (`action-date-error`, `action-assignee-error`, `action-description-error`, `action-result-error`, `action-followup-note-error`) และครอบ emoji ในป้ายสถานะ (`⏳`, `🔧`, `✅`, `⛔`) ด้วย `<span aria-hidden="true">`
+> 6. **Safe Error Response (`SAFE-01`)** — ปรับบล็อก `catch` ของ `GET /api/users/assignable` ใน `server/src/app.ts` ให้ตอบกลับเพียง `{ error: "Failed to fetch assignable staff" }` โดยไม่เปิดเผย `err?.message`
+> 7. **Wording ใน Section 4.1.7 ของ `reviewer.md`** — ปรับเป็น `"Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #75 เข้า lab4-staging เรียบร้อย"` ตามกติกาห้าม merge PR ของตนเอง
+>
+> รบกวนช่วยตรวจซ้ำอีกรอบนะคะ ขอบคุณมากค่ะ
 
 ---
 
@@ -544,4 +617,4 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >
 > โดยรวมเอกสารพร้อม merge เข้า `lab4-staging` ได้แล้วค่ะ ส่วน Minor follow-ups สามารถเก็บไปปรับเพิ่มเติมได้โดยไม่ต้องบล็อกการ merge ค่ะ
 
-**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer อนุมัติและผู้เขียน merge PR #75 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `4a555671b13ecee7cabcae75dd76e3ed9dc77e3d`, 2026-10-31 19:58 UTC) — **Closes #63**
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #75 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `4a555671b13ecee7cabcae75dd76e3ed9dc77e3d`, 2026-10-31 19:58 UTC) — **Closes #63**

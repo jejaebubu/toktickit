@@ -1491,8 +1491,8 @@ app.get(
         orderBy: { name: "asc" },
       });
       res.status(200).json(users);
-    } catch (err: any) {
-      res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    } catch (_err: any) {
+      res.status(500).json({ error: "Failed to fetch assignable staff" });
     }
   },
 );

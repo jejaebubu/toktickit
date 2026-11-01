@@ -427,7 +427,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       </div>
 
       {/* Actions Taken */}
-      <ActionsTaken ticketId={ticket.id} actions={ticket.actionsTaken} />
+      <ActionsTaken
+        ticketId={ticket.id}
+        actions={ticket.actionsTaken}
+        onActionsChange={(updatedActions) =>
+          setTicket((prev) => (prev ? { ...prev, actionsTaken: updatedActions } : prev))
+        }
+      />
 
       {/* Attachments */}
       <h3 className="h5 fw-bold text-dark mb-3">Attachments</h3>

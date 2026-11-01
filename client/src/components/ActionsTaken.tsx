@@ -21,11 +21,14 @@ const ACTION_STATUS_TRANSITIONS: Record<ActionTakenStatus, ActionTakenStatus[]> 
   CANCELLED: [],
 };
 
-const ACTION_STATUS_META: Record<ActionTakenStatus, { label: string; backgroundColor: string; color: string }> = {
-  PENDING: { label: "⏳ Pending", backgroundColor: "#FEF3C7", color: "#92400E" },
-  IN_PROGRESS: { label: "🔧 In Progress", backgroundColor: "#DBEAFE", color: "#1E40AF" },
-  COMPLETED: { label: "✅ Completed", backgroundColor: "#C6F6D5", color: "#22543D" },
-  CANCELLED: { label: "⛔ Cancelled", backgroundColor: "#E5E7EB", color: "#374151" },
+const ACTION_STATUS_META: Record<
+  ActionTakenStatus,
+  { icon: string; text: string; label: string; backgroundColor: string; color: string }
+> = {
+  PENDING: { icon: "⏳", text: "Pending", label: "⏳ Pending", backgroundColor: "#FEF3C7", color: "#92400E" },
+  IN_PROGRESS: { icon: "🔧", text: "In Progress", label: "🔧 In Progress", backgroundColor: "#DBEAFE", color: "#1E40AF" },
+  COMPLETED: { icon: "✅", text: "Completed", label: "✅ Completed", backgroundColor: "#f0fdf4", color: "#166534" },
+  CANCELLED: { icon: "⛔", text: "Cancelled", label: "⛔ Cancelled", backgroundColor: "#fef2f2", color: "#991b1b" },
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -113,7 +116,7 @@ function statusBadge(action: ActionTaken): React.ReactElement {
       style={{ fontSize: "0.78rem", backgroundColor: meta.backgroundColor, color: meta.color }}
       data-testid={`action-status-${action.id}`}
     >
-      {meta.label}
+      <span aria-hidden="true">{meta.icon}</span> {meta.text}
     </span>
   );
 }
@@ -212,8 +215,8 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
     if (description.length < 3) errors.actionDescription = "Action Description must be at least 3 characters.";
     if (description.length > 1000) errors.actionDescription = "Action Description must not exceed 1000 characters.";
     if (!form.assigneeId) errors.assigneeId = "Assignee is required.";
-    if (form.status === "COMPLETED" && !form.result.trim()) {
-      errors.result = "Result is required when Action Status is COMPLETED.";
+    if (form.status === "COMPLETED" && form.result.trim().length < 2) {
+      errors.result = "Result is required (at least 2 characters) when Action Status is COMPLETED.";
     }
     if (form.followUpRequired && !form.followUpNote.trim()) {
       errors.followUpNote = "Follow-Up Note is required when follow-up is required.";
@@ -334,7 +337,11 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 data-testid="action-date"
                 style={{ minHeight: 44 }}
               />
-              {fieldErrors.actionDateTime && <div className="text-danger small mt-1" data-testid="action-date-error">{fieldErrors.actionDateTime}</div>}
+              {fieldErrors.actionDateTime && (
+                <div className="text-danger small mt-1" role="alert" data-testid="action-date-error">
+                  {fieldErrors.actionDateTime}
+                </div>
+              )}
             </div>
 
             <div className="col-12 col-md-4">
@@ -356,7 +363,11 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                   </option>
                 ))}
               </select>
-              {fieldErrors.assigneeId && <div className="text-danger small mt-1" data-testid="action-assignee-error">{fieldErrors.assigneeId}</div>}
+              {fieldErrors.assigneeId && (
+                <div className="text-danger small mt-1" role="alert" data-testid="action-assignee-error">
+                  {fieldErrors.assigneeId}
+                </div>
+              )}
             </div>
 
             <div className="col-12 col-md-4">
@@ -384,12 +395,17 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 id="action-description"
                 className="form-control"
                 rows={2}
+                maxLength={1000}
                 value={form.actionDescription}
                 onChange={(e) => setField("actionDescription", e.target.value)}
                 placeholder="Describe the work performed (3–1000 characters)…"
                 data-testid="action-description"
               />
-              {fieldErrors.actionDescription && <div className="text-danger small mt-1" data-testid="action-description-error">{fieldErrors.actionDescription}</div>}
+              {fieldErrors.actionDescription && (
+                <div className="text-danger small mt-1" role="alert" data-testid="action-description-error">
+                  {fieldErrors.actionDescription}
+                </div>
+              )}
             </div>
 
             <div className="col-12">
@@ -400,12 +416,17 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 id="action-result"
                 className="form-control"
                 rows={2}
+                maxLength={1000}
                 value={form.result}
                 onChange={(e) => setField("result", e.target.value)}
                 placeholder={form.status === "COMPLETED" ? "Record the outcome (required to complete)…" : "Optional until the action is completed…"}
                 data-testid="action-result"
               />
-              {fieldErrors.result && <div className="text-danger small mt-1" data-testid="action-result-error">{fieldErrors.result}</div>}
+              {fieldErrors.result && (
+                <div className="text-danger small mt-1" role="alert" data-testid="action-result-error">
+                  {fieldErrors.result}
+                </div>
+              )}
             </div>
 
             <div className="col-12">
@@ -433,12 +454,17 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                   id="action-followup-note"
                   className="form-control"
                   rows={2}
+                  maxLength={500}
                   value={form.followUpNote}
                   onChange={(e) => setField("followUpNote", e.target.value)}
                   placeholder="What needs to be followed up?"
                   data-testid="action-followup-note"
                 />
-                {fieldErrors.followUpNote && <div className="text-danger small mt-1" data-testid="action-followup-note-error">{fieldErrors.followUpNote}</div>}
+                {fieldErrors.followUpNote && (
+                  <div className="text-danger small mt-1" role="alert" data-testid="action-followup-note-error">
+                    {fieldErrors.followUpNote}
+                  </div>
+                )}
               </div>
             )}
 
@@ -448,6 +474,7 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 id="action-attachment-notes"
                 type="text"
                 className="form-control"
+                maxLength={500}
                 value={form.attachmentNotes}
                 onChange={(e) => setField("attachmentNotes", e.target.value)}
                 placeholder="e.g. network-log.txt, switch-photo.jpg"
