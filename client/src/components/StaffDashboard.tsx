@@ -254,7 +254,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
 
       {/* Two-Column Content Layout on Desktop */}
       <div className="row g-4">
-        {/* Left Column: My Recent Tickets */}
+        {/* Left Column: Recent Queue Tickets */}
         <div className="col-12 col-lg-8">
           <div
             className="card border-0 shadow-sm p-4 h-100"
@@ -267,7 +267,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                   <span aria-hidden="true" className="me-2">
                     🕒
                   </span>
-                  My Recent Tickets
+                  Recent Queue Tickets
                 </h3>
                 <small style={{ color: "#6C757D" }}>
                   Latest 5 service desk tickets updated in the queue
@@ -512,3 +512,4 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
     </section>
   );
 };
+

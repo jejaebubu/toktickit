@@ -33,7 +33,6 @@ interface NavItem {
 
 const NAV_BY_ROLE: Record<string, NavItem[]> = {
   REQUESTER: [
-    { id: "dashboard", label: "Dashboard", matches: ["dashboard"] },
     { id: "my-tickets", label: "My Tickets", matches: ["my-tickets", "ticket-detail"] },
     { id: "create-ticket", label: "Create Ticket", matches: ["create-ticket"] },
   ],

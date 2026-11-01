@@ -113,6 +113,7 @@ describe("Lab 4 IT Staff Dashboard UI Suite (StaffDashboard.test.tsx)", () => {
     expect(screen.getByTestId("staff-metric-value-my-assigned")).toHaveTextContent("6");
 
     // Recent tickets rendered in both desktop table and mobile cards
+    expect(screen.getByTestId("staff-recent-tickets-panel")).toHaveTextContent("Recent Queue Tickets");
     expect(screen.getByTestId("staff-recent-row-105")).toHaveTextContent("TKT-2026-000105");
     expect(screen.getByTestId("staff-recent-row-105")).toHaveTextContent("Laptop battery drains quickly");
     expect(screen.getByTestId("staff-recent-card-106")).toHaveTextContent("TKT-2026-000106");
@@ -299,3 +300,4 @@ describe("Lab 4 IT Staff Dashboard UI Suite (StaffDashboard.test.tsx)", () => {
     }
   });
 });
+
