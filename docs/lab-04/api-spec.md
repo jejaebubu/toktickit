@@ -240,11 +240,12 @@
   ```
 - **Calculation Rules**:
   - `myOpen`: จำนวนตั๋วของตนเองที่มี `status in ['New', 'Open']`
-  - `inProgress`: จำนวนตั๋วของตนเองที่มี `status in ['In Progress', 'Waiting for Requester', 'Reopened']`
+  - `inProgress`: จำนวนตั๋วของตนเองที่มี `status in ['In Progress', 'Waiting for Requester', 'Pending', 'Reopened']`
   - `resolved`: จำนวนตั๋วของตนเองที่มี `status == 'Resolved'`
   - `closed`: จำนวนตั๋วของตนเองที่มี `status in ['Closed', 'Cancelled']`
 - **Error Responses**:
   - `401 Unauthorized`: ไม่ได้ล็อกอิน
+  - `403 Forbidden`: ผู้ใช้ไม่ใช่ Requester
 
 ---
 

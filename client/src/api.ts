@@ -680,3 +680,45 @@ export async function fetchStaffDashboard(): Promise<StaffDashboardData> {
   }
   return res.json();
 }
+
+export interface RequesterDashboardMetrics {
+  myOpen: number;
+  inProgress: number;
+  resolved: number;
+  closed: number;
+}
+
+export interface RequesterDashboardTicket {
+  id: number;
+  ticketNumber: string;
+  title?: string;
+  summary?: string;
+  status: string;
+  requestedPriority?: string;
+  itPriority?: string;
+  category?: { id: number; name: string } | null;
+  categoryName?: string;
+  createdAt?: string;
+  updatedAt: string;
+}
+
+export interface RequesterDashboardQuickAction {
+  id: string;
+  label: string;
+  url: string;
+}
+
+export interface RequesterDashboardData {
+  metrics: RequesterDashboardMetrics;
+  recentTickets: RequesterDashboardTicket[];
+  quickActions?: RequesterDashboardQuickAction[];
+}
+
+export async function fetchRequesterDashboard(): Promise<RequesterDashboardData> {
+  const res = await fetch(`${API_URL}/api/dashboard/requester`, { headers: authHeaders() });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || errorData.error || "Failed to fetch requester dashboard");
+  }
+  return res.json();
+}
