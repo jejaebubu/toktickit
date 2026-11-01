@@ -39,7 +39,7 @@
 | **API-08** | API | AC-09 / FR-11 / BR-12 | Stale update detection on Ticket update | ตรวจพบ mismatch ของ updatedAt และตอบกลับ HTTP 409 Conflict | `server/tests/lab-04/ticket-workflow.api.test.ts` | Pass |
 | **API-09** | API | AC-04 / FR-08 / BR-10 | IT Staff Dashboard metrics calculation | ส่งคืน metrics ถูกต้องตรงกับฐานข้อมูล และมีรายการ recent tickets | `server/tests/lab-04/staff-dashboard.api.test.ts` | Pass |
 | **API-10** | API | AC-06 / FR-08 | Requester requests IT Staff Dashboard API | ปฏิเสธด้วย HTTP 403 Forbidden | `server/tests/lab-04/staff-dashboard.api.test.ts` | Pass |
-| **API-11** | API | AC-05 / FR-09 / BR-11 | Requester Dashboard metrics calculation | ส่งคืนเฉพาะตัวเลขและรายการตั๋วที่เป็นของ Requester ผู้เรียกดู | `server/tests/lab-04/requester-dashboard.api.test.ts` | Planned |
+| **API-11** | API | AC-05 / FR-09 / BR-11 | Requester Dashboard metrics calculation | ส่งคืนเฉพาะตัวเลขและรายการตั๋วที่เป็นของ Requester ผู้เรียกดู | `server/tests/lab-04/requester-dashboard.api.test.ts` | Pass |
 | **API-12** | API | AC-12 / FR-13 / BR-13 | Create/Update Action Taken with inactive or Requester assignee | ปฏิเสธด้วย HTTP 422 Unprocessable Entity และไม่บันทึกข้อมูล | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
 | **API-13** | API | AC-13 / FR-15 / BR-15 | Resolve a Ticket while unresolved Actions Taken exist | ปฏิเสธด้วย HTTP 409 Conflict (`UNRESOLVED_ACTIONS_EXIST`) และสถานะตั๋วไม่เปลี่ยน | `server/tests/lab-04/ticket-workflow.api.test.ts` | Pass |
 | **API-14** | API | AC-14 / FR-14 / BR-14 | Action Taken status transitions (PENDING → IN_PROGRESS → COMPLETED/CANCELLED) | เปลี่ยนสถานะที่อนุญาตสำเร็จ HTTP 200 และปฏิเสธ transition จาก Final state ด้วย HTTP 400 | `server/tests/lab-04/actions-taken.api.test.ts` | Pass |
@@ -50,7 +50,7 @@
 | **UI-02** | UI | AC-02 / FR-04 | Actions Taken list rendering under Requester view | แสดงรายการแบบ Read-only และซ่อนปุ่ม Create/Edit | `client/tests/lab-04/ActionsTaken.test.tsx` | Pass |
 | **UI-03** | UI | AC-07 / AC-08 | Ticket workflow transition controls & advisory indicator | แสดงเฉพาะปุ่มสถานะที่อนุญาต และแสดงป้าย advisory เมื่อผู้ใช้แจ้งแก้แล้ว | `client/tests/lab-04/TicketWorkflow.test.tsx` | Pass |
 | **UI-04** | UI | AC-04 / FR-10 | IT Staff Dashboard metrics cards & drill-down links | แสดงตัวเลข 5 การ์ด และลิงก์คลิกนำทางไป Ticket Queue ตามฟิลเตอร์ | `client/tests/lab-04/StaffDashboard.test.tsx` | Pass |
-| **UI-05** | UI | AC-05 | Requester Dashboard metrics cards & recent tickets | แสดงตัวเลข 4 การ์ด และรายการตั๋วของตนเอง | `client/tests/lab-04/RequesterDashboard.test.tsx` | Planned |
+| **UI-05** | UI | AC-05 | Requester Dashboard metrics cards & recent tickets | แสดงตัวเลข 4 การ์ด และรายการตั๋วของตนเอง | `client/tests/lab-04/RequesterDashboard.test.tsx` | Pass |
 | **UI-06** | UI | AC-12 / AC-14 / FR-13 / FR-14 | Assignee dropdown & Action Status controls | Dropdown แสดงเฉพาะ IT Staff/Admin ที่ Active, แสดง error 422, และปุ่ม Complete/Cancel ทำงานถูกต้อง | `client/tests/lab-04/ActionsTaken.test.tsx` | Pass |
 | **UI-07** | UI | AC-13 / FR-15 / BR-15 | Resolution Gate warning and confirmation modal | แสดงคำเตือน/Modal เมื่อมี Action ค้าง และไม่เปลี่ยนสถานะเมื่อ API ตอบ 409 | `client/tests/lab-04/TicketWorkflow.test.tsx` | Pass |
 | **STYLE-01** | UI Style | ui-spec §1 | Zen Green Theme consistency (Palette, Status Badges, Typography) | องค์ประกอบทั้งหมดใช้สีตรงตาม Zen Green Token Specification | `client/tests/lab-04/StaffDashboard.test.tsx` | Pass |
@@ -74,8 +74,8 @@
 | **PR-03** | Issue #3 | 2026-11-01 | Actions Taken API Tests (`actions-taken.api.test.ts`) | 9 new + 93 existing = 102 | **Pass** (review addressed) |
 | **PR-04** | Issue #4 | 2026-11-01 | Actions Taken UI + assignable-staff API (`ActionsTaken.test.tsx`, `actions-taken.api.test.ts`) | 6 new + 181 existing = 187 (104 server / 83 client) | **Pass** (PR #108, review addressed & merged `2425b2d`) |
 | **PR-05** | Issue #5 | 2026-11-01 | Ticket Workflow Tests (`ticket-workflow.api.test.ts`, `TicketWorkflow.test.tsx`) | 8 new + 187 existing = 195 (108 server / 87 client) | **Pass** (PR #109, review addressed & merged `468a7ca`) |
-| **PR-06** | Issue #6 | 2026-11-01 | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | 6 new + 195 existing = 201 (110 server / 91 client) | **Pass** (review pending) |
-| **PR-07** | Issue #7 | - | Requester Dashboard Tests (`requester-dashboard.api.test.ts`, `RequesterDashboard.test.tsx`) | - | Pending |
+| **PR-06** | Issue #6 | 2026-11-01 | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | 6 new + 195 existing = 201 (110 server / 91 client) | **Pass** (PR #110, review addressed & merged `c11da67`) |
+| **PR-07** | Issue #7 | 2026-11-02 | Requester Dashboard Tests (`requester-dashboard.api.test.ts`, `RequesterDashboard.test.tsx`) | 6 new + 201 existing = 207 (112 server / 95 client) | **Pass** (review pending) |
 | **PR-08** | Issue #8 | - | Playwright E2E Tests (`e2e/lab-04/*.spec.ts`) | - | Pending |
 | **PR-09** | Issue #9 | - | Full Regression Test Suite (Lab 1–3) | - | Pending |
 | **PR-10** | Issue #10 | - | Accessibility & Responsive Inspection | - | Pending |

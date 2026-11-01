@@ -1857,4 +1857,104 @@ app.get("/api/dashboard/staff", authenticateToken, checkPasswordChangeState, asy
   }
 });
 
+// ---------------------------------------------------------------------------
+// Lab 4 (Issue 7) — Requester Dashboard API (Data Isolation: own tickets only)
+// GET /api/dashboard/requester
+// ---------------------------------------------------------------------------
+app.get("/api/dashboard/requester", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user!.role !== "REQUESTER") {
+      return res.status(403).json({
+        error: "Forbidden",
+        message: "Only Requesters can access the requester dashboard.",
+      });
+    }
+
+    const prisma = getPrisma();
+    const requesterId = req.user!.id;
+
+    const [myOpenCount, inProgressCount, resolvedCount, closedCount, rawRecentTickets] = await Promise.all([
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: { in: ["New", "NEW", "Open", "OPEN"] },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: {
+            in: [
+              "In Progress",
+              "IN PROGRESS",
+              "IN_PROGRESS",
+              "Waiting for Requester",
+              "WAITING FOR REQUESTER",
+              "WAITING_FOR_REQUESTER",
+              "Pending",
+              "PENDING",
+              "Reopened",
+              "REOPENED",
+            ],
+          },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: { in: ["Resolved", "RESOLVED"] },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: { in: ["Closed", "CLOSED", "Cancelled", "CANCELLED"] },
+        },
+      }),
+      prisma.ticket.findMany({
+        where: { requesterId },
+        take: 5,
+        orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+        include: {
+          category: { select: { id: true, name: true } },
+        },
+      }),
+    ]);
+
+    const recentTickets = rawRecentTickets.map((t) => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      title: t.summary,
+      summary: t.summary,
+      status: TICKET_STATUSES[String(t.status).toUpperCase()] ?? t.status,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      category: t.category ? { id: t.category.id, name: t.category.name } : null,
+      categoryName: t.category?.name ?? "",
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+    }));
+
+    return res.status(200).json({
+      metrics: {
+        myOpen: myOpenCount,
+        inProgress: inProgressCount,
+        resolved: resolvedCount,
+        closed: closedCount,
+      },
+      recentTickets,
+      quickActions: [
+        { id: "create-ticket", label: "Create Ticket", url: "/tickets/new" },
+        { id: "view-tickets", label: "View My Tickets", url: "/tickets" },
+      ],
+    });
+  } catch (err: any) {
+    console.error("Failed to fetch requester dashboard:", err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "Failed to load requester dashboard.",
+    });
+  }
+});
+
 export default app;

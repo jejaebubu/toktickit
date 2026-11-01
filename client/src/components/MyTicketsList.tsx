@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../context/AuthContext.js";
 
 const PRIORITY_OPTIONS = ["LOW", "MEDIUM", "HIGH", "URGENT"];
-const STATUS_OPTIONS = ["New", "In Progress", "Resolved", "Closed", "Rejected"];
+const STATUS_OPTIONS = ["New", "Open", "In Progress", "Waiting for Requester", "Pending", "Resolved", "Closed", "Reopened", "Cancelled", "Rejected"];
 const SORT_OPTIONS = [
   { value: "createdAt", label: "Created Date" },
   { value: "ticketNumber", label: "Ticket Number" },
@@ -79,14 +79,24 @@ function getPageItems(current: number, totalPages: number): number[] {
 interface MyTicketsListProps {
   onOpenTicket?: (ticketId: number) => void;
   refreshKey?: number;
+  initialStatus?: string;
 }
 
-export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refreshKey = 0 }) => {
+export const MyTicketsList: React.FC<MyTicketsListProps> = ({ onOpenTicket, refreshKey = 0, initialStatus }) => {
   const { user } = useAuth();
 
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterState>(() => ({
+    ...DEFAULT_FILTERS,
+    status: initialStatus ?? "",
+  }));
   const [searchInput, setSearchInput] = useState<string>("");
   const [page, setPage] = useState<number>(1);
+
+  useEffect(() => {
+    if (initialStatus === undefined) return;
+    setFilters((prev) => ({ ...prev, status: initialStatus }));
+    setPage(1);
+  }, [initialStatus]);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [data, setData] = useState<TicketsPage | null>(null);

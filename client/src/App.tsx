@@ -7,6 +7,7 @@ import { TicketDetail } from "./components/TicketDetail.js";
 import { StaffTicketQueue, StaffQueueInitialFilters } from "./components/StaffTicketQueue.js";
 import { StaffTicketDetail } from "./components/StaffTicketDetail.js";
 import { StaffDashboard, StaffDashboardDrillDown } from "./components/StaffDashboard.js";
+import { RequesterDashboard, RequesterDashboardDrillDown } from "./components/RequesterDashboard.js";
 import { UserManagement } from "./components/UserManagement.js";
 import { LoginScreen } from "./screens/LoginScreen.js";
 import { ChangePasswordScreen } from "./screens/ChangePasswordScreen.js";
@@ -79,16 +80,21 @@ interface RequesterViewsProps {
 function RequesterViews({ activeView, onNavigate, headerNavKey }: RequesterViewsProps): React.ReactElement {
   const [openTicketId, setOpenTicketId] = useState<number | null>(null);
   const [ticketListRefreshKey, setTicketListRefreshKey] = useState(0);
+  const [initialStatus, setInitialStatus] = useState<string | undefined>(undefined);
 
   useEffect(() => {
+    if (headerNavKey === 0) return;
     setOpenTicketId(null);
+    setInitialStatus("");
   }, [headerNavKey]);
 
   const handleTicketOpen = (id: number) => setOpenTicketId(id);
   const handleTicketBack = () => setOpenTicketId(null);
-  const handleNavigate = (view: ViewId) => {
-    onNavigate(view);
+
+  const handleDrillDown = (filters: RequesterDashboardDrillDown) => {
     setOpenTicketId(null);
+    setInitialStatus(filters.status ?? "");
+    onNavigate("my-tickets");
   };
 
   return (
@@ -98,9 +104,19 @@ function RequesterViews({ activeView, onNavigate, headerNavKey }: RequesterViews
       )}
       {openTicketId !== null ? (
         <TicketDetail ticketId={openTicketId} onBack={handleTicketBack} />
+      ) : activeView === "dashboard" ? (
+        <RequesterDashboard
+          onDrillDown={handleDrillDown}
+          onOpenTicket={handleTicketOpen}
+          onCreateTicket={() => onNavigate("create-ticket")}
+        />
       ) : (
         activeView === "my-tickets" && (
-          <MyTicketsList refreshKey={ticketListRefreshKey} onOpenTicket={handleTicketOpen} />
+          <MyTicketsList
+            refreshKey={ticketListRefreshKey}
+            onOpenTicket={handleTicketOpen}
+            initialStatus={initialStatus}
+          />
         )
       )}
       <SystemHealthCard />
