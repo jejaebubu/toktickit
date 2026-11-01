@@ -4,8 +4,9 @@ import { Header, ViewId } from "./components/Header.js";
 import { CreateTicketForm } from "./components/CreateTicketForm.js";
 import { MyTicketsList } from "./components/MyTicketsList.js";
 import { TicketDetail } from "./components/TicketDetail.js";
-import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
+import { StaffTicketQueue, StaffQueueInitialFilters } from "./components/StaffTicketQueue.js";
 import { StaffTicketDetail } from "./components/StaffTicketDetail.js";
+import { StaffDashboard, StaffDashboardDrillDown } from "./components/StaffDashboard.js";
 import { UserManagement } from "./components/UserManagement.js";
 import { LoginScreen } from "./screens/LoginScreen.js";
 import { ChangePasswordScreen } from "./screens/ChangePasswordScreen.js";
@@ -102,18 +103,58 @@ function RequesterViews({ activeView, onNavigate }: RequesterViewsProps): React.
   );
 }
 
-function TicketQueueSpotlight(): React.ReactElement {
+interface StaffViewsProps {
+  activeView: ViewId;
+  onNavigate: (view: ViewId) => void;
+  defaultStaffView: "ticket-queue" | "user-management";
+}
+
+function StaffAndAdminViews({ activeView, onNavigate, defaultStaffView }: StaffViewsProps): React.ReactElement {
   const [openTicketId, setOpenTicketId] = useState<number | null>(null);
+  const [queueInitialFilters, setQueueInitialFilters] = useState<StaffQueueInitialFilters | undefined>(undefined);
+
+  const handleDrillDown = (filters: StaffDashboardDrillDown) => {
+    setOpenTicketId(null);
+    setQueueInitialFilters({ status: filters.status, ownerId: filters.ownerId });
+    onNavigate("ticket-queue");
+  };
+
+  const handleOpenTicketFromDashboard = (ticketId: number) => {
+    setOpenTicketId(ticketId);
+    onNavigate("ticket-queue");
+  };
 
   if (openTicketId !== null) {
     return <StaffTicketDetail ticketId={openTicketId} onBack={() => setOpenTicketId(null)} />;
   }
 
-  return <StaffTicketQueue onOpenTicket={setOpenTicketId} />;
-}
+  if (activeView === "dashboard") {
+    return (
+      <StaffDashboard
+        onDrillDown={handleDrillDown}
+        onOpenTicket={handleOpenTicketFromDashboard}
+        onCreateTicket={() => onNavigate("create-ticket")}
+      />
+    );
+  }
 
-function UserManagementSpotlight(): React.ReactElement {
-  return <UserManagement />;
+  if (activeView === "create-ticket") {
+    return <CreateTicketForm onCreated={() => onNavigate(defaultStaffView)} />;
+  }
+
+  if (activeView === "user-management") {
+    return <UserManagement />;
+  }
+
+  if (activeView === "ticket-queue") {
+    return <StaffTicketQueue onOpenTicket={setOpenTicketId} initialFilters={queueInitialFilters} />;
+  }
+
+  return defaultStaffView === "user-management" ? (
+    <UserManagement />
+  ) : (
+    <StaffTicketQueue onOpenTicket={setOpenTicketId} initialFilters={queueInitialFilters} />
+  );
 }
 
 function Shell(): React.ReactElement {
@@ -139,8 +180,20 @@ function Shell(): React.ReactElement {
             </h1>
 
             {user!.role === "REQUESTER" && <RequesterViews activeView={activeView} onNavigate={navigate} />}
-            {user!.role === "IT_STAFF" && <TicketQueueSpotlight />}
-            {user!.role === "ADMINISTRATOR" && <UserManagementSpotlight />}
+            {user!.role === "IT_STAFF" && (
+              <StaffAndAdminViews
+                activeView={activeView}
+                onNavigate={navigate}
+                defaultStaffView="ticket-queue"
+              />
+            )}
+            {user!.role === "ADMINISTRATOR" && (
+              <StaffAndAdminViews
+                activeView={activeView}
+                onNavigate={navigate}
+                defaultStaffView="user-management"
+              />
+            )}
           </>
         )}
       </main>
