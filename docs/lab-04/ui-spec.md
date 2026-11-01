@@ -54,8 +54,8 @@
     - คลิกการ์ด `Waiting for Requester` $\rightarrow$ เปิดหน้ารายการตั๋วพร้อม Filter `status=Waiting for Requester`
     - คลิกการ์ด `My Assigned` $\rightarrow$ เปิดหน้ารายการตั๋วพร้อม Filter `owner=me`
 - **Content Columns (Two-column layout on Desktop)**:
-  - **ซ้าย: My Recent Tickets**:
-    - แสดงตั๋ว 5 รายการล่าสุดที่เกี่ยวข้องกับเจ้าหน้าที่
+  - **ซ้าย: Recent Queue Tickets**:
+    - แสดงตั๋ว 5 รายการล่าสุดที่อัปเดตในคิวบริการ
     - แต่ละแถวแสดง: หมายเลขตั๋ว, หัวข้อตั๋ว, Status Badge, วันเวลาอัปเดตล่าสุด
     - คลิกที่ตั๋วจะเปิดหน้า Ticket Detail ของตั๋วใบนั้น
     - ลิงก์ `"View all"` ด้านบนขวา นำทางไป Ticket Queue

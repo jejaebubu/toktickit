@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext.js";
 import { Header, ViewId } from "./components/Header.js";
 import { CreateTicketForm } from "./components/CreateTicketForm.js";
@@ -73,11 +73,16 @@ function SystemHealthCard() {
 interface RequesterViewsProps {
   activeView: ViewId;
   onNavigate: (view: ViewId) => void;
+  headerNavKey: number;
 }
 
-function RequesterViews({ activeView, onNavigate }: RequesterViewsProps): React.ReactElement {
+function RequesterViews({ activeView, onNavigate, headerNavKey }: RequesterViewsProps): React.ReactElement {
   const [openTicketId, setOpenTicketId] = useState<number | null>(null);
   const [ticketListRefreshKey, setTicketListRefreshKey] = useState(0);
+
+  useEffect(() => {
+    setOpenTicketId(null);
+  }, [headerNavKey]);
 
   const handleTicketOpen = (id: number) => setOpenTicketId(id);
   const handleTicketBack = () => setOpenTicketId(null);
@@ -107,11 +112,18 @@ interface StaffViewsProps {
   activeView: ViewId;
   onNavigate: (view: ViewId) => void;
   defaultStaffView: "ticket-queue" | "user-management";
+  headerNavKey: number;
 }
 
-function StaffAndAdminViews({ activeView, onNavigate, defaultStaffView }: StaffViewsProps): React.ReactElement {
+function StaffAndAdminViews({ activeView, onNavigate, defaultStaffView, headerNavKey }: StaffViewsProps): React.ReactElement {
   const [openTicketId, setOpenTicketId] = useState<number | null>(null);
   const [queueInitialFilters, setQueueInitialFilters] = useState<StaffQueueInitialFilters | undefined>(undefined);
+
+  useEffect(() => {
+    if (headerNavKey === 0) return;
+    setOpenTicketId(null);
+    setQueueInitialFilters({ status: "", ownerId: "" });
+  }, [headerNavKey]);
 
   const handleDrillDown = (filters: StaffDashboardDrillDown) => {
     setOpenTicketId(null);
@@ -121,7 +133,6 @@ function StaffAndAdminViews({ activeView, onNavigate, defaultStaffView }: StaffV
 
   const handleOpenTicketFromDashboard = (ticketId: number) => {
     setOpenTicketId(ticketId);
-    onNavigate("ticket-queue");
   };
 
   if (openTicketId !== null) {
@@ -161,14 +172,20 @@ function Shell(): React.ReactElement {
   const { user } = useAuth();
   const defaultView = ROLE_VIEW[user!.role] || "my-tickets";
   const [activeView, setActiveView] = useState<ViewId>(() => defaultView);
+  const [headerNavKey, setHeaderNavKey] = useState(0);
 
   const navigate = (view: ViewId) => {
     setActiveView(view);
   };
 
+  const handleHeaderNavigate = (view: ViewId) => {
+    setHeaderNavKey((k) => k + 1);
+    setActiveView(view);
+  };
+
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#F5F7F6" }}>
-      <Header activeView={activeView} onNavigate={navigate} />
+      <Header activeView={activeView} onNavigate={handleHeaderNavigate} />
 
       <main className="container py-4" style={{ maxWidth: 1200 }}>
         {activeView === "change-password" ? (
@@ -179,12 +196,15 @@ function Shell(): React.ReactElement {
               TokTickIT <span className="text-success">IT Service Desk</span>
             </h1>
 
-            {user!.role === "REQUESTER" && <RequesterViews activeView={activeView} onNavigate={navigate} />}
+            {user!.role === "REQUESTER" && (
+              <RequesterViews activeView={activeView} onNavigate={navigate} headerNavKey={headerNavKey} />
+            )}
             {user!.role === "IT_STAFF" && (
               <StaffAndAdminViews
                 activeView={activeView}
                 onNavigate={navigate}
                 defaultStaffView="ticket-queue"
+                headerNavKey={headerNavKey}
               />
             )}
             {user!.role === "ADMINISTRATOR" && (
@@ -192,6 +212,7 @@ function Shell(): React.ReactElement {
                 activeView={activeView}
                 onNavigate={navigate}
                 defaultStaffView="user-management"
+                headerNavKey={headerNavKey}
               />
             )}
           </>

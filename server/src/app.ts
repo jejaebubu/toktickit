@@ -566,7 +566,7 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
     const userRole = req.user!.role;
     const userId = req.user!.id;
     const VALID_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
-    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
+    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "PENDING", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
     const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
 
     // Requester query view (owned tickets only)
