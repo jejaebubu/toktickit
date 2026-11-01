@@ -635,3 +635,48 @@ export async function resetUserPassword(id: number, initialPassword: string): Pr
   }
   return res.json();
 }
+
+export interface StaffDashboardMetrics {
+  new: number;
+  open: number;
+  inProgress: number;
+  waitingForRequester: number;
+  myAssigned: number;
+}
+
+export interface StaffDashboardTicket {
+  id: number;
+  ticketNumber: string;
+  title?: string;
+  summary?: string;
+  status: string;
+  requestedPriority?: string;
+  itPriority?: string;
+  category?: { id: number; name: string } | null;
+  categoryName?: string;
+  requester?: { id: number; name: string; email?: string } | null;
+  owner?: { id: number; name: string; email?: string } | null;
+  createdAt?: string;
+  updatedAt: string;
+}
+
+export interface StaffDashboardQuickAction {
+  id: string;
+  label: string;
+  url: string;
+}
+
+export interface StaffDashboardData {
+  metrics: StaffDashboardMetrics;
+  recentTickets: StaffDashboardTicket[];
+  quickActions?: StaffDashboardQuickAction[];
+}
+
+export async function fetchStaffDashboard(): Promise<StaffDashboardData> {
+  const res = await fetch(`${API_URL}/api/dashboard/staff`, { headers: authHeaders() });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, errorData.message || errorData.error || "Failed to fetch staff dashboard");
+  }
+  return res.json();
+}

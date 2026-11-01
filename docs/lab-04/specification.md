@@ -111,7 +111,7 @@
   - มีตัวบอก Active Page Indicator ชัดเจนบน Navigation Bar
 - **IT Staff Dashboard Screen**:
   - Metric Cards 5 ใบ (`New`, `Open`, `In Progress`, `Waiting for Requester`, `My Assigned`) แต่ละใบมีไอคอน ตัวเลขสรุป และคลิกเพื่อ Drill-down ไปยัง Ticket Queue พร้อมตั้ง Filter สถานะนั้นโดยอัตโนมัติ
-  - ตาราง My Recent Tickets แสดงตั๋วล่าสุด 5 รายการ
+  - ตาราง Recent Queue Tickets แสดงตั๋วล่าสุดในคิวบริการ 5 รายการ
   - Quick Actions Panel: ปุ่ม Create Ticket, Search Tickets, My Queue
 - **Requester Dashboard Screen**:
   - Metric Cards 4 ใบ (`My Open`, `In Progress`, `Resolved`, `Closed`) พร้อมปุ่ม View all นำทางไป My Tickets ที่ฟิลเตอร์สถานะนั้น

@@ -566,7 +566,7 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
     const userRole = req.user!.role;
     const userId = req.user!.id;
     const VALID_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
-    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
+    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "PENDING", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
     const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
 
     // Requester query view (owned tickets only)
@@ -698,11 +698,14 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
       where.itPriority = p;
     }
 
-    if (ownerId !== undefined && ownerId !== "") {
-      if (ownerId === "unassigned" || ownerId === "null") {
+    const effectiveOwnerId = ownerId !== undefined && ownerId !== "" ? ownerId : req.query.owner;
+    if (effectiveOwnerId !== undefined && effectiveOwnerId !== "") {
+      if (effectiveOwnerId === "unassigned" || effectiveOwnerId === "null") {
         where.ownerId = null;
+      } else if (String(effectiveOwnerId).toLowerCase() === "me") {
+        where.ownerId = req.user!.id;
       } else {
-        const ownerIdNum = Number(ownerId);
+        const ownerIdNum = Number(effectiveOwnerId);
         if (isNaN(ownerIdNum)) {
           return res.status(400).json({ error: "Bad Request", message: "Invalid ownerId parameter." });
         }
@@ -1767,6 +1770,90 @@ app.post("/api/users/:id/reset-password", authenticateToken, checkPasswordChange
     res.status(200).json({ message: "Initial password set successfully. User must change password at next login." });
   } catch (err: any) {
     res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 4 (Issue 6) — IT Staff & Administrator Dashboard API
+// GET /api/dashboard/staff
+// ---------------------------------------------------------------------------
+app.get("/api/dashboard/staff", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user!.role !== "IT_STAFF" && req.user!.role !== "ADMINISTRATOR") {
+      return res.status(403).json({
+        error: "Forbidden",
+        message: "Only IT Staff and Administrators can access the staff dashboard.",
+      });
+    }
+
+    const prisma = getPrisma();
+    const [newCount, openCount, inProgressCount, waitingForRequesterCount, myAssignedCount, rawRecentTickets] = await Promise.all([
+      prisma.ticket.count({
+        where: { status: { in: ["New", "NEW"] } },
+      }),
+      prisma.ticket.count({
+        where: { status: { in: ["Open", "OPEN"] } },
+      }),
+      prisma.ticket.count({
+        where: { status: { in: ["In Progress", "IN PROGRESS", "IN_PROGRESS"] } },
+      }),
+      prisma.ticket.count({
+        where: { status: { in: ["Waiting for Requester", "WAITING FOR REQUESTER", "WAITING_FOR_REQUESTER"] } },
+      }),
+      prisma.ticket.count({
+        where: {
+          ownerId: req.user!.id,
+          status: { notIn: ["Resolved", "RESOLVED", "Closed", "CLOSED", "Cancelled", "CANCELLED"] },
+        },
+      }),
+      prisma.ticket.findMany({
+        take: 5,
+        orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+        include: {
+          category: { select: { id: true, name: true } },
+          requester: { select: { id: true, name: true, email: true } },
+          owner: { select: { id: true, name: true, email: true } },
+        },
+      }),
+    ]);
+
+    const recentTickets = rawRecentTickets.map((t) => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      title: t.summary,
+      summary: t.summary,
+      status: TICKET_STATUSES[String(t.status).toUpperCase()] ?? t.status,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      category: t.category ? { id: t.category.id, name: t.category.name } : null,
+      categoryName: t.category?.name ?? "",
+      requester: t.requester ? { id: t.requester.id, name: t.requester.name, email: t.requester.email } : null,
+      owner: t.owner ? { id: t.owner.id, name: t.owner.name, email: t.owner.email } : null,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+    }));
+
+    return res.status(200).json({
+      metrics: {
+        new: newCount,
+        open: openCount,
+        inProgress: inProgressCount,
+        waitingForRequester: waitingForRequesterCount,
+        myAssigned: myAssignedCount,
+      },
+      recentTickets,
+      quickActions: [
+        { id: "create-ticket", label: "Create Ticket", url: "/tickets/new" },
+        { id: "search-tickets", label: "Search Tickets", url: "/staff/queue" },
+        { id: "my-queue", label: "My Queue", url: "/staff/queue?owner=me" },
+      ],
+    });
+  } catch (err: any) {
+    console.error("Failed to fetch staff dashboard:", err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "Failed to load staff dashboard.",
+    });
   }
 });
 

@@ -23,7 +23,7 @@ function roleLabel(role: string): string {
   }
 }
 
-type ViewId = "create-ticket" | "my-tickets" | "ticket-detail" | "ticket-queue" | "user-management" | "change-password";
+type ViewId = "dashboard" | "create-ticket" | "my-tickets" | "ticket-detail" | "ticket-queue" | "user-management" | "change-password";
 
 interface NavItem {
   id: ViewId;
@@ -36,8 +36,14 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { id: "my-tickets", label: "My Tickets", matches: ["my-tickets", "ticket-detail"] },
     { id: "create-ticket", label: "Create Ticket", matches: ["create-ticket"] },
   ],
-  IT_STAFF: [{ id: "ticket-queue", label: "Ticket Queue", matches: ["ticket-queue"] }],
-  ADMINISTRATOR: [{ id: "user-management", label: "User Management", matches: ["user-management"] }],
+  IT_STAFF: [
+    { id: "dashboard", label: "Dashboard", matches: ["dashboard"] },
+    { id: "ticket-queue", label: "Ticket Queue", matches: ["ticket-queue"] },
+  ],
+  ADMINISTRATOR: [
+    { id: "dashboard", label: "Dashboard", matches: ["dashboard"] },
+    { id: "user-management", label: "User Management", matches: ["user-management"] },
+  ],
 };
 
 interface HeaderProps {
