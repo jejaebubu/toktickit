@@ -213,7 +213,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               >
                 <span
                   className="badge rounded-pill fw-semibold px-2 py-1"
-                  style={{ backgroundColor: "#006B3C", color: "#FFFFFF" }}
+                  style={{ backgroundColor: "#006B3C", color: "#FFFFFF", whiteSpace: "normal", textAlign: "left" }}
                   data-testid="requester-resolved-advisory-badge"
                 >
                   Requester indicated problem resolved - Pending Staff Review
