@@ -114,6 +114,20 @@ test.describe("E2E-03: Role dashboards navigation & drill-down flow (AC-04, AC-0
     await expect(page.getByTestId("my-tickets-card")).toBeVisible();
     await expect(page.getByTestId("my-tickets-filter-status")).toHaveValue("Resolved");
     await expectNoHorizontalOverflow(page);
+
+    // --- 6. Return to Requester Dashboard and verify Quick Actions (+ Create Ticket & View My Tickets) ---
+    await navigateHeader(page, project, "dashboard");
+    await expect(page.getByTestId("requester-dashboard")).toBeVisible();
+    await page.getByTestId("requester-quick-action-create-ticket").click();
+    await expect(page.getByTestId("submit-ticket-btn")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await navigateHeader(page, project, "dashboard");
+    await expect(page.getByTestId("requester-dashboard")).toBeVisible();
+    await page.getByTestId("requester-quick-action-view-tickets").click();
+    await expect(page.getByTestId("my-tickets-card")).toBeVisible();
+    await expect(page.getByTestId("my-tickets-filter-status")).toHaveValue("");
+    await expectNoHorizontalOverflow(page);
   });
 });
 

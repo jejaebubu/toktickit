@@ -131,6 +131,10 @@ test.describe("E2E-01: Actions Taken complete user workflow (AC-01, AC-02, AC-03
     await actionCard.locator('[data-testid^="action-complete-"]').click();
     await expect(page.getByTestId("action-form")).toBeVisible();
     await expect(page.getByTestId("action-status")).toHaveValue("COMPLETED");
+    // Attempt to save COMPLETED action without Result -> negative validation error (BR-16 / AC-15)
+    await page.getByTestId("action-save").click();
+    await expect(page.getByTestId("action-result-error")).toContainText(/Result is required/i);
+
     await page.getByTestId("action-result").fill("Link negotiated at 1 Gbps full-duplex with zero CRC errors over 15 minutes.");
     await page.getByTestId("action-save").click();
 
