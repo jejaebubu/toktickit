@@ -27,8 +27,8 @@
 | **PR-06 ([GitHub #110](https://github.com/jejaebubu/toktickit/pull/110))** | IT Staff Dashboard API, summary metrics calculation, and UI screen | `feature/lab04-issue6-staff-dashboard` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการออกแบบการ์ดตัวชี้วัด 5 ใบ, ระบบ Drill-down, Responsive Desktop Table + Mobile Cards และชุดทดสอบ 6 เคสใหม่ (201/201) แต่ขอให้ (1) นำเมนู `Dashboard` ออกจาก `REQUESTER` ใน `Header.tsx` เพื่อป้องกันหน้าว่างก่อนทำ Issue #7, (2) เปลี่ยนหัวข้อแผงจาก `"My Recent Tickets"` เป็น `"Recent Queue Tickets"` ให้สอดคล้องกับ query, (3) เพิ่มลิงก์ PR #110 ใน `reviewer.md` → ผู้เขียนแก้ไขครบทุกข้อใน commit `1419b97` / `512cbab` / `8bc213c` → Reviewer ตรวจซ้ำแล้ว **Approve** — merged `c11da67` |
 | **PR-07 ([GitHub #111](https://github.com/jejaebubu/toktickit/pull/111))** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Approved & Merged** | Review #1 โดย `titayaaa`: ชมการรักษาความปลอดภัย RBAC และ Data Isolation (`requesterId === req.user.id`, `SAFE-01`), ดีไซน์ Zen Green + Responsive Desktop/Mobile + Accessibility, Empty State CTA `"Submit a new request"` + Quick Actions, ระบบ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 207/207 พร้อมให้คำแนะนำเชิงพัฒนาเพิ่มเติมเรื่องกลุ่มสถานะของการ์ด `My Open Tickets` → Reviewer **Approve** ในรอบแรก — merged `927862f` |
 | **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้เพิ่มลิงก์ PR #112, เพิ่ม negative validation test ช่อง Result, และเพิ่มการคลิก Quick Actions บน Requester Dashboard → ผู้เขียนแก้ไขครบใน commit `6ba5ed1` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `0ce99e8`) |
-| **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Request Changes → Addressed** | Review #1 โดย `titayaaa`: ชมความครบถ้วนของ Regression suite 234/234 tests (Server 112, Client 95, E2E 27 บน 3 viewports) แต่ขอให้ (1) เพิ่มลิงก์ PR #113 ใน Section 2, (2) เพิ่ม `- **PR URL:**` ใน Section 3.9, (3) ป้องกัน race condition ใน `staff-ticket-flow.spec.ts` โดย assert `toHaveValue("Resolved")`, (4) เติม PR #113 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วน — รอ Reviewer ตรวจซ้ำรอบที่ 2 |
-| **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | Planned | - |
+| **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมความครบถ้วนของ Regression suite 234/234 tests แต่ขอให้เพิ่มลิงก์ PR #113, เพิ่ม PR URL ใน 3.9, assert `toHaveValue("Resolved")` ใน `staff-ticket-flow.spec.ts`, และเติม PR #113 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วนใน commit `abb8ea3` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `5158f3a`) |
+| **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | **Review pending** | ตรวจสอบ Zen Green Theme, ปรับปรุง Accessibility attributes (aria-required, labels, role=alert, touch target >= 44px), เพิ่ม unit test A11Y-01 และบันทึกชุดภาพสกรีนช็อตครบ 24 ภาพบนทั้ง 3 Viewports (Desktop, Tablet, Mobile) ครอบคลุม Actions Taken, Dashboards และ Resolution Gate — รอ Reviewer ตรวจทาน |
 | **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | Planned | - |
 
 ### Partner Pull Request Log (`titayaaa/toktickit`)
@@ -558,7 +558,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
 - **Objective:** ตรวจสอบความเข้ากันได้ย้อนหลังและการทำงานร่วมกันของทั้งระบบ (Zero Regression ตาม `AC-11`, `FR-12`) ครอบคลุมชุดทดสอบเดิมทั้งหมดของ Lab 1, Lab 2, Lab 3 ร่วมกับโมดูลใหม่ของ Lab 4 (Server Vitest 112 tests, Client Vitest 95 tests, และ Playwright E2E 27 tests บนทั้ง 3 Viewports: Desktop, Tablet, Mobile) รวม 234/234 tests ผ่าน 100% พร้อมปรับปรุงสคริปต์ `e2e/lab-03/staff-ticket-flow.spec.ts` ให้สเต็ปการเปลี่ยนสถานะเป็นไปตาม 9-state Transition Matrix (`Open -> In Progress -> Resolved`)
-- **Status:** Request Changes → Addressed (รอบที่ 1 แก้ไขเรียบร้อย รอ Reviewer ตรวจซ้ำ)
+- **Status:** Approved & Merged (merge commit `5158f3a`)
 
 #### 3.9.1 Review #1 — Request Changes (`titayaaa`, 2026-11-02)
 
@@ -608,6 +608,40 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > 5. **ผลการรันทดสอบ Regression ซ้ำ**:
 >    - E2E Lab 3 (`e2e/lab-03/staff-ticket-flow.spec.ts`): รันผ่านครบ 3/3 runs บนทุก Viewports (Desktop, Tablet, Mobile)
 >    - ชุดทดสอบทั้งหมดยังคงผ่านครบถ้วนสมบูรณ์ **234/234 tests (100% Pass)** ปราศจาก regression ครับ
+
+#### 3.9.3 Review #2 — Approved (`titayaaa`, 2026-11-02)
+
+**Verdict:** Approved (no blocking issues)
+
+**Review Comments:**
+
+> ### ✅ การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+>
+> ขอบคุณ @jejaebubu ที่ดำเนินการแก้ไขปรับปรุงครบถ้วนสมบูรณ์ทั้ง 4 จุดใน commit `abb8ea3` อย่างรวดเร็วและประณีตมากค่ะ ตรวจสอบโค้ดและเอกสารซ้ำอย่างละเอียดแล้ว:
+>
+> 1. **ความสมบูรณ์ของเอกสารและลิงก์ PR (Required 1 & 2)**:
+>    - เพิ่มลิงก์ `[GitHub #113](https://github.com/jejaebubu/toktickit/pull/113)` ในตาราง Section 2 และระบุ `- **PR URL:**` ใน Section 3.9 ของ `docs/lab-04/reviewer.md` ครบถ้วนตามมาตรฐานเดียวกันกับทุก PR ก่อนหน้า
+>    - บันทึก Review Log รอบที่ 1 และ Author Response ไว้อย่างเป็นระเบียบและโปร่งใส
+> 2. **ความเสถียรของชุดทดสอบ E2E (Improvement 3)**:
+>    - ปรับปรุง `e2e/lab-03/staff-ticket-flow.spec.ts` ด้วยการเพิ่ม `toHaveValue("In Progress")` และ `toHaveValue("Resolved")` เพื่อตรวจสอบค่าจริงของ `<select>` ก่อนตรวจสอบ notice และบันทึกภาพหน้าจอ ช่วยขจัดปัญหา Race Condition และการเกิด Flaky test ได้อย่างสมบูรณ์แบบ
+> 3. **ความสอดคล้องของบันทึกผลการทดสอบ (Improvement 4)**:
+>    - อัปเดตตารางสรุปใน `docs/lab-04/tests.md` เป็น `**Pass** (PR #113, review addressed)` และยืนยันผล `REG-01` ครบถ้วน
+> 4. **ผลการทดสอบ Full Regression Suite**:
+>    - ชุดทดสอบเดิมตั้งแต่ Lab 1 ถึง Lab 3 ร่วมกับโมดูลใหม่ของ Lab 4 ผ่านครบถ้วนสมบูรณ์ **234/234 tests (100% Pass)** ปราศจาก regression ตามข้อกำหนด `AC-11` และ `FR-12`
+>
+> ภาพรวมของโค้ด ชุดทดสอบ และเอกสารมีคุณภาพสูงมาก ขอ **Approve** ให้ทันที และพร้อมให้ดำเนินการ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ!
+
+**คำวินิจฉัย**: **APPROVED & MERGED** — Reviewer กด Merge PR #113 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `5158f3a`) — **Closes Issue #9**
+
+---
+
+### 3.10 PR-10: Zen Green UI Polish, Accessibility, Responsive Viewports, and Screenshots (Issue #10)
+
+- **Branch:** `feature/lab04-issue10-ui-polish` → `lab4-staging`
+- **Author:** `@jejaebubu`
+- **Reviewer:** `@titayaaa`
+- **Objective:** ปรับแต่ง UI ให้สอดคล้องกับภาษาการออกแบบ Zen Green Theme อย่างสมบูรณ์แบบ, ตรวจสอบและยกระดับการเข้าถึงที่เท่าเทียม (Accessibility ตามเกณฑ์ WCAG 2.1 AA) ครอบคลุม touch target size $\ge 44 \times 44\text{px}$, การระบุ `aria-required="true"`, การเชื่อมโยง Label ด้วย `htmlFor`, การแสดงผลแจ้งเตือนด้วย `role="alert"`, การรองรับ 3 Viewports โดยปราศจาก Horizontal Overflow (`overflow-x: hidden`), การเพิ่มชุดทดสอบอัตโนมัติ `A11Y-01` (`client/tests/lab-04/ActionsTaken.test.tsx`) และการจัดเก็บชุดภาพสกรีนช็อต Full Page ครบทั้ง 24 ภาพใน `artifacts/lab-04/screenshots/`
+- **Status:** เปิด PR รอการตรวจทานจาก Reviewer (`@titayaaa`)
 
 ---
 

@@ -169,4 +169,59 @@ describe("Actions Taken UI — form validation, read-only requester view, and st
     );
     expect(JSON.parse(String((patchCall?.[1] as RequestInit).body))).toMatchObject({ status: "CANCELLED" });
   });
+
+  it("A11Y-01: Keyboard focus, ARIA labels, aria-required, and touch target size (>= 44px)", async () => {
+    const user = userEvent.setup();
+    const pending = makeAction({ id: "act-open", status: "PENDING", result: null });
+    renderWithAuth(<ActionsTaken ticketId={201} actions={[pending]} />);
+
+    // 1. Verify touch target >= 44px on interactive buttons
+    const addBtn = await screen.findByTestId("action-add");
+    expect(addBtn).toHaveStyle({ minHeight: "44px" });
+    const editBtn = screen.getByTestId("action-edit-act-open");
+    expect(editBtn).toHaveStyle({ minHeight: "44px" });
+    const completeBtn = screen.getByTestId("action-complete-act-open");
+    expect(completeBtn).toHaveStyle({ minHeight: "44px" });
+    const cancelBtn = screen.getByTestId("action-cancel-status-act-open");
+    expect(cancelBtn).toHaveStyle({ minHeight: "44px" });
+
+    // 2. Open form and verify form controls accessibility (labels + aria-required)
+    await user.click(addBtn);
+    const form = screen.getByTestId("action-form");
+    expect(form).toBeInTheDocument();
+
+    const dateInput = screen.getByTestId("action-date");
+    expect(dateInput).toHaveAttribute("id", "action-date");
+    expect(document.querySelector('label[for="action-date"]')).toBeInTheDocument();
+    expect(dateInput).toHaveStyle({ minHeight: "44px" });
+
+    const assigneeSelect = screen.getByTestId("action-assignee");
+    expect(assigneeSelect).toHaveAttribute("id", "action-assignee");
+    expect(document.querySelector('label[for="action-assignee"]')).toBeInTheDocument();
+    expect(assigneeSelect).toHaveAttribute("aria-required", "true");
+    expect(assigneeSelect).toHaveStyle({ minHeight: "44px" });
+
+    const descInput = screen.getByTestId("action-description");
+    expect(descInput).toHaveAttribute("id", "action-description");
+    expect(document.querySelector('label[for="action-description"]')).toBeInTheDocument();
+    expect(descInput).toHaveAttribute("aria-required", "true");
+
+    const resultInput = screen.getByTestId("action-result");
+    expect(resultInput).toHaveAttribute("id", "action-result");
+    expect(document.querySelector('label[for="action-result"]')).toBeInTheDocument();
+    expect(resultInput).toHaveAttribute("aria-required", "false");
+
+    // Toggle follow-up note and check dynamic aria-required
+    await user.click(screen.getByTestId("action-followup-required"));
+    const noteInput = await screen.findByTestId("action-followup-note");
+    expect(noteInput).toHaveAttribute("id", "action-followup-note");
+    expect(document.querySelector('label[for="action-followup-note"]')).toBeInTheDocument();
+    expect(noteInput).toHaveAttribute("aria-required", "true");
+
+    // Verify form action buttons touch target size
+    const saveBtn = screen.getByTestId("action-save");
+    expect(saveBtn).toHaveStyle({ minHeight: "44px" });
+    const formCancelBtn = screen.getByTestId("action-form-cancel");
+    expect(formCancelBtn).toHaveStyle({ minHeight: "44px" });
+  });
 });

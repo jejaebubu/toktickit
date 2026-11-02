@@ -55,7 +55,7 @@
 | **UI-07** | UI | AC-13 / FR-15 / BR-15 | Resolution Gate warning and confirmation modal | แสดงคำเตือน/Modal เมื่อมี Action ค้าง และไม่เปลี่ยนสถานะเมื่อ API ตอบ 409 | `client/tests/lab-04/TicketWorkflow.test.tsx` | Pass |
 | **STYLE-01** | UI Style | ui-spec §1 | Zen Green Theme consistency (Palette, Status Badges, Typography) | องค์ประกอบทั้งหมดใช้สีตรงตาม Zen Green Token Specification | `client/tests/lab-04/StaffDashboard.test.tsx` | Pass |
 | **RESP-01** | Responsive | AC-10 / ui-spec §3 | Responsive layout across 3 viewports (Desktop, Tablet, Mobile) | การ์ดและตารางปรับตัวตาม breakpoint และไม่มี horizontal scrolling | `client/tests/lab-04/StaffDashboard.test.tsx` | Pass |
-| **A11Y-01** | A11Y | ui-spec §3 | Keyboard focus, ARIA labels, and touch target size | Touch targets $\ge 44\text{px}$, มี visible focus, form controls มี label | `client/tests/lab-04/ActionsTaken.test.tsx` | Planned |
+| **A11Y-01** | A11Y | ui-spec §3 | Keyboard focus, ARIA labels, and touch target size | Touch targets $\ge 44\text{px}$, มี visible focus, form controls มี label | `client/tests/lab-04/ActionsTaken.test.tsx` | Pass |
 | **E2E-01** | E2E | AC-01 / AC-02 | Actions Taken complete user workflow | Staff สร้าง/แก้ไข Action $\rightarrow$ Requester เข้าดูเห็นเป็น Read-only | `e2e/lab-04/actions-taken-flow.spec.ts` | Pass |
 | **E2E-02** | E2E | AC-07 / AC-08 | Ticket resolution & lifecycle verification | Requester แจ้งแก้ไข $\rightarrow$ Staff ตรวจงาน $\rightarrow$ เปลี่ยนเป็น Resolved | `e2e/lab-04/ticket-resolution.spec.ts` | Pass |
 | **E2E-03** | E2E | AC-04 / AC-05 / FR-10 | Role dashboards navigation & drill-down flow | ตรวจสอบตัวเลข Dashboard ทั้งสองบทบาท และคลิก Drill-down สำเร็จ | `e2e/lab-04/dashboards.spec.ts` | Pass |
@@ -77,7 +77,7 @@
 | **PR-06** | Issue #6 | 2026-11-01 | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | 6 new + 195 existing = 201 (110 server / 91 client) | **Pass** (PR #110, review addressed & merged `c11da67`) |
 | **PR-07** | Issue #7 | 2026-11-02 | Requester Dashboard Tests (`requester-dashboard.api.test.ts`, `RequesterDashboard.test.tsx`) | 6 new + 201 existing = 207 (112 server / 95 client) | **Pass** (PR #111, approved & merged `927862f`) |
 | **PR-08** | Issue #8 | 2026-11-02 | Playwright E2E Tests (`e2e/lab-04/*.spec.ts`) | 9 new E2E (3 specs × 3 viewports) + 207 unit/integration = 216 | **Pass** (PR #112, approved & merged `0ce99e8`) |
-| **PR-09** | Issue #9 | 2026-11-02 | Full Regression Test Suite (Lab 1–3 + Lab 4) | 112 server + 95 client + 27 Playwright E2E = 234 total tests | **Pass** (PR #113, review addressed) |
-| **PR-10** | Issue #10 | - | Accessibility & Responsive Inspection | - | Pending |
+| **PR-09** | Issue #9 | 2026-11-02 | Full Regression Test Suite (Lab 1–3 + Lab 4) | 112 server + 95 client + 27 Playwright E2E = 234 total tests | **Pass** (PR #113, approved & merged `5158f3a`) |
+| **PR-10** | Issue #10 | 2026-11-02 | Accessibility & Responsive Inspection (`ActionsTaken.test.tsx`, E2E viewports, Zen Green polish) | 1 new A11Y test + 24 E2E screenshots across 3 viewports = 235 total tests | **Pass** (review pending) |
 | **PR-11** | Issue #11 | - | Release Verification on `main` branch | - | Pending |
 
