@@ -77,7 +77,7 @@
 | **PR-06** | Issue #6 | 2026-11-01 | Staff Dashboard Tests (`staff-dashboard.api.test.ts`, `StaffDashboard.test.tsx`) | 6 new + 195 existing = 201 (110 server / 91 client) | **Pass** (PR #110, review addressed & merged `c11da67`) |
 | **PR-07** | Issue #7 | 2026-11-02 | Requester Dashboard Tests (`requester-dashboard.api.test.ts`, `RequesterDashboard.test.tsx`) | 6 new + 201 existing = 207 (112 server / 95 client) | **Pass** (PR #111, approved & merged `927862f`) |
 | **PR-08** | Issue #8 | 2026-11-02 | Playwright E2E Tests (`e2e/lab-04/*.spec.ts`) | 9 new E2E (3 specs × 3 viewports) + 207 unit/integration = 216 | **Pass** (PR #112, approved & merged `0ce99e8`) |
-| **PR-09** | Issue #9 | 2026-11-02 | Full Regression Test Suite (Lab 1–3 + Lab 4) | 112 server + 95 client + 27 Playwright E2E = 234 total tests | **Pass** (PR #113, review addressed) |
+| **PR-09** | Issue #9 | 2026-11-02 | Full Regression Test Suite (Lab 1–3 + Lab 4) | 112 server + 95 client + 27 Playwright E2E = 234 total tests | **Pass** (PR #113, approved & merged `5158f3a`) |
 | **PR-10** | Issue #10 | - | Accessibility & Responsive Inspection | - | Pending |
 | **PR-11** | Issue #11 | - | Release Verification on `main` branch | - | Pending |
 
