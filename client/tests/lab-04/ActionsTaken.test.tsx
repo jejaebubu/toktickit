@@ -211,6 +211,10 @@ describe("Actions Taken UI — form validation, read-only requester view, and st
     expect(document.querySelector('label[for="action-result"]')).toBeInTheDocument();
     expect(resultInput).toHaveAttribute("aria-required", "false");
 
+    // Dynamic check: selecting COMPLETED status makes result aria-required="true"
+    await user.selectOptions(screen.getByTestId("action-status"), "COMPLETED");
+    expect(screen.getByTestId("action-result")).toHaveAttribute("aria-required", "true");
+
     // Toggle follow-up note and check dynamic aria-required
     await user.click(screen.getByTestId("action-followup-required"));
     const noteInput = await screen.findByTestId("action-followup-note");
