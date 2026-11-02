@@ -31,11 +31,12 @@
 | **PR-10 ([GitHub #114](https://github.com/jejaebubu/toktickit/pull/114))** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการปรับปรุง Zen Green UI, Accessibility WCAG AA, A11Y-01, และ 24 screenshots บน 3 viewports แต่ขอให้ (1) เติมลิงก์ PR #114 ใน Section 2, (2) เพิ่ม PR URL ใน 3.10, (3) ระบุ PR #114 ใน `tests.md`, และ (4) เพิ่มเทสต์ dynamic `aria-required` บน Result → ผู้เขียนแก้ไขครบถ้วนใน commit `2182896` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `d785a4c`) |
 | **PR-11 ([GitHub #115](https://github.com/jejaebubu/toktickit/pull/115))** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | **Changes Requested (Round 1) → Pending Round 2** | Review #1 โดย `titayaaa`: ขอให้เติมลิงก์ PR #115 ใน Section 2, เพิ่ม PR URL ใน 3.11, และระบุ PR #115 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วน — รอ Reviewer ตรวจซ้ำรอบที่ 2 และกด Merge เข้าสู่ `main` |
 
-### Partner Pull Request Log (`titayaaa/toktickit`)
+### Partner Pull Request Log
 
-| PR ID | Title / Feature Scope | Branch Source | Target Branch | Author | Reviewer Status | Comments / Resolution |
+| PR ID | Repository / Scope | Branch Source | Target Branch | Author | Reviewer Status | Comments / Resolution |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **PR-P1 ([GitHub #75](https://github.com/titayaaa/toktickit/pull/75))** | Issue 27: Sprint 4 Engineering Contract & Specification (`docs/lab-04/`) | `feature/27-lab4-specs` | `lab4-staging` | `titayaaa` | **Changes Requested (3 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจ 3 รอบและขอแก้เรื่อง FK type, field mapping, transition matrix, route/status code, migration plan, ownership formula, accessibility, 403/404 และ stale claims → ผู้เขียนแก้ครบที่ commit `f144a1a` → Reviewer ตรวจรอบสุดท้ายแล้ว **Approve** → Merged `4a55567` (2026-10-31 19:58 UTC) |
+| **PR-P1 ([GitHub #75](https://github.com/titayaaa/toktickit/pull/75))** | `titayaaa/toktickit`: Issue 27: Sprint 4 Engineering Contract & Specification (`docs/lab-04/`) | `feature/27-lab4-specs` | `lab4-staging` | `titayaaa` | **Changes Requested (3 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจ 3 รอบและขอแก้เรื่อง FK type, field mapping, transition matrix, route/status code, migration plan, ownership formula, accessibility, 403/404 และ stale claims → ผู้เขียนแก้ครบที่ commit `f144a1a` → Reviewer ตรวจรอบสุดท้ายแล้ว **Approve** → Merged `4a55567` (2026-10-31 19:58 UTC) |
+| **PR-P2 ([GitHub #86](https://github.com/Achikan/TokTickIT/pull/86))** | `Achikan/TokTickIT`: feat(Issue 34): IT Staff Dashboard (API + UI) | `feature/34-staff-dashboard` | `lab4-staging` | `Achikan` | **Changes Requested (2 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจ 3 รอบ ขอแก้ blocking issues: compile error ใน `staffQueue.ts`, route เดิมของ Lab 2 หายใน `app.ts`, client contract ไม่ตรง spec, status badge CSS class, และ test assertions (urgentHigh, recentlyUpdated, userCounts) → ผู้เขียนแก้ครบที่ commit `621db34` → Reviewer ตรวจรอบสุดท้ายแล้ว **Approve & Merge** → Merged `7731405` (2026-11-01 10:22 UTC) |
 
 
 ---
@@ -787,9 +788,9 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ---
 
-## 4. Full Review Trail — Partner Repository PR #75 (`titayaaa/toktickit`)
+## 4. Full Review Trail — Partner Repository Reviews
 
-### 4.1 PR #75: Issue 27: Sprint 4 Engineering Contract & Specification (`docs/lab-04/`)
+### 4.1 PR #75: Issue 27: Sprint 4 Engineering Contract & Specification (`titayaaa/toktickit`)
 
 - **PR URL:** [titayaaa/toktickit#75](https://github.com/titayaaa/toktickit/pull/75)
 - **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
@@ -1152,3 +1153,215 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > โดยรวมเอกสารพร้อม merge เข้า `lab4-staging` ได้แล้วค่ะ ส่วน Minor follow-ups สามารถเก็บไปปรับเพิ่มเติมได้โดยไม่ต้องบล็อกการ merge ค่ะ
 
 **คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #75 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `4a555671b13ecee7cabcae75dd76e3ed9dc77e3d`, 2026-10-31 19:58 UTC) — **Closes #63**
+
+---
+
+### 4.2 PR #86: Issue 34: IT Staff Dashboard (API + UI) (`Achikan/TokTickIT`)
+
+- **PR URL:** [Achikan/TokTickIT#86](https://github.com/Achikan/TokTickIT/pull/86)
+- **Author:** `@Achikan` (Achikan)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/34-staff-dashboard`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `773140529e59b2843361db28141957b56019226f`, 2026-11-01 10:22 UTC)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `621db34052cb10f21d82977b52331246ead04472`
+
+#### 4.2.1 Review #1 — Changes Requested (`jejaebubu`, 2026-10-31 23:36 UTC+7)
+
+**Review ID:** `5723788673`  
+**Commit Reviewed:** `4e1c30122d1e4e023f16085d48d6c89e05719a01`  
+**Verdict:** Changes Requested
+
+**Verbatim Review Comments:**
+
+> Dashboard ฝั่ง server มาถูกทางแล้วนะคะ แต่ที่ head `4e1c301` ตอนนี้ยังมีจุดที่ต้องแก้ก่อน merge อยู่หลายจุด หลัก ๆ คือ server ยังรันไม่ได้, route เดิมของ Lab 2 หายไป แล้วก็ client กับ test ยังใช้ข้อมูลคนละแบบกับ contract ใหม่ค่ะ
+>
+> ### สิ่งที่ทำได้ดีแล้ว
+> - แยก `server/src/staffDashboard.ts` ออกมาชัดเจน และใช้ middleware เดิมของระบบแล้ว
+> - เปลี่ยนมาใช้ `count / groupBy / findMany` และ `take: 5` แล้ว
+> - Payload ใหม่ใกล้กับ `api-spec.md §3.1` มากขึ้น
+> - UI มี loading / forbidden / empty state แล้ว
+> - รองรับ `ownerId=me` ตาม spec แล้วค่ะ
+>
+> ### จุดที่ต้องแก้ก่อน (Blocking)
+>
+> **1. `staffQueue.ts` ตอนนี้ทำให้ server รันไม่ได้**
+>
+> มีหลายจุดที่ยังไม่ตรงกับโค้ดจริงค่ะ เช่น
+> - import `isStaffOrAdminRole` จาก `./roles.js` แต่ไม่มีไฟล์นี้ใน repo
+> - import `invalidQuery` กับ `parseIntParam` แต่ `middleware.ts` ไม่ได้ export สองตัวนี้
+> - ใช้ `require("express")` ทั้งที่ project ใช้ `"type": "module"`
+> - sort ใช้ `"status"` แต่ field ใน Prisma จริงคือ `currentStatus`
+> - `/api/staff/assignees` ของเดิมหายไป ทำให้ test ของ Lab 3 มีโอกาสพัง
+> - validation บางส่วนถูก comment ออก ทำให้ query ที่ผิดอาจได้ `200` แทน `400`
+>
+> ตรงนี้กระทบทั้ง server เลยค่ะ เพราะ `app` จะ import ไม่ผ่าน ทำให้ test ทั้งชุดรันไม่ได้ ไม่ใช่แค่ Dashboard
+>
+> แนะนำให้เอาไฟล์เดิมจาก `lab4-staging` กลับมาก่อน แล้วค่อยเพิ่มเฉพาะ `ownerId === "me"` ค่ะ
+>
+> `git checkout lab4-staging -- server/src/staffQueue.ts`
+>
+> ---
+>
+> **2. Route เดิมของ Lab 2 หายไปจาก `app.ts`**
+>
+> ตอนนี้ `server/src/app.ts` เหลือประมาณ 98 บรรทัด ทำให้ route เดิมหลายตัวหายไป เช่น
+> - categories / related systems
+> - สร้างและดู ticket
+> - ดู ticket detail
+> - upload / list / download / delete attachment
+>
+> และตอนนี้ยังไม่มี module ใหม่มารับ route พวกนี้แทนค่ะ ทำให้ Requester สร้างหรือดู ticket รวมถึงแนบไฟล์ไม่ได้ ซึ่งจะกระทบของเดิมจาก Lab 2
+>
+> แนะนำให้ restore `app.ts` จาก `lab4-staging` ก่อน
+>
+> `git checkout lab4-staging -- server/src/app.ts`
+>
+> แล้วค่อยเพิ่มเฉพาะ route ของ Dashboard กลับเข้าไปค่ะ
+>
+> ---
+>
+> **3. Client ยังใช้ contract เก่าอยู่**
+>
+> ตอนนี้ Client ยังใช้ชื่อแบบเดิม เช่น
+> `metrics.unassigned`, `metrics.ownedByMe`, `metrics.byItPriority`, `lists.recentlyUpdated`, `lists.urgentHigh` และ `administrator.userCounts`
+>
+> แต่ Server ใหม่ส่งเป็น
+> `unassignedCount`, `ownedByMeCount`, `byPriority`, `recentlyUpdated.items`, `urgentHigh.items` และ `userCounts`
+>
+> ทำให้ตอนนี้บางค่าจะเป็น `undefined` และ Dashboard มีโอกาส crash ตอน render ค่ะ
+>
+> ถ้าจะใช้ contract ใหม่ตาม spec แนะนำให้แก้ประมาณนี้
+>
+> `metrics.unassigned` → `metrics.unassignedCount`  
+> `metrics.ownedByMe` → `metrics.ownedByMeCount`  
+> `metrics.byItPriority` → `metrics.byPriority`  
+> `lists.recentlyUpdated` → `recentlyUpdated.items`  
+> `lists.urgentHigh` → `urgentHigh.items`  
+> `administrator.userCounts` → `userCounts`
+>
+> ส่วนข้อมูล owner ตอนนี้ Client คาด `ownerId` แต่ Server ส่ง `owner: { id, name } | null` ตรงนี้ก็ควรเลือกให้ตรงกันค่ะ
+>
+> ---
+>
+> **4. Metrics บางตัวยังไม่ตรงกับ `api-spec.md §3.1`**
+>
+> `byStatus` ตาม spec ต้องนับ ticket ทุกสถานะและมีครบทั้ง 8 statuses แต่ตอนนี้ Server กรองเฉพาะ active status ทำให้ `RESOLVED`, `CLOSED`, `CANCELLED` ไม่ถูกนับและบาง key หายไปค่ะ
+>
+> `urgentHigh` ตาม spec ต้องมีทั้ง `URGENT` และ `HIGH` โดยเรียง URGENT ก่อน และไม่เกิน 5 รายการ แต่ตอนนี้เอาเฉพาะ URGENT อย่างเดียวค่ะ
+>
+> ส่วน `drilldown` ตาม spec ต้องมี mapping สำหรับ 5 แบบ คือ unassigned, ownedByMe, byStatus, byPriority และ recentlyUpdated แต่ตอนนี้ Server ส่ง `queueBase / ticketDetailBase` ซึ่งยังเป็นคนละรูปแบบกับ spec ค่ะ
+>
+> ---
+>
+> **5. Drill-down บน UI ยังใช้งานจริงไม่ได้**
+>
+> ตอนนี้เวลาเลือก ticket หรือกดการ์ดจาก Dashboard
+> - `onSelectTicket` รับ ticket id มาแล้ว แต่ยังไม่ได้เอาไปเปิด Ticket Detail
+> - `onViewQueue` รับ filter มาแล้ว แต่ยังไม่ได้ส่งต่อให้ Ticket Queue
+> - `StaffTicketQueue` ยังไม่รับ initial filters
+> - ADMIN ยังเข้า Ticket Queue ผ่าน flow นี้ไม่ได้ เพราะตอนนี้รองรับเฉพาะ `IT_STAFF`
+>
+> แนะนำให้เก็บ filter กับ ticket id ที่กดมาจาก Dashboard ไว้ใน state แล้วส่งต่อให้ `StaffTicketQueue` / `StaffTicketDetail` จริงค่ะ และเพิ่มให้ ADMIN เข้า queue/detail ได้ด้วย
+>
+> ---
+>
+> **6. Tests ยังเป็นของ contract เก่าอยู่**
+>
+> ทั้ง Server test และ Client test ยังใช้ payload แบบเดิม ทำให้ยังไม่ได้ทดสอบ contract ใหม่จริง ๆ ค่ะ
+>
+> ควรเพิ่ม/แก้ test ให้ครอบคลุมพวกนี้ด้วย
+> - `ownerId=me` ได้ผลตรงกับ user ที่ login อยู่
+> - `byStatus` มีครบทั้ง 8 statuses
+> - `RESOLVED / CLOSED / CANCELLED` ถูกนับจริง
+> - `urgentHigh` มีทั้ง URGENT และ HIGH และเรียง URGENT ก่อน
+> - `drilldown` มีครบ 5 URL ตาม spec
+> - item มี `owner: { id, name } | null`
+> - limit ไม่เกิน 5 และเรียงถูกต้อง
+> - ไม่มีข้อมูลก็ยังคืน `200` พร้อมค่า 0 ครบ
+> - ADMIN ได้ `userCounts`
+> - unauthenticated ได้ `401` และ Requester ได้ `403`
+> - ฝั่ง UI กด drill-down แล้วส่ง filter จริง และกด ticket แล้วเปิด detail จริงค่ะ
+>
+> ฝากอัปเดต test ให้ตรงกับ spec แล้วรันใหม่ที่ head ล่าสุดด้วยนะคะ
+>
+> ### อีกจุดที่ต้องเลือกให้ตรงกัน — Admin `userCounts`
+>
+> ตอนนี้ `api-spec.md` กำหนดเป็น
+>
+> `userCounts: { total, active }`
+>
+> และ Server ก็ทำตาม spec นี้แล้วค่ะ
+>
+> แต่ Client ยังใช้ `administrator.userCounts` และต้องการข้อมูลแยก requesters / staff / admins เพิ่มด้วย
+>
+> ตรงนี้ต้องเลือกว่าจะใช้แบบไหน แล้วทำ Server / Client / Spec ให้ตรงกันค่ะ ถ้ายึดตาม spec ปัจจุบัน ตอนนี้จะเป็นฝั่ง Client ที่ต้องแก้
+>
+> ### จุดเล็ก ๆ ที่ควรปรับเพิ่ม
+> - การ mount `staffQueueRouter` กับ Dashboard route ควรจัดให้ชัดขึ้น
+> - `csrfProtection` บน GET ไม่น่าจำเป็น
+> - `pageSize` เปลี่ยนจาก 10 → 20 และ max 50 → 100 อาจกระทบ test
+
+---
+
+#### 4.2.2 Review #2 — Changes Requested (`jejaebubu`, 2026-11-01 02:43 UTC+7)
+
+**Review ID:** `5724630453`  
+**Commit Reviewed:** `178d559d26017f6949c106853c66e249fbd329fc`  
+**Verdict:** Changes Requested
+
+**Verbatim Review Comments:**
+
+> เช็คที่ `178d559` แล้วนะคะ ยืนยันว่าตอนนี้ส่วนหลัก ๆ ผ่านครบแล้วค่ะ
+>
+> - Server build ผ่าน และ full server suite ผ่าน 327/327 tests
+> - Client build ผ่าน และ full client suite ผ่าน 133/133 tests
+> - กู้ `app.ts` / `staffQueue.ts` กลับมาแล้ว
+> - `ownerId=me`, contract ใหม่, Admin `userCounts`, drilldown, cards ที่ใช้ `<a>`, `<time>`, SD-05 drilldown และ `onViewUsers` ทำครบแล้ว
+> - เพิ่ม `ticketId` ใน `style.test.tsx` แล้ว ทำให้ client build ผ่านค่ะ
+>
+> **เหลืออีก 2 เรื่องที่ยังต้องแก้ตาม feedback รอบก่อนนะคะ**
+>
+> **1. Status badge ยังใช้ class ไม่ตรงกับ CSS**
+>
+> ใน `client/src/StaffDashboard.tsx:42` ยังใช้ `status-badge status-*` อยู่ แต่ใน `styles.css` มี class เป็น `badge-status-*` ทำให้สีของ status badge ไม่แสดงตาม design ค่ะ
+>
+> รบกวนเปลี่ยนให้ใช้ mapping แบบเดียวกับ `STAFF_TICKET` / queue / detail เช่น `badge-status-new`, `badge-status-in-progress` และสถานะอื่น ๆ ด้วยนะคะ ส่วน `text-tok-green` ที่เพิ่มมาแล้วไม่มีปัญหาค่ะ
+>
+> **2. Tests บางส่วนยังขาด assertion จากรอบก่อน**
+>
+> ตอนนี้ test ใหม่ยังไม่ได้เช็กบางกรณีที่ feedback เคยระบุไว้ ได้แก่
+>
+> - `urgentHigh` ต้องมีทั้ง URGENT และ HIGH และเรียง URGENT ไว้ก่อน แต่ตอนนี้ seed ให้ URGENT เป็น CANCELLED เลยเหลือแค่ HIGH 1 รายการ
+> - `recentlyUpdated` ต้องเช็กว่าเรียงจากรายการใหม่ไปเก่า และตัด ticket ที่เก่ากว่า 7 วันออก
+> - Admin `userCounts` ตอนนี้เช็กแค่ `>= 1` แต่ควรเทียบกับ `prisma.user.count()` จริงด้วย
+> - การเช็ก owner object ไม่ควรใช้ `if (item)` ครอบ assertion เพราะถ้าไม่เจอ item จะทำให้ข้ามการตรวจสอบไปได้ ควร assert ก่อนว่าเจอ item จริง
+> - Client test ยังขาดการเช็ก drilldown ของ `byStatus` / `byPriority` และกรณีที่ IT_STAFF ต้องไม่เห็น `userCounts`
+> - ยังไม่มี App-level test ที่ยืนยันว่ากดการ์ดแล้วส่ง filter ไปให้ `StaffTicketQueue` จริง และกด ticket แล้วเปิด `StaffTicketDetail` ได้จริง แม้ตอนนี้จะเขียนโค้ดเชื่อมไว้แล้วก็ตาม
+>
+> รบกวนเพิ่ม assertion และ test เหล่านี้กลับมาให้ครบ แล้วรัน full suite อีกรอบนะคะ
+>
+> **Nit เล็ก ๆ (ไม่ใช่ blocker):** การ์ด Admin ยังใช้ `href="#"` และ href ของการ์ดบางส่วนชี้ไปที่ `/api/...` ถ้าเปิดใน tab ใหม่ก็จะเห็นเป็น JSON แทนหน้า UI ค่ะ ถ้าปรับให้เป็น route ฝั่ง client ได้ก็จะดีมากค่ะ
+>
+> ถ้าแก้ 2 ประเด็นหลักนี้ครบแล้ว ก็น่าจะ approve ได้เลยค่ะ
+
+---
+
+#### 4.2.3 Review #3 — Approved (`jejaebubu`, 2026-11-01 16:50 UTC+7)
+
+**Review ID:** `5727471865`  
+**Commit Reviewed:** `621db34052cb10f21d82977b52331246ead04472`  
+**Verdict:** Approved (no blocking issues)
+
+**Verbatim Review Comments:**
+
+> Checked at 621db34. Both remaining items are addressed:
+>
+> Status badge now uses the badge-status-* mapping, consistent with queue/detail.
+> The missing assertions and tests are restored (urgentHigh, recentlyUpdated, userCounts vs DB, owner check, client drilldown, App-level test).
+>
+> The href nit isn’t a blocker. Consider a follow-up issue. Approving.
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #86 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `773140529e59b2843361db28141957b56019226f`, 2026-11-01 10:22 UTC) — **Closes #74**
+
