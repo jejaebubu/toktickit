@@ -28,8 +28,8 @@
 | **PR-07 ([GitHub #111](https://github.com/jejaebubu/toktickit/pull/111))** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Approved & Merged** | Review #1 โดย `titayaaa`: ชมการรักษาความปลอดภัย RBAC และ Data Isolation (`requesterId === req.user.id`, `SAFE-01`), ดีไซน์ Zen Green + Responsive Desktop/Mobile + Accessibility, Empty State CTA `"Submit a new request"` + Quick Actions, ระบบ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 207/207 พร้อมให้คำแนะนำเชิงพัฒนาเพิ่มเติมเรื่องกลุ่มสถานะของการ์ด `My Open Tickets` → Reviewer **Approve** ในรอบแรก — merged `927862f` |
 | **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้เพิ่มลิงก์ PR #112, เพิ่ม negative validation test ช่อง Result, และเพิ่มการคลิก Quick Actions บน Requester Dashboard → ผู้เขียนแก้ไขครบใน commit `6ba5ed1` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `0ce99e8`) |
 | **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมความครบถ้วนของ Regression suite 234/234 tests แต่ขอให้เพิ่มลิงก์ PR #113, เพิ่ม PR URL ใน 3.9, assert `toHaveValue("Resolved")` ใน `staff-ticket-flow.spec.ts`, และเติม PR #113 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วนใน commit `abb8ea3` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `5158f3a`) |
-| **PR-10 ([GitHub #114](https://github.com/jejaebubu/toktickit/pull/114))** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | **Request Changes → Addressed** | Review #1 โดย `titayaaa`: ชมการปรับปรุง Zen Green UI, Accessibility WCAG AA, A11Y-01, และ 24 screenshots บน 3 viewports แต่ขอให้ (1) เติมลิงก์ PR #114 ใน Section 2, (2) เพิ่ม PR URL ใน 3.10, (3) ระบุ PR #114 ใน `tests.md`, และ (4) เพิ่มเทสต์ dynamic `aria-required` บน Result → ผู้เขียนแก้ไขครบถ้วน — รอ Reviewer ตรวจซ้ำรอบที่ 2 |
-| **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | Planned | - |
+| **PR-10 ([GitHub #114](https://github.com/jejaebubu/toktickit/pull/114))** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการปรับปรุง Zen Green UI, Accessibility WCAG AA, A11Y-01, และ 24 screenshots บน 3 viewports แต่ขอให้ (1) เติมลิงก์ PR #114 ใน Section 2, (2) เพิ่ม PR URL ใน 3.10, (3) ระบุ PR #114 ใน `tests.md`, และ (4) เพิ่มเทสต์ dynamic `aria-required` บน Result → ผู้เขียนแก้ไขครบถ้วนใน commit `2182896` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `d785a4c`) |
+| **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | **Review pending** | รวบรวมเอกสาร Sprint 4 (`ai-use.md`, `README.md`, `tests.md`, `reviewer.md`), ยืนยันผลทดสอบทั้งระบบ 235 tests ผ่าน 100%, และเปิด Release PR เพื่อผสานโค้ดเข้าสู่สาขาหลัก `main` — รอ Reviewer ตรวจทานและกด Merge |
 
 ### Partner Pull Request Log (`titayaaa/toktickit`)
 
@@ -642,7 +642,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
 - **Objective:** ปรับแต่ง UI ให้สอดคล้องกับภาษาการออกแบบ Zen Green Theme อย่างสมบูรณ์แบบ, ตรวจสอบและยกระดับการเข้าถึงที่เท่าเทียม (Accessibility ตามเกณฑ์ WCAG 2.1 AA) ครอบคลุม touch target size $\ge 44 \times 44\text{px}$, การระบุ `aria-required="true"`, การเชื่อมโยง Label ด้วย `htmlFor`, การแสดงผลแจ้งเตือนด้วย `role="alert"`, การรองรับ 3 Viewports โดยปราศจาก Horizontal Overflow (`overflow-x: hidden`), การเพิ่มชุดทดสอบอัตโนมัติ `A11Y-01` (`client/tests/lab-04/ActionsTaken.test.tsx`) และการจัดเก็บชุดภาพสกรีนช็อต Full Page ครบทั้ง 24 ภาพใน `artifacts/lab-04/screenshots/`
-- **Status:** Request Changes → Addressed (รอบที่ 1 แก้ไขเรียบร้อย รอ Reviewer ตรวจซ้ำ)
+- **Status:** Approved & Merged (merge commit `d785a4c`)
 
 #### 3.10.1 Review #1 — Request Changes (`titayaaa`, 2026-11-02)
 
@@ -688,6 +688,41 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >    - เพิ่มการทดสอบเลือกสถานะ `COMPLETED` แล้ว assert `expect(screen.getByTestId("action-result")).toHaveAttribute("aria-required", "true")` ในเคส `A11Y-01` ผ่านฉลุย 100%
 > 5. **เตรียมความพร้อมสำหรับ PR-11 (Minor 5)**:
 >    - รับทราบข้อเสนอแนะเรื่องการอัปเดต `ai-use.md` และ `README.md` โดยจะดำเนินการอย่างละเอียดใน PR-11 (Release) ตามแผนครับ
+
+#### 3.10.3 Review #2 — Approved (`titayaaa`, 2026-11-02)
+
+**Verdict:** Approved (no blocking issues)
+
+**Review Comments:**
+
+> ### ✅ การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+>
+> ขอบคุณ @jejaebubu ที่ดำเนินการแก้ไขปรับปรุงครบถ้วนสมบูรณ์ทั้งประเด็นเอกสาร ลิงก์ PR และการเพิ่มเคสทดสอบ dynamic validation ใน commit `2182896` อย่างรวดเร็วและประณีตมากค่ะ ตรวจสอบโค้ดและเอกสารซ้ำอย่างละเอียดแล้ว:
+>
+> 1. **ความสมบูรณ์ของเอกสารและลิงก์ PR (Required 1 & 2)**:
+>    - เพิ่มลิงก์ `[GitHub #114](https://github.com/jejaebubu/toktickit/pull/114)` ในตาราง Section 2 และระบุ `- **PR URL:**` ใน Section 3.10 ของ `docs/lab-04/reviewer.md` ครบถ้วนตามมาตรฐานเดียวกันกับทุก PR ก่อนหน้า
+>    - บันทึก Review Log รอบที่ 1 และ Author Response ไว้อย่างเป็นระเบียบและโปร่งใส
+> 2. **ความสอดคล้องของตารางสรุปผลการทดสอบ (Required 3)**:
+>    - อัปเดตตารางสรุปใน `docs/lab-04/tests.md` แถว `PR-10` เป็น `**Pass** (PR #114, review pending)` ถูกต้องเรียบร้อย
+> 3. **Dynamic `aria-required="true"` Verification (`ActionsTaken.test.tsx` — Minor 4)**:
+>    - เพิ่มขั้นตอนการเลือกสถานะ `COMPLETED` ใน `action-status` แล้ว assert ตรวจสอบว่าช่อง `action-result` เปลี่ยนเป็น `aria-required="true"` ในเคส `A11Y-01` ได้อย่างรัดกุมและสมบูรณ์แบบ 100%
+> 4. **ความสมบูรณ์ของ Artifacts & Viewports**:
+>    - ภาพ Full Page Screenshots ครบทั้ง 24 ภาพใน `artifacts/lab-04/screenshots/` ครอบคลุมทั้ง 3 Viewports (Desktop, Tablet, Mobile)
+>    - ปราศจากปัญหา Horizontal Overflow และเป็นไปตามมาตรฐานการออกแบบ Zen Green และ WCAG 2.1 AA
+>
+> ภาพรวมของโค้ด ชุดทดสอบ และเอกสารมีคุณภาพสูงมาก ยอดเยี่ยมมากค่ะ ขออนุมัติ (**Approve**) ให้ทันที และพร้อมให้ดำเนินการ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ!
+
+**คำวินิจฉัย**: **APPROVED & MERGED** — Reviewer กด Merge PR #114 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `d785a4c`) — **Closes Issue #10**
+
+---
+
+### 3.11 PR-11: Sprint 4 Documentation and Release Integration to Main (Issue #11)
+
+- **Branch:** `release/lab04-staging-to-main` → `main`
+- **Author:** `@jejaebubu`
+- **Reviewer:** `@titayaaa`
+- **Objective:** ตรวจสอบและส่งมอบระบบ TokTickIT ฉบับสมบูรณ์สำหรับ Sprint 4 เข้าสู่สาขาหลัก (`main`) ตามเกณฑ์ Handout Section 11.1 ครอบคลุมการอัปเดต `docs/lab-04/ai-use.md` (Key Prompts 1–11 และ Coding-Agent reflection), การอัปเดต `README.md` (โครงสร้างโปรเจกต์, คู่มือการติดตั้ง, คำสั่งรันเทสต์, Seed data, และฟีเจอร์หลัก), การกระทบยอดผลการทดสอบครบ 235 tests (Server 112, Client 96, E2E 27 runs) ผ่าน 100%, และการยืนยัน Zero Regression จาก Lab 1–3
+- **Status:** เปิด Release PR รอการตรวจประเมินขั้นสุดท้ายและกด Merge เข้าสู่ `main` โดย Reviewer (`@titayaaa`)
 
 ---
 

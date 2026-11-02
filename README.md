@@ -4,20 +4,23 @@ TokTickIT คือเว็บแอปพลิเคชันระบบ IT 
 
 ## โครงสร้างโปรเจกต์
 
-- `client/`: ระบบหน้าบ้าน (Frontend) พัฒนาด้วย React + TypeScript + Vite + Bootstrap
-- `server/`: ระบบหลังบ้าน (Backend) พัฒนาด้วย Node.js + Express + TypeScript + Prisma
+- `client/`: ระบบหน้าบ้าน (Frontend) พัฒนาด้วย React + TypeScript + Vite + Bootstrap (ธีม Zen Green)
+- `server/`: ระบบหลังบ้าน (Backend) พัฒนาด้วย Node.js + Express + TypeScript + Prisma ORM
 - `e2e/lab-02/`: ชุดทดสอบ End-to-End (Playwright) สำหรับ Lab 2
 - `e2e/lab-03/`: ชุดทดสอบ End-to-End (Playwright) สำหรับ Lab 3 (Login, Staff Ticket Flow, User Administration)
+- `e2e/lab-04/`: ชุดทดสอบ End-to-End (Playwright) สำหรับ Lab 4 (Actions Taken, Ticket Resolution Gate, Role Dashboards)
 - `docs/lab-01/`: เอกสารประกอบการเรียนและหลักฐานการส่งงาน Lab 1
-- `docs/lab-02/`: เอกสารประกอบการเรียนและหลักฐานการส่งงาน Lab 2 `specification.md`, `tests.md`, `ui-spec.md`, `api-spec.md`, `reviewer.md`, `ai-use.md`
-- `docs/lab-03/`: เอกสารประกอบการเรียนและหลักฐานการส่งงาน Lab 3 — `specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`, `reviewer.md`, `ai-use.md`
+- `docs/lab-02/`: เอกสารประกอบการเรียนและหลักฐานการส่งงาน Lab 2
+- `docs/lab-03/`: เอกสารประกอบการเรียนและหลักฐานการส่งงาน Lab 3
+- `docs/lab-04/`: เอกสารประกอบการเรียนและหลักฐานการส่งงาน Lab 4 — `specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`, `reviewer.md`, `ai-use.md`
 - `artifacts/lab-02/screenshots/`: หลักฐานภาพหน้าจอ (screenshots) ของ Lab 2
-- `artifacts/lab-03/screenshots/`: หลักฐานภาพหน้าจอ (screenshots) ของ Lab 3 แยกตาม feature (auth, staff-queue, staff-ticket-detail, user-management) ครอบ desktop/tablet/mobile
+- `artifacts/lab-03/screenshots/`: หลักฐานภาพหน้าจอ (screenshots) ของ Lab 3
+- `artifacts/lab-04/screenshots/`: หลักฐานภาพหน้าจอ Full Page (screenshots) ของ Lab 4 ครบทั้ง 3 viewports (desktop, tablet, mobile) ใน 3 หมวด (actions-taken, dashboards, workflow) รวม 24 ภาพ
 
 ## Branch Workflow
 
-- พัฒนาบน feature branch (`feature/lab03-XX-*`) เสมอ → สร้าง Pull Request เข้า `lab3-staging` → รอ peer review ผ่าน (Approved) → merge
-- เมื่อครบทุก Issue แล้วจึง release จาก `lab3-staging` ไปยัง `main` ผ่าน Pull Request (Lab Sheet Section 11.1)
+- พัฒนาบน feature branch (`feature/lab04-issue*-*`) เสมอ → สร้าง Pull Request เข้า `lab4-staging` → รอ peer review ผ่าน (Approved) → merge (กติกา 1 PR : 1 Issue)
+- เมื่อครบทุก Issue แล้วจึง release จาก `release/lab04-staging-to-main` ไปยัง `main` ผ่าน Pull Request (Lab Sheet Section 11.1)
 
 ## สิ่งที่ต้องเตรียมก่อนเริ่มรันระบบ
 
@@ -48,9 +51,9 @@ cd ..
 
 ```bash
 cd server
-npx prisma migrate dev            # สร้าง/อัปเดต schema (เครื่องใหม่ครั้งแรกจะสร้าง migrations)
+npx prisma migrate dev            # รัน Prisma migrations (รวม schema Lab 1–4)
 cd ..
-npm run seed                      # รัน Prisma seed (idempotent — รันซ้ำได้)
+npm run seed                      # รัน Prisma seed (idempotent — รันซ้ำได้ปลอดภัย)
 ```
 
 ### 3. รันในโหมดพัฒนา (server + client พร้อมกัน)
@@ -62,65 +65,68 @@ npm run dev          # รัน server (http://localhost:3000) + client (http:/
 ### 4. การรันชุดทดสอบอัตโนมัติ (Unit + API + UI)
 
 ```bash
-npm test            # รัน test ทั้งหมด — ยืนยันผลรันจริง 2026-10-02: server 83/83 (16 files), client 79/79 (12 test files: lab-01 1 + lab-02 4 + lab-03 7)
+npm test            # รัน unit & integration tests ทั้งหมด (Server 112 passed + Client 96 passed)
 ```
 
-> ชุด server เป็น self-isolating — รันซ้ำโดยไม่ต้อง seed ใหม่ก็ได้ผลเหมือนเดิม (ยืนยันแล้ว 3/3 รอบเมื่อไม่ seed ซ้ำ และ 10/10 รอบเมื่อ seed ใหม่ก่อนทุกรอบ) ดูรายละเอียดที่ `docs/lab-03/tests.md` §5.1
-
-หรือรันแยก:
+หรือรันแยกส่วน:
 
 ```bash
-npm --prefix server test    # API tests (Supertest + Vitest; DB ต้อง reset + seed ก่อน)
-npm --prefix client test    # UI tests (Vitest + React Testing Library)
+npm --prefix server test    # API tests (Supertest + Vitest; 21 test files / 112 passed 100%)
+npm --prefix client test    # UI tests (Vitest + React Testing Library; 16 test files / 96 passed 100%)
 ```
 
 ### 5. การรันทดสอบ End-to-End (Playwright)
 
 ```bash
-npm run test:e2e    # รัน seed + build server + ทดสอบ 3 viewports (desktop/tablet/mobile)
+npm run test:e2e    # รัน seed + build server + E2E 3 viewports (desktop/tablet/mobile)
 ```
 
-หมายเหตุ: `test:e2e` จะสร้าง ticket และผู้ใช้ใหม่ระหว่างทดสอบ และบันทึก screenshot ลง
-`artifacts/lab-{02,03}/screenshots/` เพื่อใช้เป็นหลักฐานส่งงาน (ผลลัพธ์ที่ควรได้: lab-02 6 passed + lab-03 12 passed = **18 passed** ต่อ 3 viewports)
+หรือรันเจาะจง Lab 4:
+```bash
+npx playwright test e2e/lab-04
+```
 
-## ผู้ใช้เริ่มต้น (Seed) สำหรับ Lab 3
+> หมายเหตุ: ชุดทดสอบ E2E ของทั้งระบบรวม 27 runs (Lab 2: 6 runs, Lab 3: 12 runs, Lab 4: 9 runs บน Desktop 1280×800, Tablet 820×1180, Mobile 393×851) ผ่านครบ 100% ปราศจาก Horizontal Overflow
+
+## ผู้ใช้เริ่มต้น (Seed Data)
 
 รหัสผ่านของทุกบัญชีที่ seed สร้างคือ `Password123!`
 
-| บทบาท | อีเมล | รหัสผ่าน | หมายเหตุ |
+| บทบาท | อีเมล | รหัสผ่าน | หน้าที่และสิทธิการใช้งาน |
 | :--- | :--- | :--- | :--- |
-| Requester | `jennifer@toktickit.com` | `Password123!` | สร้าง/view tickets |
-| Requester | `michael@toktickit.com` | `Password123!` | |
-| Requester | `sarah@toktickit.com` | `Password123!` | |
-| Requester | `david.lee@toktickit.com` | `Password123!` | |
-| Requester (inactive) | `inactive.requester@toktickit.com` | `Password123!` | ใช้ทดสอบ login ถูกปฏิเสธ 401 |
-| IT Staff | `alex.it@toktickit.com` | `Password123!` | Ticket Queue, claim, comment/note |
-| IT Staff | `kevin.it@toktickit.com` | `Password123!` | |
-| IT Staff | `emily.it@toktickit.com` | `Password123!` | |
-| IT Staff (inactive) | `inactive.it@toktickit.com` | `Password123!` | ใช้ทดสอบ login ถูกปฏิเสธ 401 |
-| Administrator | `admin@toktickit.com` | `Password123!` | User management |
-| Requester (first login) | `newuser@toktickit.com` | `Password123!` | มี `mustChangePassword = true` — ต้องเปลี่ยนรหัสผ่านก่อนใช้งาน |
+| Requester | `jennifer@toktickit.com` | `Password123!` | Requester Dashboard, ส่งตั๋ว, ดูตั๋วของตนเอง (Actions Taken read-only, Advisory flag) |
+| Requester | `michael@toktickit.com` | `Password123!` | Requester User |
+| Requester | `sarah@toktickit.com` | `Password123!` | Requester User |
+| Requester | `david.lee@toktickit.com` | `Password123!` | Requester User |
+| Requester (inactive) | `inactive.requester@toktickit.com` | `Password123!` | ทดสอบ login ถูกปฏิเสธ 401 |
+| IT Staff | `alex.it@toktickit.com` | `Password123!` | IT Staff Dashboard, Ticket Queue, Actions Taken (Create/Edit/Complete/Cancel), Resolution Gate |
+| IT Staff | `kevin.it@toktickit.com` | `Password123!` | IT Staff User |
+| IT Staff | `emily.it@toktickit.com` | `Password123!` | IT Staff User |
+| IT Staff (inactive) | `inactive.it@toktickit.com` | `Password123!` | ทดสอบการปฏิเสธ Assignee ที่ไม่ active (422) |
+| Administrator | `admin@toktickit.com` | `Password123!` | IT Staff Dashboard, User Management, Ticket Queue, Full Control |
+| Requester (first login) | `newuser@toktickit.com` | `Password123!` | มี `mustChangePassword = true` — บังคับเปลี่ยนรหัสผ่านก่อนเข้าสู่ระบบ |
 
-## Backend API
+## ฟีเจอร์หลักของ TokTickIT Lab 4
 
-- `POST /api/auth/login` — ล็อกอิน → JWT token
-- `POST /api/auth/logout` — ออกจากระบบ
-- `GET  /api/auth/me` — ข้อมูลผู้ใช้ปัจจุบัน
-- `POST /api/auth/change-password` — เปลี่ยนรหัสผ่าน (บังคับเมื่อ mustChangePassword)
-- `GET  /api/categories` — รายการหมวดหมู่
-- `GET  /api/related-systems` — รายการระบบที่เกี่ยวข้อง
-- `POST /api/tickets` — สร้างตั๋ว
-- `GET  /api/tickets` — รายการตั๋ว (search/filter/sort/pagination; Staff เห็น queue ทั้งหมด, Requester เห็นเฉพาะของตนเอง)
-- `GET  /api/tickets/:id` — ดูรายละเอียดตั๋ว
-- `PATCH /api/tickets/:id` — Staff: claim/assign, itPriority, status, resolution intent (AC-08)
-- `GET  /api/tickets/:id/comments` / `POST .../comments` — public comments
-- `GET  /api/tickets/:id/internal-notes` / `POST .../internal-notes` — internal notes (IT Staff เท่านั้น)
-- `GET  /api/tickets/:id/attachments` — รายการไฟล์แนบ
-- `POST /api/tickets/:id/attachments` — อัปโหลดไฟล์แนบ
-- `GET  /api/attachments/:id/download` — ดาวน์โหลดไฟล์แนบ
-- `DELETE /api/attachments/:id` — soft remove ไฟล์แนบพร้อมเหตุผล
-- `GET  /api/admin/users` / `POST /api/admin/users` — รายการ + สร้างผู้ใช้ (Administrator)
-- `PATCH /api/admin/users/:id` — เปิด/ปิดใช้งาน, เปลี่ยน role (Administrator)
-- `POST /api/admin/users/:id/reset-password` — ตั้งรหัสผ่านใหม่ (Administrator)
+1. **Actions Taken Lifecycle**:
+   - บันทึกประวัติการปฏิบัติงานภายใต้ตั๋วงานสำหรับเจ้าหน้าที่ไอที (Parent-Child)
+   - ฟิลด์: วันที่-เวลา, ผู้ปฏิบัติงาน (`performedBy`), ผู้รับมอบหมาย (`assignee`), รายละเอียด (`actionDescription`), ผลลัพธ์ (`result`), สถานะ (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`), การติดตามงาน (`followUpRequired`, `followUpNote`), และบันทึกไฟล์แนบ (`attachmentNotes`)
+   - กฎ Validation: `result` บังคับกรอกเฉพาะเมื่อ Action เป็น `COMPLETED` (BR-16) และ `followUpNote` บังคับกรอกเมื่อเลือก follow-up
+   - ป้องกันการมอบหมายให้ผู้ใช้ที่ไม่ active หรือ Requester ด้วย HTTP 422 Unprocessable Entity
+   - Requester สามารถดูประวัติได้แบบ Read-only เพื่อความโปร่งใส (404 no-leak เมื่อเข้าถึงตั๋วผู้อื่น)
+2. **Ticket Workflow & Resolution Gate**:
+   - 9-state Transition Matrix พร้อมการควบคุมวงจรสถานะตั๋วอย่างเคร่งครัด
+   - **Resolution Gate**: บล็อกไม่ให้เจ้าหน้าที่เปลี่ยนสถานะตั๋วเป็น `Resolved` หากยังมี Actions Taken ค้างอยู่ในสถานะ `PENDING` หรือ `IN_PROGRESS` (HTTP 409 `UNRESOLVED_ACTIONS_EXIST`) พร้อม Modal แจ้งเตือนบน UI
+   - **Requester Advisory Flag**: Requester สามารถกดแจ้ง "My problem is resolved" เพื่อขึ้นป้าย Advisory ให้เจ้าหน้าที่รับทราบ โดยตั๋วจะไม่ถูกแอบปิดเอง
+   - Concurrency Check: ป้องกันการบันทึกทับข้อมูลเก่าด้วย `expectedUpdatedAt` (409 Stale Update)
+3. **Role-Appropriate Dashboards**:
+   - **IT Staff Dashboard**: ตัวชี้วัดคิวงาน 5 ด้าน (New, Open, In Progress, Waiting for Requester, My Assigned) พร้อม Recent Queue Tickets และ Quick Actions รองรับ Drill-down ไปยัง Ticket Queue แบบฟิลเตอร์อัตโนมัติ
+   - **Requester Dashboard**: ตัวชี้วัดตั๋วของตนเอง 4 ด้าน (My Open, In Progress, Resolved, Closed) พร้อม Recent Tickets, Quick Actions (+ Create Ticket, View My Tickets) และ Empty State CTA
+4. **Design System & Accessibility (Zen Green & WCAG 2.1 AA)**:
+   - ดีไซน์สวยงามตามหลัก Zen Green Theme (`#006B3C` Primary)
+   - คอนทราสต์สีผ่านเกณฑ์ WCAG 2.1 AA ($\ge 4.5:1$)
+   - Touch Target Sizes ทุกปุ่มและ Form Input $\ge 44 \times 44\text{px}$
+   - ฟอร์มมี `aria-required="true"` และเชื่อม Label ด้วย `htmlFor` ถูกต้อง
+   - ปราศจาก Horizontal Overflow บนทุก Viewports (Desktop $\ge 1280\text{px}$, Tablet $768\text{px}-1279\text{px}$, Mobile $< 768\text{px}$)
 
-รายละเอียดเพิ่มเติม: `docs/lab-03/api-spec.md`
+รายละเอียดทางเทคนิคเพิ่มเติม: ดูได้ใน [`docs/lab-04/`](docs/lab-04/) (`specification.md`, `api-spec.md`, `ui-spec.md`, `tests.md`, `reviewer.md`, `ai-use.md`)
