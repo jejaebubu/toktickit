@@ -28,7 +28,7 @@
 | **PR-07 ([GitHub #111](https://github.com/jejaebubu/toktickit/pull/111))** | Requester Dashboard API, owned ticket metrics, and UI screen | `feature/lab04-issue7-requester-dashboard` | `lab4-staging` | **Approved & Merged** | Review #1 โดย `titayaaa`: ชมการรักษาความปลอดภัย RBAC และ Data Isolation (`requesterId === req.user.id`, `SAFE-01`), ดีไซน์ Zen Green + Responsive Desktop/Mobile + Accessibility, Empty State CTA `"Submit a new request"` + Quick Actions, ระบบ Drill-down ไปยัง `MyTicketsList` และชุดทดสอบ 207/207 พร้อมให้คำแนะนำเชิงพัฒนาเพิ่มเติมเรื่องกลุ่มสถานะของการ์ด `My Open Tickets` → Reviewer **Approve** ในรอบแรก — merged `927862f` |
 | **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้เพิ่มลิงก์ PR #112, เพิ่ม negative validation test ช่อง Result, และเพิ่มการคลิก Quick Actions บน Requester Dashboard → ผู้เขียนแก้ไขครบใน commit `6ba5ed1` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `0ce99e8`) |
 | **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมความครบถ้วนของ Regression suite 234/234 tests แต่ขอให้เพิ่มลิงก์ PR #113, เพิ่ม PR URL ใน 3.9, assert `toHaveValue("Resolved")` ใน `staff-ticket-flow.spec.ts`, และเติม PR #113 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วนใน commit `abb8ea3` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `5158f3a`) |
-| **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | Planned | - |
+| **PR-10** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | **Review pending** | ตรวจสอบ Zen Green Theme, ปรับปรุง Accessibility attributes (aria-required, labels, role=alert, touch target >= 44px), เพิ่ม unit test A11Y-01 และบันทึกชุดภาพสกรีนช็อตครบ 24 ภาพบนทั้ง 3 Viewports (Desktop, Tablet, Mobile) ครอบคลุม Actions Taken, Dashboards และ Resolution Gate — รอ Reviewer ตรวจทาน |
 | **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | Planned | - |
 
 ### Partner Pull Request Log (`titayaaa/toktickit`)
@@ -632,6 +632,16 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > ภาพรวมของโค้ด ชุดทดสอบ และเอกสารมีคุณภาพสูงมาก ขอ **Approve** ให้ทันที และพร้อมให้ดำเนินการ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ!
 
 **คำวินิจฉัย**: **APPROVED & MERGED** — Reviewer กด Merge PR #113 เข้าสู่สาขา `lab4-staging` เรียบร้อย (Merge SHA: `5158f3a`) — **Closes Issue #9**
+
+---
+
+### 3.10 PR-10: Zen Green UI Polish, Accessibility, Responsive Viewports, and Screenshots (Issue #10)
+
+- **Branch:** `feature/lab04-issue10-ui-polish` → `lab4-staging`
+- **Author:** `@jejaebubu`
+- **Reviewer:** `@titayaaa`
+- **Objective:** ปรับแต่ง UI ให้สอดคล้องกับภาษาการออกแบบ Zen Green Theme อย่างสมบูรณ์แบบ, ตรวจสอบและยกระดับการเข้าถึงที่เท่าเทียม (Accessibility ตามเกณฑ์ WCAG 2.1 AA) ครอบคลุม touch target size $\ge 44 \times 44\text{px}$, การระบุ `aria-required="true"`, การเชื่อมโยง Label ด้วย `htmlFor`, การแสดงผลแจ้งเตือนด้วย `role="alert"`, การรองรับ 3 Viewports โดยปราศจาก Horizontal Overflow (`overflow-x: hidden`), การเพิ่มชุดทดสอบอัตโนมัติ `A11Y-01` (`client/tests/lab-04/ActionsTaken.test.tsx`) และการจัดเก็บชุดภาพสกรีนช็อต Full Page ครบทั้ง 24 ภาพใน `artifacts/lab-04/screenshots/`
+- **Status:** เปิด PR รอการตรวจทานจาก Reviewer (`@titayaaa`)
 
 ---
 
