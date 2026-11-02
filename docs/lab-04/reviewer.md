@@ -29,7 +29,7 @@
 | **PR-08 ([GitHub #112](https://github.com/jejaebubu/toktickit/pull/112))** | End-to-end testing flows (Actions Taken, resolution, dashboards) | `feature/lab04-issue8-e2e` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมชุดทดสอบ E2E Playwright ทั้ง 3 flows × 3 viewports (9 runs) และการแก้ `whiteSpace: "normal"` บน Advisory Badge แต่ขอให้เพิ่มลิงก์ PR #112, เพิ่ม negative validation test ช่อง Result, และเพิ่มการคลิก Quick Actions บน Requester Dashboard → ผู้เขียนแก้ไขครบใน commit `6ba5ed1` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `0ce99e8`) |
 | **PR-09 ([GitHub #113](https://github.com/jejaebubu/toktickit/pull/113))** | Lab 1–3 regression test suite and system hardening | `feature/lab04-issue9-regression` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมความครบถ้วนของ Regression suite 234/234 tests แต่ขอให้เพิ่มลิงก์ PR #113, เพิ่ม PR URL ใน 3.9, assert `toHaveValue("Resolved")` ใน `staff-ticket-flow.spec.ts`, และเติม PR #113 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วนใน commit `abb8ea3` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `5158f3a`) |
 | **PR-10 ([GitHub #114](https://github.com/jejaebubu/toktickit/pull/114))** | Zen Green UI polish, accessibility, responsive viewports, and screenshots | `feature/lab04-issue10-ui-polish` | `lab4-staging` | **Request Changes → Approved & Merged** | Review #1 โดย `titayaaa`: ชมการปรับปรุง Zen Green UI, Accessibility WCAG AA, A11Y-01, และ 24 screenshots บน 3 viewports แต่ขอให้ (1) เติมลิงก์ PR #114 ใน Section 2, (2) เพิ่ม PR URL ใน 3.10, (3) ระบุ PR #114 ใน `tests.md`, และ (4) เพิ่มเทสต์ dynamic `aria-required` บน Result → ผู้เขียนแก้ไขครบถ้วนใน commit `2182896` → Reviewer ตรวจรอบที่ 2 แล้ว **Approve & Merge** (merge SHA: `d785a4c`) |
-| **PR-11** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | **Review pending** | รวบรวมเอกสาร Sprint 4 (`ai-use.md`, `README.md`, `tests.md`, `reviewer.md`), ยืนยันผลทดสอบทั้งระบบ 235 tests ผ่าน 100%, และเปิด Release PR เพื่อผสานโค้ดเข้าสู่สาขาหลัก `main` — รอ Reviewer ตรวจทานและกด Merge |
+| **PR-11 ([GitHub #115](https://github.com/jejaebubu/toktickit/pull/115))** | Sprint 4 documentation and release integration to main | `release/lab04-staging-to-main` | `main` | **Changes Requested (Round 1) → Pending Round 2** | Review #1 โดย `titayaaa`: ขอให้เติมลิงก์ PR #115 ใน Section 2, เพิ่ม PR URL ใน 3.11, และระบุ PR #115 ใน `tests.md` → ผู้เขียนแก้ไขครบถ้วน — รอ Reviewer ตรวจซ้ำรอบที่ 2 และกด Merge เข้าสู่ `main` |
 
 ### Partner Pull Request Log (`titayaaa/toktickit`)
 
@@ -718,11 +718,72 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ### 3.11 PR-11: Sprint 4 Documentation and Release Integration to Main (Issue #11)
 
+- **PR URL:** [jejaebubu/toktickit#115](https://github.com/jejaebubu/toktickit/pull/115)
 - **Branch:** `release/lab04-staging-to-main` → `main`
 - **Author:** `@jejaebubu`
 - **Reviewer:** `@titayaaa`
 - **Objective:** ตรวจสอบและส่งมอบระบบ TokTickIT ฉบับสมบูรณ์สำหรับ Sprint 4 เข้าสู่สาขาหลัก (`main`) ตามเกณฑ์ Handout Section 11.1 ครอบคลุมการอัปเดต `docs/lab-04/ai-use.md` (Key Prompts 1–11 และ Coding-Agent reflection), การอัปเดต `README.md` (โครงสร้างโปรเจกต์, คู่มือการติดตั้ง, คำสั่งรันเทสต์, Seed data, และฟีเจอร์หลัก), การกระทบยอดผลการทดสอบครบ 235 tests (Server 112, Client 96, E2E 27 runs) ผ่าน 100%, และการยืนยัน Zero Regression จาก Lab 1–3
-- **Status:** เปิด Release PR รอการตรวจประเมินขั้นสุดท้ายและกด Merge เข้าสู่ `main` โดย Reviewer (`@titayaaa`)
+- **Status:** Review Round 1 Addressed (รอ Reviewer ตรวจประเมินรอบ 2 และกด Merge เข้าสู่ `main`)
+
+#### 3.11.1 Review #1 — Changes Requested (`titayaaa`, 2026-11-02)
+
+**Verdict:** Changes Requested
+
+> ขอบคุณ @jejaebubu สำหรับการรวบรวมฟีเจอร์ เอกสาร และผลการทดสอบทั้งหมดของ Sprint 4 เพื่อเตรียม Release เข้าสู่สาขาหลัก `main` ค่ะ ภาพรวมเอกสารและการจัดโครงสร้างทำได้ประณีตและครอบคลุมมาก:
+> - `README.md`: อัปเดตโครงสร้างไดเรกทอรี, คู่มือติดตั้ง, ตาราง Seed Data 11 บัญชี, คำสั่งรันเทสต์ และสรุปฟีเจอร์หลักทั้ง 4 ด้านของ Lab 4 ไว้อย่างชัดเจนและอ่านง่ายมาก
+> - `docs/lab-04/ai-use.md`: บันทึก Key Prompts (Prompt 8–11) และเขียน Reflection ของ Coding-Agent และบทสรุปภาพรวม Sprint 4 ได้อย่างลึกซึ้งและโปร่งใส
+> - `docs/lab-04/tests.md` & `reviewer.md`: สะท้อนผลการทดสอบครบ 235 tests (Server 112, Client 96, E2E 27 runs) ผ่าน 100% ปราศจาก regression จาก Lab 1–3
+>
+> เนื่องจาก PR นี้เป็น Release PR ที่จะผสานโค้ดเข้าสู่สาขาหลัก (`main`) เป็นชุดสุดท้าย เพื่อให้เอกสารบน `main` มีความสมบูรณ์และเชื่อมโยงร่องรอยการตรวจสอบ (Traceability) ได้ 100% ขอส่งเป็น **Changes Requested** เพื่อให้เพื่อนเติมลิงก์ PR #115 อีก 3 จุดเล็กน้อยก่อนกด Approve & Merge นะคะ:
+>
+> ---
+>
+> ### 🔴 จุดที่ต้องปรับแก้ก่อนอนุมัติ (Required Changes)
+> #### 1. เติมลิงก์ GitHub PR #115 ในตาราง Section 2 ของ `docs/lab-04/reviewer.md`
+> - ในตาราง Section 2 แถว `PR-11` คอลัมน์แรก ปัจจุบันระบุเป็น:
+>   ```markdown
+>   | **PR-11** | Sprint 4 documentation and release integration to main | ...
+>   ```
+>   เพื่อให้ตรงตามฟอร์แมตของ PR-01 ถึง PR-10 ที่มี hyperlink ชี้ไปยัง PR รบกวนปรับเป็น:
+>   ```markdown
+>   | **PR-11 ([GitHub #115](https://github.com/jejaebubu/toktickit/pull/115))** | Sprint 4 documentation and release integration to main | ...
+>   ```
+>
+> #### 2. เพิ่มฟิลด์ - **PR URL:** ใน Section 3.11 ของ docs/lab-04/reviewer.md
+> ในหัวข้อ Section 3.11 บรรทัดแรกใต้หัวข้อ ปัจจุบันเริ่มต้นที่ - **Branch:** ทันที:
+> ```markdown
+> ### 3.11 PR-11: Sprint 4 Documentation and Release Integration to Main (Issue #11)
+> - **Branch:** `release/lab04-staging-to-main` → `main`
+> - **Author:** `@jejaebubu`
+> ```
+> รบกวนเพิ่มบรรทัดลิงก์ PR URL ให้ครบถ้วนเหมือนกับ Section 3.1 ถึง 3.10 ดังนี้ค่ะ:
+> ```markdown
+> ### 3.11 PR-11: Sprint 4 Documentation and Release Integration to Main (Issue #11)
+> - **PR URL:** [jejaebubu/toktickit#115](https://github.com/jejaebubu/toktickit/pull/115)
+> - **Branch:** `release/lab04-staging-to-main` → `main`
+> - **Author:** `@jejaebubu`
+> ```
+>
+> 🟠 ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Improvement Suggestion)
+> #### 3. ระบุหมายเลข PR #115 ในตารางผลการทดสอบ docs/lab-04/tests.md
+> ในตารางสรุป Section 2 แถว PR-11 ปัจจุบันระบุเป็น:
+> ```markdown
+> | **PR-11** | Issue #11 | 2026-11-02 | Release Verification on main branch | 112 server + 96 client + 27 Playwright E2E = 235 total tests | Pass (review pending) |
+> ```
+> แนะนำให้ระบุหมายเลข PR เพิ่มเติมเป็น **Pass** (PR #115, review pending) เพื่อให้สอดคล้องกับแถว PR-05 ถึง PR-10 ค่ะ
+>
+> ฝากเก็บรายละเอียด 3 จุดนี้แล้ว push อัปเดต commit เข้ามาอีกครั้งนะคะ เดี๋ยวจะรีบเข้ามาตรวจซ้ำและกด Approve & Merge เข้าสู่ main ให้ทันทีเลยค่ะ ขอบคุณมากค่ะ
+
+#### 3.11.2 Author Response & Resolution (`jejaebubu`)
+
+> ขอบคุณ @titayaaa สำหรับการตรวจทาน Release PR อย่างละเอียดและรวดเร็วมากครับ ดำเนินการแก้ไขปรับปรุงครบทั้ง 3 จุดเรียบร้อยแล้วครับ:
+>
+> 1. **เติมลิงก์ GitHub PR #115 ใน Section 2 (`docs/lab-04/reviewer.md` — Required 1)**:
+>    - ปรับเป็น `| **PR-11 ([GitHub #115](https://github.com/jejaebubu/toktickit/pull/115))** |` สอดคล้องตามมาตรฐานทุก PR
+> 2. **เพิ่มฟิลด์ `- **PR URL:**` ใน Section 3.11 (`docs/lab-04/reviewer.md` — Required 2)**:
+>    - เพิ่มลิงก์ `- **PR URL:** [jejaebubu/toktickit#115](https://github.com/jejaebubu/toktickit/pull/115)` ใต้หัวข้อ Section 3.11 พร้อมบันทึก Review Trail ไว้อย่างเป็นระเบียบ
+> 3. **ระบุหมายเลข PR ในตารางผลการทดสอบ (`docs/lab-04/tests.md` — Improvement 3)**:
+>    - ปรับสถานะแถว `PR-11` เป็น `**Pass** (PR #115, review pending)` สอดคล้องกับทุก PR ก่อนหน้า
 
 ---
 
