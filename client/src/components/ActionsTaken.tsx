@@ -355,6 +355,7 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 onChange={(e) => setField("assigneeId", e.target.value)}
                 data-testid="action-assignee"
                 style={{ minHeight: 44 }}
+                aria-required="true"
               >
                 <option value="">Select an assignee…</option>
                 {assignablePeople.map((person) => (
@@ -400,6 +401,7 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 onChange={(e) => setField("actionDescription", e.target.value)}
                 placeholder="Describe the work performed (3–1000 characters)…"
                 data-testid="action-description"
+                aria-required="true"
               />
               {fieldErrors.actionDescription && (
                 <div className="text-danger small mt-1" role="alert" data-testid="action-description-error">
@@ -421,6 +423,7 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                 onChange={(e) => setField("result", e.target.value)}
                 placeholder={form.status === "COMPLETED" ? "Record the outcome (required to complete)…" : "Optional until the action is completed…"}
                 data-testid="action-result"
+                aria-required={form.status === "COMPLETED"}
               />
               {fieldErrors.result && (
                 <div className="text-danger small mt-1" role="alert" data-testid="action-result-error">
@@ -459,6 +462,7 @@ export const ActionsTaken: React.FC<ActionsTakenProps> = ({ ticketId, actions, o
                   onChange={(e) => setField("followUpNote", e.target.value)}
                   placeholder="What needs to be followed up?"
                   data-testid="action-followup-note"
+                  aria-required="true"
                 />
                 {fieldErrors.followUpNote && (
                   <div className="text-danger small mt-1" role="alert" data-testid="action-followup-note-error">
