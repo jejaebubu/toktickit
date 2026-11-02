@@ -36,7 +36,7 @@
 | PR ID | Repository / Scope | Branch Source | Target Branch | Author | Reviewer Status | Comments / Resolution |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PR-P1 ([GitHub #75](https://github.com/titayaaa/toktickit/pull/75))** | `titayaaa/toktickit`: Issue 27: Sprint 4 Engineering Contract & Specification (`docs/lab-04/`) | `feature/27-lab4-specs` | `lab4-staging` | `titayaaa` | **Changes Requested (3 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจ 3 รอบและขอแก้เรื่อง FK type, field mapping, transition matrix, route/status code, migration plan, ownership formula, accessibility, 403/404 และ stale claims → ผู้เขียนแก้ครบที่ commit `f144a1a` → Reviewer ตรวจรอบสุดท้ายแล้ว **Approve** → Merged `4a55567` (2026-10-31 19:58 UTC) |
-| **PR-P2 ([GitHub #86](https://github.com/Achikan/TokTickIT/pull/86))** | `Achikan/TokTickIT`: feat(Issue 34): IT Staff Dashboard (API + UI) | `feature/34-staff-dashboard` | `lab4-staging` | `Achikan` | **Changes Requested (2 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจ 3 รอบ ขอแก้ blocking issues: compile error ใน `staffQueue.ts`, route เดิมของ Lab 2 หายใน `app.ts`, client contract ไม่ตรง spec, status badge CSS class, และ test assertions (urgentHigh, recentlyUpdated, userCounts) → ผู้เขียนแก้ครบที่ commit `621db34` → Reviewer ตรวจรอบสุดท้ายแล้ว **Approve & Merge** → Merged `7731405` (2026-11-01 10:22 UTC) |
+| **PR-P2 ([GitHub #86](https://github.com/Achikan/TokTickIT/pull/86))** | `Achikan/TokTickIT`: feat(Issue 34): IT Staff Dashboard (API + UI) | `feature/34-staff-dashboard` | `lab4-staging` | `Achikan` | **Changes Requested / Commented (4 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจครบ 4 รอบ (Changes Requested รอบ 1 เรื่อง compile error ใน `staffQueue.ts` และ route Lab 2 หาย → Commented รอบ 2 เรื่อง client build, drilldown UI, status badge CSS class → Changes Requested รอบ 3 เรื่อง test assertions urgentHigh/recentlyUpdated/userCounts) → ผู้เขียนแก้ครบถ้วนที่ commit `621db34` → Reviewer ตรวจรอบที่ 4 แล้ว **Approve & Merge** → Merged `7731405` (2026-11-01 10:22 UTC) |
 
 
 ---
@@ -1303,9 +1303,116 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > - `csrfProtection` บน GET ไม่น่าจำเป็น
 > - `pageSize` เปลี่ยนจาก 10 → 20 และ max 50 → 100 อาจกระทบ test
 
----
+#### 4.2.2 Author Response #1 (`Achikan`, commit `2bc78ab`)
 
-#### 4.2.2 Review #2 — Changes Requested (`jejaebubu`, 2026-11-01 02:43 UTC+7)
+**Response Date:** 2026-10-31 17:39 UTC (2026-11-01 00:39 UTC+7)
+
+> อัปเดตและแก้ตาม feedback ล่าสุดเรียบร้อยแล้วใน commit `2bc78ab` ค่ะ:
+>
+> 1. **Restore `staffQueue.ts` & `app.ts`**:
+>    - คืนค่า `staffQueue.ts` และ `app.ts` กลับมาจาก `lab4-staging` ทั้งหมด ทำให้ route เดิมของ Lab 2-3 (categories, related systems, create/detail ticket, attachments, assignees) กลับมาครบถ้วน
+>    - เพิ่มเฉพาะการรองรับ `ownerId=me` ตาม spec §3.2
+> 2. **ปรับ Metrics & Payload ให้ตรง `api-spec.md §3.1`**:
+>    - `byStatus` นับครบทั้ง 8 statuses (รวม RESOLVED, CLOSED, CANCELLED)
+>    - `byPriority` กรองเฉพาะ active statuses
+>    - `urgentHigh` มีทั้ง URGENT และ HIGH โดยเรียง URGENT ขึ้นก่อน และ cap ที่ 5 รายการ
+>    - `recentlyUpdated` ใช้เวลา UTC จาก DB clock (`SELECT NOW()`) ย้อนหลัง 7 วัน และ cap 5 รายการ
+>    - Ticket items ส่ง `owner: { id, name } | null`
+>    - Admin ได้ `userCounts: { total, active }` และ Client อัปเดตรองรับ payload นี้แล้ว
+>    - drilldown map ครบทั้ง 5 URLs
+> 3. **UI Drill-down & Role Access**:
+>    - กดการ์ด/ปุ่มจาก Dashboard ส่ง filter เข้า `StaffTicketQueue` (`initialFilters`) จริง
+>    - กดเลือก Ticket เปิด `StaffTicketDetail` จริง
+>    - ADMIN สามารถเข้า Ticket Queue และ Ticket Detail ผ่าน drill-down flow ได้แล้ว
+>    - คง default view ของแต่ละ role ไว้ตามเดิม ไม่ให้กระทบ regression test
+> 4. **ผลการทดสอบ (Head ล่าสุด)**:
+>    - Server: 24 test files ผ่านทั้งหมด (**326/326 passed**)
+>    - Client: 17 test files ผ่านทั้งหมด (**133/133 passed**)
+>    - Build ผ่านทั้ง Server และ Client ไม่มี regression ค่ะ
+
+#### 4.2.3 Review #2 — Commented (`jejaebubu`, 2026-11-01 01:19 UTC+7)
+
+**Review ID:** `5724248896`  
+**Commit Reviewed:** `2bc78abdcdff66772fd86f675015edd89e5b4fe2`  
+**Verdict:** Commented
+
+**Verbatim Review Comments:**
+
+> เช็กที่ head `2bc78ab` แล้วนะคะ รอบนี้จุดหลัก ๆ จาก feedback ก่อนหน้าแก้ครบแล้วค่ะ 
+>
+> ### จุดที่ผ่านแล้ว
+> - `app.ts` กับ `staffQueue.ts` restore กลับมาเรียบร้อยแล้ว route เดิมของ Lab 2–3 ยังอยู่ครบ และ `ownerId=me` ใช้งานได้แล้วค่ะ
+> - Payload ตอนนี้ตรงกับ `api-spec.md §3.1` แล้ว ทั้ง `byStatus` ครบ 8 สถานะ, `byPriority` ครบ 4 ระดับ, `urgentHigh` มีทั้ง URGENT + HIGH และเรียงถูกต้อง
+> - ข้อมูลแต่ละ item มี `owner: { id, name } | null` รวมถึง `userCounts` และ `drilldown` ครบ 5 URL แล้วค่ะ
+> - Server dashboard test ผ่าน `6/6`
+> - Client test ผ่าน `133/133`
+> - Server build ผ่านค่ะ
+> - Server full test ผ่าน `325/326` โดยตัวที่ไม่ผ่านเป็น timeout ของ `seedLab3 is idempotent (5s)` แต่พอรันไฟล์นั้นแยกผ่าน `10/10` เลยดูเป็น flake เดิมมากกว่า ไม่น่าใช่ regression จาก PR นี้ค่ะ
+>
+> เหลืออีกนิดที่อยากให้เก็บก่อน merge นะคะ
+>
+> ### 1. Client build ยังไม่ผ่านจริง
+>
+> ตอนรัน `npm run build` ฝั่ง Client ยังเจอ 2 errors ที่ `client/tests/lab-03/style.test.tsx` บรรทัด 41, 49 เรื่อง `ticketId` หายค่ะ
+>
+> เข้าใจว่าเป็นปัญหาที่มีอยู่ก่อน PR นี้ แต่ตอนนี้ข้อความที่บอกว่า **“Build ผ่านทั้ง Server และ Client”** ยังไม่ตรงกับผลจริง
+>
+> ถ้ายังไม่แก้ใน PR นี้ อย่างน้อยขอให้แก้ข้อความใน PR ให้ตรงกับสถานะปัจจุบันค่ะ
+>
+> ### 2. Drill-down ฝั่ง UI ยังไม่ครบ
+>
+> ตอนนี้ Server ส่ง `data.drilldown.recentlyUpdated` มาแล้ว แต่ฝั่ง UI ยังไม่ได้เอาไปใช้ค่ะ เลยยังกดจาก Recently Updated ไปหน้า Queue พร้อม `sort=-updatedAt` ตาม `ui-spec.md §3` ไม่ได้
+>
+> ส่วน AD-01 card ก็ยังไม่ได้ link ไปหน้า User Management ค่ะ
+>
+> ตรงนี้ฝากเชื่อม flow ให้ครบตาม spec อีกนิดนะคะ
+>
+> ### 3. Status badge ใน Dashboard ใช้ class ไม่ตรงกับ CSS
+>
+> ใน `StaffDashboard.tsx` ตอนนี้ใช้ประมาณ `status-badge status-*` แต่ class ที่มีอยู่จริงใน project เป็น `badge-status-*` ค่ะ ทำให้สีของ status badge ยังไม่ออกตาม design ที่กำหนดไว้
+>
+> แล้ว `text-tok-green` ก็ยังไม่มีใน CSS ด้วยค่ะ ฝากเปลี่ยนไปใช้ class ที่มีอยู่จริงหรือเพิ่ม style ให้ตรงกันนะคะ
+>
+> ### 4. UI test ยังไม่ครอบ flow จริงทั้งหมด
+>
+> ตอนนี้ test ของ `StaffDashboard` เช็ก callback แล้ว แต่ยังไม่มี test ระดับ `App` ที่ยืนยันว่า
+> - กดการ์ดแล้วเปิด Queue พร้อม filter จริง
+> - กด ticket แล้วเปิด Ticket Detail จริง
+>
+> แล้ว `UI-SD-03` เรื่องป้องกัน double-click ก็ยังไม่มีใน `tests.md` ค่ะ
+>
+> ตรงนี้อยากให้เพิ่มไว้ จะได้มั่นใจว่า Dashboard เชื่อมกับหน้าต่าง ๆ ได้จริง ไม่ใช่แค่ callback ทำงานค่ะ
+>
+> ### 5. Dashboard card ใช้ `<button>` แทน `<a>`
+>
+> ใน `ui-spec.md` ระบุไว้ว่า card ควรใช้ `<a>` แต่ implementation ตอนนี้เป็น `<button>`
+>
+> อันนี้ไม่ได้ block การ merge มากค่ะ แต่ถ้าจะให้ตรงกับ spec ทั้งหมด ฝากเก็บอีกนิดค่ะ
+>
+> ### สรุป
+>
+> ถ้าดูจาก feedback รอบก่อน **ถือว่าปิดครบแล้วค่ะ** 
+>
+> แต่ถ้าจะให้ตรงกับ `ui-spec.md`, `tests.md` และสถานะ build จริงทั้งหมด ขอ Comment เบา ๆ อีกรอบ โดยเฉพาะ **ข้อ 1–3** ก่อนนะคะ
+>
+> แก้แล้วบอกมาได้เลยค่ะ เดี๋ยวรีบช่วยเช็กรอบถัดไปให้ ขอบคุณมากค่ะ 
+
+#### 4.2.4 Author Response #2 (`Achikan`, commit `178d559`)
+
+**Response Date:** 2026-10-31 19:02 UTC (2026-11-01 02:02 UTC+7)
+
+> Addressed latest review at 178d559.
+>
+> - Restored `server/src/app.ts` and `server/src/staffQueue.ts` from `lab4-staging`; added only the Dashboard route (with `requireAuth/blockPendingPasswordChange/requireRole`) and the `ownerId=me` alias. `/api/staff/assignees`, validation and pageSize/max restored.
+> - `staffDashboard.ts`: DB clock (`SELECT NOW()`), `byStatus` all 8 statuses, `byPriority` active-only 4 keys, `urgentHigh` = URGENT+HIGH (URGENT first) capped 5, `recentlyUpdated` all statuses within 7d, 5-key `drilldown`, `owner: {id,name}|null`, top-level `userCounts` for Admin.
+> - Client `StaffDashboard.tsx`: new contract (`unassignedCount/ownedByMeCount/byPriority/...items/userCounts`), cards as real `<a>` links, owner/"Unassigned", `<time>`, empty/forbidden/failure states, double-click guard (UI-SD-03), Admin user-count card.
+> - `App.tsx`: Lab 3 landing restored; drill-downs now set queue filters / open detail; Admin can reach queue+detail via drill-down; Ticket Queue nav shown when active.
+> - `StaffTicketQueue` accepts `initialFilters`; `StaffTicketDetail` accepts id-only ticket.
+> - Tests rewritten to contract: server 7 tests (exact DB counts, caps, ordering, 401/403, admin, ownerId=me alias); client 6 tests. `style.test.tsx` ticketId added (REG exception noted).
+>
+> Verified: server `tsc --noEmit` clean; full server suite green; client `tsc --noEmit` clean; client full suite 133/133. Requester create/view/attach flows untouched.
+
+#### 4.2.5 Review #3 — Changes Requested (`jejaebubu`, 2026-11-01 02:43 UTC+7)
 
 **Review ID:** `5724630453`  
 **Commit Reviewed:** `178d559d26017f6949c106853c66e249fbd329fc`  
@@ -1346,9 +1453,21 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >
 > ถ้าแก้ 2 ประเด็นหลักนี้ครบแล้ว ก็น่าจะ approve ได้เลยค่ะ
 
----
+#### 4.2.6 Author Response #3 (`Achikan`, commit `621db34`)
 
-#### 4.2.3 Review #3 — Approved (`jejaebubu`, 2026-11-01 16:50 UTC+7)
+**Response Date:** 2026-10-31 23:49 UTC (2026-11-01 06:49 UTC+7)
+
+> Addressed remaining feedback at 621db34.
+>
+> 1. Status badge: `statusBadge` now uses `badge-status-*` mapping (matching queue/detail) instead of `status-badge status-*`.
+> 2. Tests completed:
+>    - Server: urgentHigh now has both URGENT and HIGH with URGENT first; recentlyUpdated asserts newest-first ordering + exclusion of >7d tickets; Admin `userCounts` compared to actual `prisma.user.count()`; owner assertion no longer guarded by `if (item)`; unassignedCount updated for the active URGENT ticket.
+>    - Client: drilldown href assertions for byStatus/byPriority; IT_STAFF no longer sees userCounts card; urgentHigh mock includes both priorities.
+>    - New App-level test (AppDashboard.test.tsx): card click sends filter to StaffTicketQueue; ticket click opens StaffTicketDetail.
+>
+> Verified: server tsc clean, client tsc clean, server dashboard+queue tests 38/38, client full suite 136/136. Nit (href) left as drilldown URLs so links still carry query params.
+
+#### 4.2.7 Review #4 — Approved (`jejaebubu`, 2026-11-01 16:50 UTC+7)
 
 **Review ID:** `5727471865`  
 **Commit Reviewed:** `621db34052cb10f21d82977b52331246ead04472`  
@@ -1364,4 +1483,3 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > The href nit isn’t a blocker. Consider a follow-up issue. Approving.
 
 **คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #86 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `773140529e59b2843361db28141957b56019226f`, 2026-11-01 10:22 UTC) — **Closes #74**
-
