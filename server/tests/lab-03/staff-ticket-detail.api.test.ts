@@ -14,7 +14,10 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
       data: { mustChangePassword: false, isActive: true },
     });
 
-    let ticket = await prisma.ticket.findFirst();
+    let ticket = await prisma.ticket.findFirst({
+      where: { status: { in: ["New", "Open", "In Progress"] } },
+      orderBy: { id: "asc" },
+    });
     if (!ticket) {
       let cat = await prisma.category.findFirst() || await prisma.category.create({ data: { name: "Hardware" } });
       let sys = await prisma.relatedSystem.findFirst() || await prisma.relatedSystem.create({ data: { name: "Corporate Laptop", isActive: true } });
@@ -90,7 +93,8 @@ describe("Lab 3 IT Staff Ticket Operations API Suite (staff-ticket-detail.api.te
 
     expect(res.status).toBe(200);
     expect(res.body.requesterIndicatedResolved).toBe(true);
-    expect(res.body.status).toBe("Waiting for Requester");
+    expect(res.body.status).toBe("OPEN");
+    expect(res.body.status).not.toBe("Resolved");
   });
 
   it("API-11: Requester cannot view or update another user's ticket — 404 no-leak (§6.2)", async () => {

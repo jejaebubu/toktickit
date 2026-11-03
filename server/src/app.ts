@@ -18,15 +18,41 @@ const JWT_SECRET: string = (() => {
 })();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 const TICKET_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
+const ACTION_STATUSES = ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
+type ActionStatus = (typeof ACTION_STATUSES)[number];
+const ACTION_STATUS_TRANSITIONS: Record<ActionStatus, ActionStatus[]> = {
+  PENDING: ["IN_PROGRESS", "COMPLETED", "CANCELLED"],
+  IN_PROGRESS: ["COMPLETED", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+};
+const ACTION_USER_SELECT = { id: true, name: true, email: true, role: true } as const;
+const ACTION_TAKEN_INCLUDE = {
+  performedBy: { select: ACTION_USER_SELECT },
+  assignee: { select: { ...ACTION_USER_SELECT, isActive: true } },
+} as const;
 const TICKET_STATUSES: Record<string, string> = {
   NEW: "New",
   OPEN: "Open",
   "IN PROGRESS": "In Progress",
   "WAITING FOR REQUESTER": "Waiting for Requester",
+  PENDING: "Pending",
   RESOLVED: "Resolved",
   CLOSED: "Closed",
   REOPENED: "Reopened",
   CANCELLED: "Cancelled",
+};
+
+const TICKET_STATUS_TRANSITIONS: Record<string, string[]> = {
+  New: ["Open", "Cancelled"],
+  Open: ["In Progress", "Waiting for Requester", "Pending", "Cancelled"],
+  "In Progress": ["Waiting for Requester", "Pending", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Pending", "Resolved", "Cancelled"],
+  Pending: ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  Resolved: ["Closed", "Reopened"],
+  Reopened: ["In Progress", "Waiting for Requester", "Pending", "Resolved", "Cancelled"],
+  Closed: [],
+  Cancelled: [],
 };
 
 function validatePasswordComplexity(password: string): string | null {
@@ -540,7 +566,7 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
     const userRole = req.user!.role;
     const userId = req.user!.id;
     const VALID_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
-    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
+    const VALID_STATUSES = ["NEW", "OPEN", "IN PROGRESS", "WAITING FOR REQUESTER", "PENDING", "RESOLVED", "CLOSED", "REOPENED", "CANCELLED"];
     const VALID_SORT_FIELDS = ["createdAt", "ticketNumber", "requestedPriority", "itPriority", "status", "updatedAt"];
 
     // Requester query view (owned tickets only)
@@ -672,11 +698,14 @@ app.get("/api/tickets", authenticateToken, checkPasswordChangeState, async (req:
       where.itPriority = p;
     }
 
-    if (ownerId !== undefined && ownerId !== "") {
-      if (ownerId === "unassigned" || ownerId === "null") {
+    const effectiveOwnerId = ownerId !== undefined && ownerId !== "" ? ownerId : req.query.owner;
+    if (effectiveOwnerId !== undefined && effectiveOwnerId !== "") {
+      if (effectiveOwnerId === "unassigned" || effectiveOwnerId === "null") {
         where.ownerId = null;
+      } else if (String(effectiveOwnerId).toLowerCase() === "me") {
+        where.ownerId = req.user!.id;
       } else {
-        const ownerIdNum = Number(ownerId);
+        const ownerIdNum = Number(effectiveOwnerId);
         if (isNaN(ownerIdNum)) {
           return res.status(400).json({ error: "Bad Request", message: "Invalid ownerId parameter." });
         }
@@ -738,6 +767,10 @@ app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (
         requester: { select: { id: true, name: true, email: true } },
         owner: { select: { id: true, name: true, email: true } },
         attachments: true,
+        actionsTaken: {
+          orderBy: [{ actionDateTime: "asc" }, { createdAt: "asc" }],
+          include: ACTION_TAKEN_INCLUDE,
+        },
         publicComments: {
           orderBy: { createdAt: "asc" },
           include: { author: { select: { id: true, name: true, email: true, role: true } } },
@@ -765,11 +798,316 @@ app.get("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (
 });
 
 // ---------------------------------------------------------------------------
-// Lab 3 (Issue 7) — IT Staff Ticket Operations
-// PATCH /api/tickets/:id (claim/assign owner, IT priority, status,
-// requester "Waiting for Requester" resolution indication)
+// Lab 4 (Issue 3) — Actions Taken REST API (RBAC, validation, status machine)
+// GET/POST /api/tickets/:id/actions-taken
+// PATCH    /api/tickets/:id/actions-taken/:actionId
 // ---------------------------------------------------------------------------
-app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+type AssigneeResolution = { id: number } | { status: number; message: string };
+
+async function resolveActionAssignee(raw: unknown): Promise<AssigneeResolution> {
+  if (raw === undefined || raw === null || raw === "") {
+    return { status: 400, message: "assigneeId is required." };
+  }
+  const assigneeId = Number(raw);
+  if (!Number.isInteger(assigneeId) || assigneeId <= 0) {
+    return { status: 400, message: "assigneeId must be a positive integer." };
+  }
+  const assignee = await getPrisma().user.findUnique({ where: { id: assigneeId } });
+  if (!assignee || !assignee.isActive || (assignee.role !== "IT_STAFF" && assignee.role !== "ADMINISTRATOR")) {
+    return { status: 422, message: "Assignee must be an active IT Staff or Administrator." };
+  }
+  return { id: assigneeId };
+}
+
+function parseActionStatus(raw: unknown): ActionStatus | null {
+  if (typeof raw !== "string") return null;
+  const normalized = raw.trim().toUpperCase();
+  return ACTION_STATUSES.includes(normalized as ActionStatus) ? (normalized as ActionStatus) : null;
+}
+
+function parseOptionalText(raw: unknown): { ok: true; value: string | null | undefined } | { ok: false } {
+  if (raw === undefined) return { ok: true, value: undefined };
+  if (raw === null) return { ok: true, value: null };
+  if (typeof raw !== "string") return { ok: false };
+  const trimmed = raw.trim();
+  return { ok: true, value: trimmed.length ? trimmed : null };
+}
+
+app.get("/api/tickets/:id/actions-taken", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticketId = Number(req.params.id);
+    if (!Number.isInteger(ticketId) || ticketId <= 0) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+
+    const ticket = await getPrisma().ticket.findUnique({
+      where: { id: ticketId },
+      select: { id: true, requesterId: true },
+    });
+    if (!ticket) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+    if (req.user!.role === "REQUESTER" && ticket.requesterId !== req.user!.id) {
+      return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+    }
+
+    const actions = await getPrisma().actionTaken.findMany({
+      where: { ticketId },
+      orderBy: [{ actionDateTime: "asc" }, { createdAt: "asc" }],
+      include: ACTION_TAKEN_INCLUDE,
+    });
+
+    res.status(200).json(actions);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+app.post(
+  "/api/tickets/:id/actions-taken",
+  authenticateToken,
+  checkPasswordChangeState,
+  requireRole("IT_STAFF", "ADMINISTRATOR"),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const ticketId = Number(req.params.id);
+      if (!Number.isInteger(ticketId) || ticketId <= 0) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+      const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId }, select: { id: true } });
+      if (!ticket) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+
+      const body = req.body ?? {};
+      const description = typeof body.actionDescription === "string" ? body.actionDescription.trim() : "";
+      if (description.length < 3 || description.length > 1000) {
+        return res.status(400).json({ error: "Bad Request", message: "actionDescription must be between 3 and 1000 characters." });
+      }
+
+      let status: ActionStatus = "PENDING";
+      if (body.status !== undefined) {
+        const parsedStatus = parseActionStatus(body.status);
+        if (!parsedStatus) {
+          return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${ACTION_STATUSES.join(", ")}` });
+        }
+        status = parsedStatus;
+      }
+
+      const resultField = parseOptionalText(body.result);
+      if (!resultField.ok) {
+        return res.status(400).json({ error: "Bad Request", message: "result must be a string or null." });
+      }
+      const result = resultField.value ?? null;
+      if (status === "COMPLETED" && !result) {
+        return res.status(400).json({ error: "Bad Request", message: "result is required when status is COMPLETED." });
+      }
+
+      const assignee = await resolveActionAssignee(body.assigneeId);
+      if (!("id" in assignee)) {
+        return res.status(assignee.status).json({
+          error: assignee.status === 422 ? "Unprocessable Entity" : "Bad Request",
+          message: assignee.message,
+        });
+      }
+
+      let followUpRequired = false;
+      if (body.followUpRequired !== undefined) {
+        if (typeof body.followUpRequired !== "boolean") {
+          return res.status(400).json({ error: "Bad Request", message: "followUpRequired must be a boolean." });
+        }
+        followUpRequired = body.followUpRequired;
+      }
+      const followUpNoteField = parseOptionalText(body.followUpNote);
+      if (!followUpNoteField.ok) {
+        return res.status(400).json({ error: "Bad Request", message: "followUpNote must be a string or null." });
+      }
+      const followUpNote = followUpNoteField.value ?? null;
+      if (followUpRequired && !followUpNote) {
+        return res.status(400).json({ error: "Bad Request", message: "followUpNote is required when followUpRequired is true." });
+      }
+
+      const attachmentNotesField = parseOptionalText(body.attachmentNotes);
+      if (!attachmentNotesField.ok) {
+        return res.status(400).json({ error: "Bad Request", message: "attachmentNotes must be a string or null." });
+      }
+
+      let actionDateTime: Date | undefined;
+      if (body.actionDateTime !== undefined) {
+        if (typeof body.actionDateTime !== "string") {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be an ISO date string." });
+        }
+        actionDateTime = new Date(body.actionDateTime);
+        if (Number.isNaN(actionDateTime.getTime())) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be a valid ISO date string." });
+        }
+      }
+
+      const created = await getPrisma().actionTaken.create({
+        data: {
+          ticketId,
+          actionDescription: description,
+          result,
+          performedById: req.user!.id,
+          assigneeId: assignee.id,
+          status,
+          followUpRequired,
+          followUpNote,
+          attachmentNotes: attachmentNotesField.value ?? null,
+          ...(actionDateTime ? { actionDateTime } : {}),
+        },
+        include: ACTION_TAKEN_INCLUDE,
+      });
+
+      res.status(201).json(created);
+    } catch (err: any) {
+      res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    }
+  },
+);
+
+app.patch(
+  "/api/tickets/:id/actions-taken/:actionId",
+  authenticateToken,
+  checkPasswordChangeState,
+  requireRole("IT_STAFF", "ADMINISTRATOR"),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const ticketId = Number(req.params.id);
+      if (!Number.isInteger(ticketId) || ticketId <= 0) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+      const ticket = await getPrisma().ticket.findUnique({ where: { id: ticketId }, select: { id: true } });
+      if (!ticket) {
+        return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
+      }
+
+      const existing = await getPrisma().actionTaken.findFirst({
+        where: { id: req.params.actionId, ticketId },
+      });
+      if (!existing) {
+        return res.status(404).json({ error: "Not Found", message: "Action Taken not found." });
+      }
+
+      const body = req.body ?? {};
+      const data: any = {};
+
+      if (body.actionDescription !== undefined) {
+        const description = typeof body.actionDescription === "string" ? body.actionDescription.trim() : "";
+        if (description.length < 3 || description.length > 1000) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDescription must be between 3 and 1000 characters." });
+        }
+        data.actionDescription = description;
+      }
+
+      let nextResult = existing.result;
+      if (body.result !== undefined) {
+        const resultField = parseOptionalText(body.result);
+        if (!resultField.ok) {
+          return res.status(400).json({ error: "Bad Request", message: "result must be a string or null." });
+        }
+        nextResult = resultField.value ?? null;
+        data.result = nextResult;
+      }
+
+      let nextStatus = existing.status as ActionStatus;
+      if (body.status !== undefined) {
+        const parsedStatus = parseActionStatus(body.status);
+        if (!parsedStatus) {
+          return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${ACTION_STATUSES.join(", ")}` });
+        }
+        nextStatus = parsedStatus;
+        if (nextStatus !== existing.status) {
+          const allowed = ACTION_STATUS_TRANSITIONS[existing.status as ActionStatus] ?? [];
+          if (!allowed.includes(nextStatus)) {
+            return res.status(400).json({
+              error: "Bad Request",
+              message: `Invalid status transition from ${existing.status} to ${nextStatus}.`,
+            });
+          }
+          data.status = nextStatus;
+        }
+      }
+
+      if (nextStatus === "COMPLETED" && !nextResult) {
+        return res.status(400).json({ error: "Bad Request", message: "result is required when status is COMPLETED." });
+      }
+
+      if (body.assigneeId !== undefined) {
+        const assignee = await resolveActionAssignee(body.assigneeId);
+        if (!("id" in assignee)) {
+          return res.status(assignee.status).json({
+            error: assignee.status === 422 ? "Unprocessable Entity" : "Bad Request",
+            message: assignee.message,
+          });
+        }
+        data.assigneeId = assignee.id;
+      }
+
+      let nextFollowUpRequired = existing.followUpRequired;
+      if (body.followUpRequired !== undefined) {
+        if (typeof body.followUpRequired !== "boolean") {
+          return res.status(400).json({ error: "Bad Request", message: "followUpRequired must be a boolean." });
+        }
+        nextFollowUpRequired = body.followUpRequired;
+        data.followUpRequired = nextFollowUpRequired;
+      }
+
+      let nextFollowUpNote = existing.followUpNote;
+      if (body.followUpNote !== undefined) {
+        const followUpNoteField = parseOptionalText(body.followUpNote);
+        if (!followUpNoteField.ok) {
+          return res.status(400).json({ error: "Bad Request", message: "followUpNote must be a string or null." });
+        }
+        nextFollowUpNote = followUpNoteField.value ?? null;
+        data.followUpNote = nextFollowUpNote;
+      }
+      if (body.followUpRequired === false && body.followUpNote === undefined) {
+        nextFollowUpNote = null;
+        data.followUpNote = null;
+      }
+      if (nextFollowUpRequired && !nextFollowUpNote) {
+        return res.status(400).json({ error: "Bad Request", message: "followUpNote is required when followUpRequired is true." });
+      }
+
+      if (body.attachmentNotes !== undefined) {
+        const attachmentNotesField = parseOptionalText(body.attachmentNotes);
+        if (!attachmentNotesField.ok) {
+          return res.status(400).json({ error: "Bad Request", message: "attachmentNotes must be a string or null." });
+        }
+        data.attachmentNotes = attachmentNotesField.value ?? null;
+      }
+
+      if (body.actionDateTime !== undefined) {
+        if (typeof body.actionDateTime !== "string") {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be an ISO date string." });
+        }
+        const parsedDate = new Date(body.actionDateTime);
+        if (Number.isNaN(parsedDate.getTime())) {
+          return res.status(400).json({ error: "Bad Request", message: "actionDateTime must be a valid ISO date string." });
+        }
+        data.actionDateTime = parsedDate;
+      }
+
+      const updated = await getPrisma().actionTaken.update({
+        where: { id: existing.id },
+        data,
+        include: ACTION_TAKEN_INCLUDE,
+      });
+
+      res.status(200).json(updated);
+    } catch (err: any) {
+      res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    }
+  },
+);
+
+// ---------------------------------------------------------------------------
+// Lab 3 (Issue 7) & Lab 4 (Issue 5) — Ticket Workflow, Transition Matrix,
+// Resolution Gate, and Optimistic Concurrency Check
+// PATCH /api/tickets/:id (and alias PATCH /api/tickets/:id/status)
+// ---------------------------------------------------------------------------
+async function handleTicketPatch(req: AuthenticatedRequest, res: Response) {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
@@ -781,27 +1119,62 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
       return res.status(404).json({ error: "Ticket not found" });
     }
 
-    const { ownerId, itPriority, status, requesterIndicatedResolved } = req.body;
+    const { ownerId, itPriority, status, requesterIndicatedResolved, expectedUpdatedAt } = req.body ?? {};
+    const currentCanonicalStatus = TICKET_STATUSES[String(ticket.status).toUpperCase()] ?? ticket.status;
 
-    // Requester special action: Indicate problem appears resolved (AC-08, FR-09)
+    // Requester special action: Indicate problem appears resolved (AC-08, BR-09)
     if (req.user!.role === "REQUESTER") {
       if (ticket.requesterId !== req.user!.id) {
         return res.status(404).json({ error: "Not Found", message: "Ticket not found." });
       }
-      if (requesterIndicatedResolved === true) {
-        const updated = await getPrisma().ticket.update({
-          where: { id },
-          data: { requesterIndicatedResolved: true, status: "Waiting for Requester" },
-          include: {
-            category: true,
-            relatedSystem: true,
-            requester: { select: { id: true, name: true, email: true } },
-            owner: { select: { id: true, name: true, email: true } },
-          },
+      if (status !== undefined || ownerId !== undefined || itPriority !== undefined || requesterIndicatedResolved !== true) {
+        return res.status(403).json({
+          error: "Forbidden",
+          message: "Requesters cannot formally update ticket status or assignment.",
         });
-        return res.status(200).json(updated);
       }
-      return res.status(403).json({ error: "Forbidden", message: "Requesters cannot formally update ticket status or assignment." });
+      if (["Resolved", "Closed", "Cancelled"].includes(currentCanonicalStatus)) {
+        return res.status(400).json({
+          error: "Bad Request",
+          message: "Cannot indicate resolution on a resolved, closed, or cancelled ticket.",
+        });
+      }
+
+      const updated = await getPrisma().ticket.update({
+        where: { id },
+        data: { requesterIndicatedResolved: true },
+        include: {
+          category: true,
+          relatedSystem: true,
+          requester: { select: { id: true, name: true, email: true } },
+          owner: { select: { id: true, name: true, email: true } },
+          actionsTaken: {
+            orderBy: [{ actionDateTime: "desc" }, { createdAt: "desc" }],
+            include: ACTION_TAKEN_INCLUDE,
+          },
+        },
+      });
+      return res.status(200).json(updated);
+    }
+
+    // Optimistic Concurrency Check (BR-12, AC-09)
+    const headerUnmodifiedSince = req.header("if-unmodified-since");
+    const hasBodyExpected = expectedUpdatedAt !== undefined && expectedUpdatedAt !== null && String(expectedUpdatedAt).trim() !== "";
+    const rawExpectedUpdatedAt = hasBodyExpected ? expectedUpdatedAt : headerUnmodifiedSince;
+    if (rawExpectedUpdatedAt !== undefined && rawExpectedUpdatedAt !== null && String(rawExpectedUpdatedAt).trim() !== "") {
+      const expectedTime = new Date(String(rawExpectedUpdatedAt)).getTime();
+      const actualTime = new Date(ticket.updatedAt).getTime();
+      const isMismatch = hasBodyExpected
+        ? expectedTime !== actualTime
+        : Math.floor(expectedTime / 1000) !== Math.floor(actualTime / 1000);
+      if (Number.isNaN(expectedTime) || isMismatch) {
+        return res.status(409).json({
+          error: "Conflict",
+          code: "STALE_UPDATE",
+          message: "Ticket has been updated by another user. Please refresh.",
+          currentUpdatedAt: ticket.updatedAt.toISOString(),
+        });
+      }
     }
 
     // IT Staff / Admin ticket workflow updates
@@ -820,6 +1193,9 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
           return res.status(400).json({ error: "Bad Request", message: "Owner must be an active IT Staff or Administrator." });
         }
         dataToUpdate.ownerId = ownerIdNum;
+        if (currentCanonicalStatus === "New" && status === undefined) {
+          dataToUpdate.status = "Open";
+        }
       }
     }
     if (itPriority !== undefined) {
@@ -835,6 +1211,37 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
       if (!canonicalStatus) {
         return res.status(400).json({ error: "Bad Request", message: `Invalid status. Allowed: ${Object.values(TICKET_STATUSES).join(", ")}` });
       }
+
+      if (canonicalStatus !== currentCanonicalStatus) {
+        const allowedNext = TICKET_STATUS_TRANSITIONS[currentCanonicalStatus] ?? [];
+        if (!allowedNext.includes(canonicalStatus)) {
+          return res.status(400).json({
+            error: "Bad Request",
+            code: "INVALID_STATUS_TRANSITION",
+            message: `Invalid status transition from ${currentCanonicalStatus} to ${canonicalStatus}.`,
+          });
+        }
+      }
+
+      // Resolution Gate (BR-15, AC-13): block transitioning to Resolved when open Actions Taken exist
+      if (canonicalStatus === "Resolved") {
+        const unresolvedCount = await getPrisma().actionTaken.count({
+          where: {
+            ticketId: id,
+            status: { in: ["PENDING", "IN_PROGRESS"] },
+          },
+        });
+        if (unresolvedCount > 0) {
+          return res.status(409).json({
+            error: "Conflict",
+            code: "UNRESOLVED_ACTIONS_EXIST",
+            unresolvedCount,
+            openActionsCount: unresolvedCount,
+            message: `Cannot resolve ticket while ${unresolvedCount} action(s) are still open (PENDING or IN_PROGRESS). Complete or cancel them before resolving the ticket.`,
+          });
+        }
+      }
+
       dataToUpdate.status = canonicalStatus;
       // Staff-initiated status change clears any stale requester resolution intent
       dataToUpdate.requesterIndicatedResolved = false;
@@ -848,14 +1255,22 @@ app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, async
         relatedSystem: true,
         requester: { select: { id: true, name: true, email: true } },
         owner: { select: { id: true, name: true, email: true } },
+        actionsTaken: {
+          orderBy: [{ actionDateTime: "desc" }, { createdAt: "desc" }],
+          include: ACTION_TAKEN_INCLUDE,
+        },
       },
     });
 
     res.status(200).json(updatedTicket);
   } catch (err: any) {
-    res.status(500).json({ error: "Internal Server Error", message: err?.message });
+    console.error("Failed to update ticket:", err);
+    res.status(500).json({ error: "Internal Server Error", message: "Failed to update ticket." });
   }
-});
+}
+
+app.patch("/api/tickets/:id", authenticateToken, checkPasswordChangeState, handleTicketPatch);
+app.patch("/api/tickets/:id/status", authenticateToken, checkPasswordChangeState, handleTicketPatch);
 
 // ---------------------------------------------------------------------------
 // Public Comments & Internal Notes APIs
@@ -1156,6 +1571,25 @@ app.post("/api/tickets/:id/internal-notes", authenticateToken, checkPasswordChan
 // ---------------------------------------------------------------------------
 // Lab 3 — Administrator User Management (ADMINISTRATOR only)
 // ---------------------------------------------------------------------------
+app.get(
+  "/api/users/assignable",
+  authenticateToken,
+  checkPasswordChangeState,
+  requireRole("IT_STAFF", "ADMINISTRATOR"),
+  async (_req: Request, res: Response) => {
+    try {
+      const users = await getPrisma().user.findMany({
+        where: { isActive: true, role: { in: ["IT_STAFF", "ADMINISTRATOR"] } },
+        select: { id: true, name: true, email: true, role: true, isActive: true },
+        orderBy: { name: "asc" },
+      });
+      res.status(200).json(users);
+    } catch (_err: any) {
+      res.status(500).json({ error: "Failed to fetch assignable staff" });
+    }
+  },
+);
+
 app.get("/api/users", authenticateToken, checkPasswordChangeState, requireRole("ADMINISTRATOR"), async (req: Request, res: Response) => {
   try {
     const { search, role } = req.query;
@@ -1336,6 +1770,190 @@ app.post("/api/users/:id/reset-password", authenticateToken, checkPasswordChange
     res.status(200).json({ message: "Initial password set successfully. User must change password at next login." });
   } catch (err: any) {
     res.status(500).json({ error: "Internal Server Error", message: err?.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 4 (Issue 6) — IT Staff & Administrator Dashboard API
+// GET /api/dashboard/staff
+// ---------------------------------------------------------------------------
+app.get("/api/dashboard/staff", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user!.role !== "IT_STAFF" && req.user!.role !== "ADMINISTRATOR") {
+      return res.status(403).json({
+        error: "Forbidden",
+        message: "Only IT Staff and Administrators can access the staff dashboard.",
+      });
+    }
+
+    const prisma = getPrisma();
+    const [newCount, openCount, inProgressCount, waitingForRequesterCount, myAssignedCount, rawRecentTickets] = await Promise.all([
+      prisma.ticket.count({
+        where: { status: { in: ["New", "NEW"] } },
+      }),
+      prisma.ticket.count({
+        where: { status: { in: ["Open", "OPEN"] } },
+      }),
+      prisma.ticket.count({
+        where: { status: { in: ["In Progress", "IN PROGRESS", "IN_PROGRESS"] } },
+      }),
+      prisma.ticket.count({
+        where: { status: { in: ["Waiting for Requester", "WAITING FOR REQUESTER", "WAITING_FOR_REQUESTER"] } },
+      }),
+      prisma.ticket.count({
+        where: {
+          ownerId: req.user!.id,
+          status: { notIn: ["Resolved", "RESOLVED", "Closed", "CLOSED", "Cancelled", "CANCELLED"] },
+        },
+      }),
+      prisma.ticket.findMany({
+        take: 5,
+        orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+        include: {
+          category: { select: { id: true, name: true } },
+          requester: { select: { id: true, name: true, email: true } },
+          owner: { select: { id: true, name: true, email: true } },
+        },
+      }),
+    ]);
+
+    const recentTickets = rawRecentTickets.map((t) => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      title: t.summary,
+      summary: t.summary,
+      status: TICKET_STATUSES[String(t.status).toUpperCase()] ?? t.status,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      category: t.category ? { id: t.category.id, name: t.category.name } : null,
+      categoryName: t.category?.name ?? "",
+      requester: t.requester ? { id: t.requester.id, name: t.requester.name, email: t.requester.email } : null,
+      owner: t.owner ? { id: t.owner.id, name: t.owner.name, email: t.owner.email } : null,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+    }));
+
+    return res.status(200).json({
+      metrics: {
+        new: newCount,
+        open: openCount,
+        inProgress: inProgressCount,
+        waitingForRequester: waitingForRequesterCount,
+        myAssigned: myAssignedCount,
+      },
+      recentTickets,
+      quickActions: [
+        { id: "create-ticket", label: "Create Ticket", url: "/tickets/new" },
+        { id: "search-tickets", label: "Search Tickets", url: "/staff/queue" },
+        { id: "my-queue", label: "My Queue", url: "/staff/queue?owner=me" },
+      ],
+    });
+  } catch (err: any) {
+    console.error("Failed to fetch staff dashboard:", err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "Failed to load staff dashboard.",
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 4 (Issue 7) — Requester Dashboard API (Data Isolation: own tickets only)
+// GET /api/dashboard/requester
+// ---------------------------------------------------------------------------
+app.get("/api/dashboard/requester", authenticateToken, checkPasswordChangeState, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user!.role !== "REQUESTER") {
+      return res.status(403).json({
+        error: "Forbidden",
+        message: "Only Requesters can access the requester dashboard.",
+      });
+    }
+
+    const prisma = getPrisma();
+    const requesterId = req.user!.id;
+
+    const [myOpenCount, inProgressCount, resolvedCount, closedCount, rawRecentTickets] = await Promise.all([
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: { in: ["New", "NEW", "Open", "OPEN"] },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: {
+            in: [
+              "In Progress",
+              "IN PROGRESS",
+              "IN_PROGRESS",
+              "Waiting for Requester",
+              "WAITING FOR REQUESTER",
+              "WAITING_FOR_REQUESTER",
+              "Pending",
+              "PENDING",
+              "Reopened",
+              "REOPENED",
+            ],
+          },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: { in: ["Resolved", "RESOLVED"] },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          requesterId,
+          status: { in: ["Closed", "CLOSED", "Cancelled", "CANCELLED"] },
+        },
+      }),
+      prisma.ticket.findMany({
+        where: { requesterId },
+        take: 5,
+        orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+        include: {
+          category: { select: { id: true, name: true } },
+        },
+      }),
+    ]);
+
+    const recentTickets = rawRecentTickets.map((t) => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      title: t.summary,
+      summary: t.summary,
+      status: TICKET_STATUSES[String(t.status).toUpperCase()] ?? t.status,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      category: t.category ? { id: t.category.id, name: t.category.name } : null,
+      categoryName: t.category?.name ?? "",
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+    }));
+
+    return res.status(200).json({
+      metrics: {
+        myOpen: myOpenCount,
+        inProgress: inProgressCount,
+        resolved: resolvedCount,
+        closed: closedCount,
+      },
+      recentTickets,
+      quickActions: [
+        { id: "create-ticket", label: "Create Ticket", url: "/tickets/new" },
+        { id: "view-tickets", label: "View My Tickets", url: "/tickets" },
+      ],
+    });
+  } catch (err: any) {
+    console.error("Failed to fetch requester dashboard:", err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "Failed to load requester dashboard.",
+    });
   }
 });
 

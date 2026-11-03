@@ -18,19 +18,21 @@ model Category {
 }
 
 model User {
-  id                 Int             @id @default(autoincrement())
-  name               String
-  email              String          @unique
-  passwordHash       String
-  role               String          @default("REQUESTER") // REQUESTER, IT_STAFF, ADMINISTRATOR
-  mustChangePassword Boolean         @default(true)
-  isActive           Boolean         @default(true)
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-  requestedTickets   Ticket[]        @relation("TicketRequester")
-  ownedTickets       Ticket[]        @relation("TicketOwner")
-  publicComments     PublicComment[]
-  internalNotes      InternalNote[]
+  id                    Int             @id @default(autoincrement())
+  name                  String
+  email                 String          @unique
+  passwordHash          String
+  role                  String          @default("REQUESTER") // REQUESTER, IT_STAFF, ADMINISTRATOR
+  mustChangePassword    Boolean         @default(true)
+  isActive              Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  requestedTickets      Ticket[]        @relation("TicketRequester")
+  ownedTickets          Ticket[]        @relation("TicketOwner")
+  publicComments        PublicComment[]
+  internalNotes         InternalNote[]
+  actionsTakenPerformed ActionTaken[]   @relation("ActionTakenPerformer")
+  actionsTakenAssigned  ActionTaken[]   @relation("ActionTakenAssignee")
 }
 
 model RelatedSystem {
@@ -42,27 +44,28 @@ model RelatedSystem {
 }
 
 model Ticket {
-  id                Int             @id @default(autoincrement())
-  ticketNumber      String          @unique
-  requesterId       Int
-  requester         User            @relation("TicketRequester", fields: [requesterId], references: [id])
-  ownerId           Int?
-  owner             User?           @relation("TicketOwner", fields: [ownerId], references: [id])
-  categoryId        Int
-  category          Category        @relation(fields: [categoryId], references: [id])
-  relatedSystemId   Int
-  relatedSystem     RelatedSystem   @relation(fields: [relatedSystemId], references: [id])
-  summary           String
-  description       String
-  requestedPriority String
-  itPriority        String          @default("MEDIUM")
-  status            String          @default("New")
-  requesterIndicatedResolved Boolean @default(false)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  attachments       Attachment[]
-  publicComments    PublicComment[]
-  internalNotes     InternalNote[]
+  id                         Int             @id @default(autoincrement())
+  ticketNumber               String          @unique
+  requesterId                Int
+  requester                  User            @relation("TicketRequester", fields: [requesterId], references: [id])
+  ownerId                    Int?
+  owner                      User?           @relation("TicketOwner", fields: [ownerId], references: [id])
+  categoryId                 Int
+  category                   Category        @relation(fields: [categoryId], references: [id])
+  relatedSystemId            Int
+  relatedSystem              RelatedSystem   @relation(fields: [relatedSystemId], references: [id])
+  summary                    String
+  description                String
+  requestedPriority          String
+  itPriority                 String          @default("MEDIUM")
+  status                     String          @default("New")
+  requesterIndicatedResolved Boolean         @default(false)
+  createdAt                  DateTime        @default(now())
+  updatedAt                  DateTime        @updatedAt
+  attachments                Attachment[]
+  publicComments             PublicComment[]
+  internalNotes              InternalNote[]
+  actionsTaken               ActionTaken[]
 
   @@index([ownerId])
   @@index([status])
@@ -100,4 +103,35 @@ model InternalNote {
   author    User     @relation(fields: [authorId], references: [id])
   content   String
   createdAt DateTime @default(now())
+}
+
+enum ActionTakenStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model ActionTaken {
+  id                String            @id @default(uuid())
+  ticketId          Int
+  ticket            Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actionDateTime    DateTime          @default(now())
+  actionDescription String            @db.Text
+  result            String?           @db.Text
+  performedById     Int
+  performedBy       User              @relation("ActionTakenPerformer", fields: [performedById], references: [id])
+  assigneeId        Int
+  assignee          User              @relation("ActionTakenAssignee", fields: [assigneeId], references: [id])
+  status            ActionTakenStatus @default(PENDING)
+  followUpRequired  Boolean           @default(false)
+  followUpNote      String?           @db.Text
+  attachmentNotes   String?           @db.Text
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([ticketId])
+  @@index([performedById])
+  @@index([assigneeId])
+  @@index([ticketId, status])
 }

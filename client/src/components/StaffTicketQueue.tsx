@@ -12,7 +12,7 @@ import { useAuth } from "../context/AuthContext.js";
 import { StatusBadge, PriorityBadge } from "./ui/Badges.js";
 
 const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"];
-const STATUSES = ["New", "Open", "In Progress", "Waiting for Requester", "Resolved", "Closed", "Reopened", "Cancelled"];
+const STATUSES = ["New", "Open", "In Progress", "Waiting for Requester", "Pending", "Resolved", "Closed", "Reopened", "Cancelled"];
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -48,18 +48,43 @@ function getPageItems(current: number, total: number): number[] {
   return Array.from({ length: 5 }, (_, i) => start + i);
 }
 
-interface StaffTicketQueueProps {
-  onOpenTicket: (ticketId: number) => void;
+export interface StaffQueueInitialFilters {
+  status?: string;
+  ownerId?: string;
 }
 
-export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onOpenTicket }) => {
+interface StaffTicketQueueProps {
+  onOpenTicket: (ticketId: number) => void;
+  initialFilters?: StaffQueueInitialFilters;
+}
+
+export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onOpenTicket, initialFilters }) => {
   const { user } = useAuth();
-  const [filters, setFilters] = useState<StaffQueueState>(DEFAULT);
+  const resolveOwnerId = (rawOwnerId?: string): string => {
+    if (!rawOwnerId) return "";
+    if (rawOwnerId === "me") return user ? String(user.id) : "me";
+    return rawOwnerId;
+  };
+  const [filters, setFilters] = useState<StaffQueueState>(() => ({
+    ...DEFAULT,
+    status: initialFilters?.status ?? "",
+    ownerId: resolveOwnerId(initialFilters?.ownerId),
+  }));
   const [searchInput, setSearchInput] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [data, setData] = useState<TicketsPage | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initialFilters) return;
+    setFilters((prev) => ({
+      ...prev,
+      status: initialFilters.status ?? "",
+      ownerId: resolveOwnerId(initialFilters.ownerId),
+      page: 1,
+    }));
+  }, [initialFilters?.status, initialFilters?.ownerId, user?.id]);
 
   useEffect(() => {
     fetchCategories().then(setCategories).catch(() => setCategories([]));
