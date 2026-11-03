@@ -161,6 +161,47 @@
 
 ---
 
+### 2.4 GET /api/users/assignable
+- **คำอธิบาย**: ดึงรายชื่อเจ้าหน้าที่ไอทีและผู้ดูแลระบบที่พร้อมรับมอบหมายงาน Action Taken สำหรับนำไปแสดงผลใน Dropdown เลือก Assignee บนหน้าจอ UI (FR-01, AC-01, BR-13)
+- **Authorization**: เฉพาะ `IT_STAFF` และ `ADMINISTRATOR` เท่านั้น (`REQUESTER` ตอบกลับ `403 Forbidden`, ไม่ได้ยืนยันตัวตนตอบกลับ `401 Unauthorized`)
+- **Query Parameters**: ไม่มี
+- **Business Logic**:
+  - กรองเฉพาะผู้ใช้ที่มีบทบาทเป็น `IT_STAFF` หรือ `ADMINISTRATOR`
+  - กรองเฉพาะผู้ใช้ที่มีสถานะเปิดใช้งาน (`isActive = true`)
+  - คืนค่าเฉพาะฟิลด์ที่ปลอดภัย (`id`, `name`, `email`, `role`, `isActive`) โดยไม่เปิดเผย hash รหัสผ่าน
+- **Success Response (`200 OK`)**:
+  ```json
+  [
+    {
+      "id": 2,
+      "name": "Michael Chen",
+      "email": "michael.chen@toktickit.com",
+      "role": "IT_STAFF",
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@toktickit.com",
+      "role": "IT_STAFF",
+      "isActive": true
+    },
+    {
+      "id": 1,
+      "name": "Admin TokTick",
+      "email": "admin@toktickit.com",
+      "role": "ADMINISTRATOR",
+      "isActive": true
+    }
+  ]
+  ```
+- **Error Responses**:
+  - `401 Unauthorized`: ไม่ได้เข้าสู่ระบบ
+  - `403 Forbidden`: ผู้ใช้มีบทบาทเป็น `REQUESTER`
+  - `500 Internal Server Error`: ข้อผิดพลาดฝั่งเซิร์ฟเวอร์
+
+---
+
 ## 3. Dashboard Endpoints
 
 ### 3.1 GET /api/dashboard/staff

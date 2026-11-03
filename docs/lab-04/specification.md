@@ -190,6 +190,7 @@ model ActionTaken {
 - `PATCH /api/tickets/:id/actions-taken/:actionId`: แก้ไข Action Taken ที่มีอยู่เดิม รวมถึงมอบหมาย `assigneeId` และเปลี่ยน `status` (เฉพาะ IT Staff/Admin)
 - `GET /api/dashboard/staff`: สรุปตัวชี้วัดเชิงปฏิบัติการและรายการตั๋วเร่งด่วนสำหรับ IT Staff/Admin
 - `GET /api/dashboard/requester`: สรุปตัวชี้วัดตั๋วและรายการตั๋วสำหรับ Requester ผู้ล็อกอิน
+- `GET /api/users/assignable`: ดึงรายชื่อเจ้าหน้าที่ไอทีและผู้ดูแลระบบที่ active สำหรับเลือกเป็น Assignee ใน Action Taken (เฉพาะ IT Staff/Admin)
 - `PATCH /api/tickets/:id/status` หรือ `PATCH /api/tickets/:id`: อัปเดตสถานะตั๋วตาม Transition Matrix ตรวจสอบ Concurrency และบังคับ Resolution Gate (`409 Conflict` เมื่อยังมี Action ค้าง)
 - ดูรายละเอียด Request/Response Schemas, Status Codes และ Error Handling ใน `docs/lab-04/api-spec.md`
 
