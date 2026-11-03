@@ -158,3 +158,21 @@
   - มี Visible Focus Ring เมื่อใช้งานผ่านคีย์บอร์ด (ปุ่ม Tab)
   - ทุก Input Field มี Label ผูกด้วย `htmlFor` และมี `aria-required="true"` บนช่องที่บังคับกรอก
 
+---
+
+## 4. Completed Visual and Accessibility Checklist (Final Audit)
+
+ตารางตรวจสอบความสมบูรณ์ด้านการออกแบบและการเข้าถึง (Visual & Accessibility Audit) ตามเกณฑ์ Lab 4 Section 14 (Answer Part 9):
+
+| หมวดการตรวจสอบ (Audit Area) | รายการเกณฑ์ที่ตรวจสอบ (Checklist Item) | สถานะ (Status) | รายละเอียดผลการตรวจสอบ (Audit Evidence & Verification) |
+| :--- | :--- | :---: | :--- |
+| **1. Design Consistency** | การใช้ Zen Green Design Tokens ทั่วทั้งระบบ | ✅ ผ่าน (Pass) | ใช้ `#006B3C` (Primary Green), `#0B7A46` (Secondary Green), `#EAF6EF` (Card Tint), และ `#F5F7F6` (Neutral Background) อย่างสม่ำเสมอทุกคอมโพเนนต์ |
+| **2. Dashboards** | โครงสร้างและการจัดวางบน IT Staff และ Requester Dashboard | ✅ ผ่าน (Pass) | Metric Cards จัดเรียงสวยงาม มีตัวเลขสรุปและคำอธิบายชัดเจน รองรับสถานะ Loading skeleton, Zero-data empty state, Forbidden (403), และ Retry on failure |
+| **3. Actions Taken** | ฟอร์มบันทึกและประวัติการทำงานบน Ticket Detail | ✅ ผ่าน (Pass) | แสดงรายการเรียงล่าสุดไปเก่าสุด, มี Badge แสดงสถานะและผู้ปฏิบัติงาน, ซ่อน/แสดงปุ่มแก้ไขตามบทบาท RBAC อย่างถูกต้อง |
+| **4. Editable vs Read-Only** | การแยกแยะมุมมองแก้ไขและมุมมองอ่านอย่างเดียว | ✅ ผ่าน (Pass) | IT Staff/Admin เห็นปุ่ม Add Action, Complete, Cancel ชัดเจน ในขณะที่ Requester เห็นเฉพาะประวัติแบบ Read-only (`data-testid="actions-readonly-list"`) |
+| **5. Validation Placement** | ตำแหน่งการแสดงผลข้อความแจ้งเตือนข้อผิดพลาด | ✅ ผ่าน (Pass) | ข้อความ Error แสดงใต้ช่อง Input/Select โดยตรง พร้อมสีแดงเตือน (`#991b1b`), ไอคอนแจ้งเตือน, และ attribute `role="alert"` |
+| **6. Keyboard Focus** | การนำทางด้วยแป้นพิมพ์และ Focus Indicator | ✅ ผ่าน (Pass) | ทุกปุ่มกด ลิงก์ และฟอร์มคอนโทรลมี Visible Outline Focus (`outline: 2px solid #006B3C`, `outline-offset: 2px`) เมื่อกด Tab |
+| **7. Clipping & Overlap** | การป้องกันข้อความถูกตัดทอนหรือซ้อนทับกัน | ✅ ผ่าน (Pass) | ใช้ Auto-wrapping (`white-space: normal`, `word-break: break-word`) บน Badges, Modals, และการ์ดรายการ ไม่พบการตัดทอนหรือซ้อนทับกันในทุกความกว้างจอ |
+| **8. Horizontal Overflow** | การป้องกันแถบเลื่อนแนวนอนบนหน้าจอมือถือ | ✅ ผ่าน (Pass) | ทุก Container และ Grid มี `max-width: 100%` และ `overflow-x: hidden` ไม่เกิดการเลื่อนหลุดกรอบแนวนอนบน Mobile (Viewport 393×851) |
+
+
