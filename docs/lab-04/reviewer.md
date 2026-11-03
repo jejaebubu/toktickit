@@ -33,11 +33,19 @@
 
 ### Partner Pull Request Log
 
-| PR ID | Repository / Scope | Branch Source | Target Branch | Author | Reviewer Status | Comments / Resolution |
+| PR ID | Repository / Scope | Branch Source | Target Branch | Author | Reviewer Status | Comments / Resolution (Merge SHA) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **PR-P1 ([GitHub #75](https://github.com/titayaaa/toktickit/pull/75))** | `titayaaa/toktickit`: Issue 27: Sprint 4 Engineering Contract & Specification (`docs/lab-04/`) | `feature/27-lab4-specs` | `lab4-staging` | `titayaaa` | **Changes Requested (3 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจ 3 รอบและขอแก้เรื่อง FK type, field mapping, transition matrix, route/status code, migration plan, ownership formula, accessibility, 403/404 และ stale claims → ผู้เขียนแก้ครบที่ commit `f144a1a` → Reviewer ตรวจรอบสุดท้ายแล้ว **Approve** → Merged `4a55567` (2026-10-31 19:58 UTC) |
-| **PR-P2 ([GitHub #86](https://github.com/Achikan/TokTickIT/pull/86))** | `Achikan/TokTickIT`: feat(Issue 34): IT Staff Dashboard (API + UI) | `feature/34-staff-dashboard` | `lab4-staging` | `Achikan` | **Changes Requested / Commented (4 rounds) → Approved & Merged** | Reviewer `jejaebubu` ตรวจครบ 4 รอบ (Changes Requested รอบ 1 เรื่อง compile error ใน `staffQueue.ts` และ route Lab 2 หาย → Commented รอบ 2 เรื่อง client build, drilldown UI, status badge CSS class → Changes Requested รอบ 3 เรื่อง test assertions urgentHigh/recentlyUpdated/userCounts) → ผู้เขียนแก้ครบถ้วนที่ commit `621db34` → Reviewer ตรวจรอบที่ 4 แล้ว **Approve & Merge** → Merged `7731405` (2026-11-01 10:22 UTC) |
-
+| **PR-P01 ([GitHub #75](https://github.com/titayaaa/toktickit/pull/75))** | `titayaaa/toktickit`: Issue 27: Sprint 4 Engineering Contract & Specification (docs/lab-04) | `feature/27-lab4-specs` | `lab4-staging` | `titayaaa` | **Changes Requested (3 rounds) → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `4a55567`, 2026-10-31 19:58 UTC) |
+| **PR-P02 ([GitHub #76](https://github.com/titayaaa/toktickit/pull/76))** | `titayaaa/toktickit`: feat(db): ActionTaken model, migration, idempotent seed, and verification tests (Issue #64) | `feature/28-db-and-seed` | `lab4-staging` | `titayaaa` | **Changes Requested / Commented → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `3392232`, 2026-11-01 11:03 UTC) |
+| **PR-P03 ([GitHub #77](https://github.com/titayaaa/toktickit/pull/77))** | `titayaaa/toktickit`: feat(api): Actions Taken REST API, RBAC, and assignee validation (Issue #65) | `feature/29-actions-taken-api` | `lab4-staging` | `titayaaa` | **Changes Requested → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `b13cb43`, 2026-11-01 12:00 UTC) |
+| **PR-P04 ([GitHub #78](https://github.com/titayaaa/toktickit/pull/78))** | `titayaaa/toktickit`: feat(ui): Actions Taken component on Ticket Detail, state sync, and A11Y (Issue #66) | `feature/30-actions-taken-ui` | `lab4-staging` | `titayaaa` | **Changes Requested (2 rounds) → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `36e2e53`, 2026-11-01 19:45 UTC) |
+| **PR-P05 ([GitHub #79](https://github.com/titayaaa/toktickit/pull/79))** | `titayaaa/toktickit`: feat(workflow): Ticket workflow operations, resolution gate, and optimistic concurrency (Issue #31) | `feature/31-ticket-workflow` | `lab4-staging` | `titayaaa` | **Commented → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `1a056c2`, 2026-11-01 21:12 UTC) |
+| **PR-P06 ([GitHub #80](https://github.com/titayaaa/toktickit/pull/80))** | `titayaaa/toktickit`: feat(dashboard): IT Staff Dashboard API, summary metrics, and UI screen (Issue #32, #68) | `feature/32-staff-dashboard` | `lab4-staging` | `titayaaa` | **Changes Requested → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `ba347fb`, 2026-11-01 22:20 UTC) |
+| **PR-P07 ([GitHub #81](https://github.com/titayaaa/toktickit/pull/81))** | `titayaaa/toktickit`: feat(dashboard): Requester Dashboard API, personal metrics, and UI screen (Issue #33, #69) | `feature/33-requester-dashboard` | `lab4-staging` | `titayaaa` | **Approved & Merged (1 round)** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `ce5a566`, 2026-11-02 03:55 UTC) |
+| **PR-P08 ([GitHub #82](https://github.com/titayaaa/toktickit/pull/82))** | `titayaaa/toktickit`: test(regression): full regression of Lab 1-3 suites with Lab 4 features (Issue #34, #70) | `feature/34-final-hardening` | `lab4-staging` | `titayaaa` | **Changes Requested → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `858d2ec`, 2026-11-02 09:08 UTC) |
+| **PR-P09 ([GitHub #83](https://github.com/titayaaa/toktickit/pull/83))** | `titayaaa/toktickit`: test(e2e): Playwright E2E suites, responsive audits, and visual evidence (Issue #35, #71) | `feature/35-e2e-and-visual` | `lab4-staging` | `titayaaa` | **Changes Requested → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `b4dee7e`, 2026-11-03 10:05 UTC) |
+| **PR-P10 ([GitHub #84](https://github.com/titayaaa/toktickit/pull/84))** | `titayaaa/toktickit`: PR-10: Sprint 4 Documentation and Release Integration to Main (Issue #36, #72) | `release/lab04-staging-to-main` | `main` | `titayaaa` | **Changes Requested → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `main` (Merge SHA: `06a4035`, 2026-11-03 19:57 UTC) |
+| **PR-P11 ([GitHub #86](https://github.com/Achikan/TokTickIT/pull/86))** | `Achikan/TokTickIT`: feat(Issue 34): IT Staff Dashboard (API + UI) | `feature/34-staff-dashboard` | `lab4-staging` | `Achikan` | **Changes Requested / Commented (4 rounds) → Approved & Merged** | Reviewer `@jejaebubu` ตรวจทานโค้ด สเปก และเทสต์อย่างละเอียด $\rightarrow$ Reviewer อนุมัติและเป็นผู้กด Merge เข้าสู่ `lab4-staging` (Merge SHA: `7731405`, 2026-11-01 10:22 UTC) |
 
 ---
 
@@ -788,7 +796,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ---
 
-## 4. Full Review Trail — Partner Repository Reviews
+## 4. Full Review Trail — Partner Repository Reviews (`titayaaa/toktickit`)
 
 ### 4.1 PR #75: Issue 27: Sprint 4 Engineering Contract & Specification (`titayaaa/toktickit`)
 
@@ -1156,7 +1164,1234 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 
 ---
 
-### 4.2 PR #86: Issue 34: IT Staff Dashboard (API + UI) (`Achikan/TokTickIT`)
+---
+
+### 4.2 PR #76: feat(db): ActionTaken model, migration, idempotent seed, and verification tests (Issue #64) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#76](https://github.com/titayaaa/toktickit/pull/76)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/28-db-and-seed`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `33922325eed3ee5deba3f7872f8b2193ef8bce8a`, 2026-11-01T11:03:13Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `018981d77b068a31d3ee0250e535ed9ccd4b4111`
+
+#### 4.2.1 Review #1 — CHANGES_REQUESTED (`jejaebubu`, 2026-10-31T20:38:29Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `aade062`)
+
+**Verbatim Review Comments:**
+
+> ตรวจ schema, migration, seed, tests และ docs เทียบกับ Issue/BR แล้วนะคะ โดยรวมทำได้ดี แต่ขอ **Changes Requested** ก่อนค่ะ เพราะมีจุดหนึ่งที่อาจกระทบการสร้าง `ActionTaken` ใน Issue ถัดไป
+> 
+> **🔴 Blocking: Seed กำหนด `ActionTaken.id` เอง ทำให้ sequence ไม่ขยับตาม**
+> 
+> ใน `server/prisma/seed.ts:311-449` มีการใช้ `id: 1..6` ใน `actionTaken.upsert`
+> 
+> ปัญหาที่พบเมื่อเริ่มจาก DB ใหม่ แล้วรัน `db push --force-reset` ตามด้วย `npm run prisma:seed` คือ
+> 
+> - `actions_taken_id_seq.last_value = 1`
+> - แต่ `MAX(actions_taken.id) = 6`
+> - พอเรียก `prisma.actionTaken.create()` จะเจอ error `P2002` ที่ target `id` เพราะ sequence สร้าง ID ซ้ำกับข้อมูลที่มีอยู่แล้ว
+> 
+> ถ้าปล่อยไว้ API ที่ใช้สร้าง `ActionTaken` ใน Issue ถัดไปจะไม่สามารถ insert ข้อมูลได้ค่ะ
+> 
+> **แนวทางแก้ที่แนะนำ**
+> - เอา `id` ออกจาก seed แล้วใช้ natural key ในการ upsert เช่น `ticketId + actionDateTime + actionDescription`
+> - หรือถ้าต้องการใช้ explicit ID ต่อ ให้เรียก `setval` เพื่อปรับ sequence หลัง seed ให้ตรงกับ ID สูงสุด
+> 
+> และรบกวนเพิ่ม test ที่ลองสร้าง `ActionTaken` ใหม่ 1 รายการหลัง seed ด้วยนะคะ เพื่อป้องกันปัญหานี้กลับมาอีก
+> 
+> ปัญหา sequence แบบเดียวกันมีอยู่เดิมใน `publicComment` และ `internalNote` ด้วย โดย full suite บน clean seed fail 6 tests ซึ่งเป็นปัญหาที่มีอยู่ใน base อยู่แล้ว แต่ PR นี้เพิ่มความเสี่ยงใหม่ให้ `ActionTaken` ค่ะ อย่างน้อยขอให้แก้ `ActionTaken` ก่อน และถ้าจะแก้ seed รอบนี้ แนะนำให้จัดการทั้ง 3 ตารางไปพร้อมกันเลยค่ะ
+> 
+> **🟠 Should fix: `requesterId` hardcode**
+> 
+> ใน `server/prisma/seed.ts:360,459,480` มีการกำหนด `requesterId: 1/2/3` ไว้ตรง ๆ
+> 
+> ถ้าเอา seed ไปรันบน DB ที่มี Requester ID ไม่ตรงกับ fresh DB อาจทำให้ ticket ไปผูกกับ requester ผิดคน หรือเกิด FK error ได้ค่ะ
+> 
+> แนะนำให้ lookup `RequesterUser` จาก email ก่อน แล้วนำ `.id` ที่ได้มาใช้แทนการ hardcode ค่ะ
+> 
+> **🟡 Minor: จุดที่แนะนำให้เก็บเพิ่ม**
+> 
+> - `docs/lab-04/reviewer.md:672` ระบุ `782d54e / db7e326` เป็น commit ที่เกี่ยวข้อง แต่ทั้งสองเป็น fix/docs commit ไม่ใช่ merge commit โดย merge commit ของ PR #106 คือ `23166db`
+> - `server/prisma/seed.ts:350` ประกาศ `staffCharlie` ไว้แต่ไม่ได้ใช้งาน
+> - เพิ่ม negative test อีก 2 กรณี:
+>   - `followUpRequired=false` แล้ว `followUpNote=null`
+>   - เมื่อ status เป็น `IN_PROGRESS` แล้ว `result=null`
+> - `server/prisma/seed.ts:290` มี indentation ไม่สม่ำเสมอ เป็นแค่เรื่อง formatting ค่ะ
+> 
+> **✅ ผลตรวจสอบที่ผ่านแล้ว**
+> 
+> - `npm run build` ผ่าน
+> - Migration SQL สามารถ apply ซ้ำ 2 ครั้งได้
+> - `db-seed.test.ts` ผ่าน 10/10
+> - Full suite ผ่าน 128 tests และ fail 6 tests โดยทั้ง 6 ตัวเป็นปัญหาเดิมที่มีอยู่ใน base ได้แก่ attachment ไม่มีใน seed และ explicit comment/note IDs ไม่ใช่ regression ใหม่จาก PR นี้
+> - `prisma migrate deploy` บน DB ใหม่ยังติดที่ base migration `20260917000000_lab3_users_and_workflow` เพราะ `TicketPriority` missing ซึ่งเป็นปัญหาเดิม ไม่ได้เกิดจาก PR นี้ค่ะ
+> 
+> **สรุป:** โครงสร้าง schema, migration และ tests ทำได้ดี และตรงกับ BR หลักแล้วค่ะ แต่ขอให้แก้เรื่อง `ActionTaken` sequence ก่อน merge และแนะนำให้แก้ `requesterId` ที่ hardcode ไว้ด้วย หลังแก้แล้ว ping กลับมาให้ re-review ได้เลยค่ะ
+
+
+#### 4.2.2 Author Response #1 (`titayaaa`, 2026-10-31T21:02:41Z)
+
+> > ตรวจ schema, migration, seed, tests และ docs เทียบกับ Issue/BR แล้วนะคะ โดยรวมทำได้ดี แต่ขอ **Changes Requested** ก่อนค่ะ เพราะมีจุดหนึ่งที่อาจกระทบการสร้าง `ActionTaken` ใน Issue ถัดไป
+> > 
+> > **🔴 Blocking: Seed กำหนด `ActionTaken.id` เอง ทำให้ sequence ไม่ขยับตาม**
+> > 
+> > ใน `server/prisma/seed.ts:311-449` มีการใช้ `id: 1..6` ใน `actionTaken.upsert`
+> > 
+> > ปัญหาที่พบเมื่อเริ่มจาก DB ใหม่ แล้วรัน `db push --force-reset` ตามด้วย `npm run prisma:seed` คือ
+> > 
+> > * `actions_taken_id_seq.last_value = 1`
+> > * แต่ `MAX(actions_taken.id) = 6`
+> > * พอเรียก `prisma.actionTaken.create()` จะเจอ error `P2002` ที่ target `id` เพราะ sequence สร้าง ID ซ้ำกับข้อมูลที่มีอยู่แล้ว
+> > 
+> > ถ้าปล่อยไว้ API ที่ใช้สร้าง `ActionTaken` ใน Issue ถัดไปจะไม่สามารถ insert ข้อมูลได้ค่ะ
+> > 
+> > **แนวทางแก้ที่แนะนำ**
+> > 
+> > * เอา `id` ออกจาก seed แล้วใช้ natural key ในการ upsert เช่น `ticketId + actionDateTime + actionDescription`
+> > * หรือถ้าต้องการใช้ explicit ID ต่อ ให้เรียก `setval` เพื่อปรับ sequence หลัง seed ให้ตรงกับ ID สูงสุด
+> > 
+> > และรบกวนเพิ่ม test ที่ลองสร้าง `ActionTaken` ใหม่ 1 รายการหลัง seed ด้วยนะคะ เพื่อป้องกันปัญหานี้กลับมาอีก
+> > 
+> > ปัญหา sequence แบบเดียวกันมีอยู่เดิมใน `publicComment` และ `internalNote` ด้วย โดย full suite บน clean seed fail 6 tests ซึ่งเป็นปัญหาที่มีอยู่ใน base อยู่แล้ว แต่ PR นี้เพิ่มความเสี่ยงใหม่ให้ `ActionTaken` ค่ะ อย่างน้อยขอให้แก้ `ActionTaken` ก่อน และถ้าจะแก้ seed รอบนี้ แนะนำให้จัดการทั้ง 3 ตารางไปพร้อมกันเลยค่ะ
+> > 
+> > **🟠 Should fix: `requesterId` hardcode**
+> > 
+> > ใน `server/prisma/seed.ts:360,459,480` มีการกำหนด `requesterId: 1/2/3` ไว้ตรง ๆ
+> > 
+> > ถ้าเอา seed ไปรันบน DB ที่มี Requester ID ไม่ตรงกับ fresh DB อาจทำให้ ticket ไปผูกกับ requester ผิดคน หรือเกิด FK error ได้ค่ะ
+> > 
+> > แนะนำให้ lookup `RequesterUser` จาก email ก่อน แล้วนำ `.id` ที่ได้มาใช้แทนการ hardcode ค่ะ
+> > 
+> > **🟡 Minor: จุดที่แนะนำให้เก็บเพิ่ม**
+> > 
+> > * `docs/lab-04/reviewer.md:672` ระบุ `782d54e / db7e326` เป็น commit ที่เกี่ยวข้อง แต่ทั้งสองเป็น fix/docs commit ไม่ใช่ merge commit โดย merge commit ของ PR #106 คือ `23166db`
+> > * `server/prisma/seed.ts:350` ประกาศ `staffCharlie` ไว้แต่ไม่ได้ใช้งาน
+> > * เพิ่ม negative test อีก 2 กรณี:
+> >   
+> >   * `followUpRequired=false` แล้ว `followUpNote=null`
+> >   * เมื่อ status เป็น `IN_PROGRESS` แล้ว `result=null`
+> > * `server/prisma/seed.ts:290` มี indentation ไม่สม่ำเสมอ เป็นแค่เรื่อง formatting ค่ะ
+> > 
+> > **✅ ผลตรวจสอบที่ผ่านแล้ว**
+> > 
+> > * `npm run build` ผ่าน
+> > * Migration SQL สามารถ apply ซ้ำ 2 ครั้งได้
+> > * `db-seed.test.ts` ผ่าน 10/10
+> > * Full suite ผ่าน 128 tests และ fail 6 tests โดยทั้ง 6 ตัวเป็นปัญหาเดิมที่มีอยู่ใน base ได้แก่ attachment ไม่มีใน seed และ explicit comment/note IDs ไม่ใช่ regression ใหม่จาก PR นี้
+> > * `prisma migrate deploy` บน DB ใหม่ยังติดที่ base migration `20260917000000_lab3_users_and_workflow` เพราะ `TicketPriority` missing ซึ่งเป็นปัญหาเดิม ไม่ได้เกิดจาก PR นี้ค่ะ
+> > 
+> > **สรุป:** โครงสร้าง schema, migration และ tests ทำได้ดี และตรงกับ BR หลักแล้วค่ะ แต่ขอให้แก้เรื่อง `ActionTaken` sequence ก่อน merge และแนะนำให้แก้ `requesterId` ที่ hardcode ไว้ด้วย หลังแก้แล้ว ping กลับมาให้ re-review ได้เลยค่ะ
+> 
+> ขอบคุณสำหรับคำแนะนำและการตรวจทานที่ละเอียดรอบคอบมาก ๆ ค่ะ แก้ไขครบถ้วนทุกจุดตามคำแนะนำทั้งระดับ Blocking, Should Fix และ Minor ใน commit `06e01c2` ดังนี้ค่ะ:
+> 
+> 1. **🔴 แก้ปัญหา PostgreSQL Sequence ไม่ขยับตาม Explicit ID:**
+>    - ใน `server/prisma/seed.ts` เพิ่มคำสั่ง `setval` ซิงค์ sequence ของทั้ง 3 ตาราง (`actions_taken`, `public_comments`, `internal_notes`) ให้ตรงกับ `MAX(id)` ของข้อมูลที่ seed ลงไป
+>    - เพิ่มเทสต์ใน `server/tests/lab-04/db-seed.test.ts` ที่ทดลองเรียก `prisma.actionTaken.create()` หลัง seed สำเร็จ เพื่อยืนยันว่า auto-increment ทำงานถูกต้องและได้ id >= 7 โดยไม่เกิด error P2002 duplicate key
+> 2. **🟠 แก้ RequesterId Hardcode:**
+>    - ใน `server/prisma/seed.ts` ทำการ lookup `RequesterUser` จาก verified email (`jennifer.anderson@example.com`, `michael.brown@example.com`, `sarah.johnson@example.com`) ก่อนนำ `.id` มาผูกเข้ากับ `ticket` แทนการ hardcode `1/2/3` เพื่อป้องกัน FK mismatch
+> 3. **🟡 เก็บตกจุดย่อย (Minor Fixes):**
+>    - ใน `docs/lab-04/reviewer.md` แก้ไข Merge commit ของ PR #106 เป็น `23166db` ถูกต้อง
+>    - ลบตัวแปร `staffCharlie` ที่ประกาศค้างไว้ใน `seed.ts` ออก
+>    - เพิ่ม Negative Test อีก 2 กรณีใน `db-seed.test.ts` (รวมเป็น 13 เทสต์):
+>      - ตรวจสอบว่า Action ที่ `isFollowUpRequired === false` จะต้องมี `followUpNote === null` (BR-07)
+>      - ตรวจสอบว่า Action ที่สถานะ `IN_PROGRESS` สามารถมี `result === null` ได้จริง (BR-16)
+>    - ปรับปรุง Indentation ใน `seed.ts` บรรทัดที่ 290 ให้เป็นระเบียบเรียบร้อย
+>    - รัน `npm run build` ผ่าน 100% ทั้ง Client และ Server
+> 
+> รบกวนตรวจทานรอบที่ 2 นะคะ ขอบคุณมาก ๆ ค่ะ!
+
+
+#### 4.2.3 Review #2 — COMMENTED (`jejaebubu`, 2026-11-01T10:30:14Z)
+
+**Verdict:** COMMENTED (commit `aade062`)
+
+**Verbatim Review Comments:**
+
+> เห็นคอมเมนต์ตอบกลับแล้ว แต่ใน PR #76 บน GitHub ตอนนี้ commit ล่าสุดยังเป็น aade062 อยู่เลย ยังไม่เห็น commit 06e01c2 ขึ้นมานะคะ รบกวนช่วย git push origin feature/28-db-and-seed ขึ้น GitHub ให้หน่อยน้า เดี๋ยวพอโค้ดขึ้นแล้วตรวจรอบ 2 ให้เลยค่ะ
+
+
+#### 4.2.4 Author Response #2 (`titayaaa`, 2026-11-01T10:44:56Z)
+
+> พุช commit 06e01c2 และ 018981d ขึ้น origin เรียบร้อยแล้วค่ะ โค้ดทั้งหมดพร้อมให้ตรวจรอบ 2 ได้เลยนะคะ ขอบคุณมากค่ะ!
+
+
+#### 4.2.5 Review #3 — APPROVED (`jejaebubu`, 2026-11-01T11:03:01Z)
+
+**Verdict:** APPROVED (commit `018981d`)
+
+**Verbatim Review Comments:**
+
+> ### การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+> 
+> ตรวจ commits `06e01c2` และ `018981d` แล้วนะคะ แก้ไขครบถ้วนทุกประเด็นที่แจ้งไว้ในรอบแรก ทั้งระดับ Blocking, Should Fix และ Minor เลยค่ะ:
+> 
+> 1. **PostgreSQL Sequence Synchronization (`seed.ts` & `db-seed.test.ts`):**
+>    - เพิ่มการซิงก์ค่า sequence ด้วย `setval(pg_get_serial_sequence(...))` สำหรับตาราง `actions_taken`, `public_comments` และ `internal_notes` ให้ตรงกับ `MAX(id)` หลัง seed
+>    - เพิ่มเทสต์ใน `db-seed.test.ts` ทดสอบสร้าง `ActionTaken` ใหม่หลัง seed โดยไม่ระบุ `id` ได้ค่า `id >= 7` และไม่เกิด `P2002`
+> 2. **Dynamic Requester Lookup (`seed.ts`):**
+>    - เปลี่ยนจากการ hardcode `requesterId: 1/2/3` เป็นการ lookup `RequesterUser` จากอีเมล (`reqJennifer`, `reqMichael`, `reqSarah`) เรียบร้อย
+> 3. **Negative Tests & Code Cleanliness (`db-seed.test.ts`, `seed.ts`, `reviewer.md`):**
+>    - เพิ่ม negative tests ตรวจสอบกรณี `isFollowUpRequired = false` (`followUpNote === null`) และกรณี `status = IN_PROGRESS` (`result === null`) ครบถ้วน
+>    - ลบตัวแปร `staffCharlie` ที่ไม่ได้ใช้งาน จัด indentation ใน `seed.ts` และอัปเดต SHA ของ merge commit PR #106 (`23166db`) พร้อมบันทึกประวัติการรีวิวใน `reviewer.md` ครบถ้วน
+> 
+> โค้ดและชุดทดสอบพร้อมสำหรับทำ Issue 29 ต่อแล้วค่ะ ขออนุมัติ (**Approve**) และกด Merge เข้าสู่ `lab4-staging` ให้เลยนะคะ!
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #76 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `33922325eed3ee5deba3f7872f8b2193ef8bce8a`, 2026-11-01T11:03:13Z) — **Closes PR #76**
+
+---
+
+### 4.3 PR #77: feat(api): Actions Taken REST API, RBAC, and assignee validation (Issue #65) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#77](https://github.com/titayaaa/toktickit/pull/77)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/29-actions-taken-api`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `b13cb435cc1816edf2939f7ae59a3e321a7c43f0`, 2026-11-01T12:00:30Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `f094823c690adada5b55978632ca119f8204d18b`
+
+#### 4.3.1 Review #1 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-01T11:30:19Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `93e8241`)
+
+**Verbatim Review Comments:**
+
+> ตรวจโค้ด REST API, RBAC, tests และเอกสารของ PR #77 (Issue 29) เทียบกับ `schema.prisma`, `specification.md`, `api-spec.md` และ `tests.md` แล้วนะคะ ภาพรวมโครงสร้าง endpoint `GET/POST/PATCH /:id/actions-taken`, `GET /api/users/assignable`, การดึง `performedById` จาก JWT, `validateAssignee` (422) และ state machine ของ Action status ทำไว้ดีเลยค่ะ
+> 
+> แต่ขอ **Changes Requested** ก่อนนะคะ เพราะมีจุดที่ทำให้ `npm run build` (`tsc`) กับ `vitest` พังใน `beforeAll` และมีจุดเรื่อง ownership check กับ traceability matrix ที่ต้องปรับให้ตรงกันค่ะ
+> 
+> ---
+> 
+> ### 🔴 Blocking: ต้องแก้ก่อน Merge
+> 
+> 1. **`server/tests/lab-04/actions-taken.api.test.ts` (บรรทัด 62–85): ขาด `relatedSystemId` และ `requestedPriority` ใน `prisma.ticket.create` + ผูก `requesterId` ข้ามตาราง**
+>    ใน `schema.prisma` โมเดล `Ticket` กำหนดให้ `relatedSystemId` และ `requestedPriority` เป็น required fields แต่ใน `beforeAll` ตอนสร้าง `ownTicket` และ `otherTicket` ไม่ได้ส่ง 2 ฟิลด์นี้เข้าไป ทำให้:
+>    - รัน `npm run build` (`tsc`) ไม่ผ่าน เพราะติด TypeScript error (`Property 'relatedSystemId' is missing`, `Property 'requestedPriority' is missing`)
+>    - รัน `vitest run tests/lab-04/actions-taken.api.test.ts` พังตั้งแต่ `beforeAll` ด้วย `PrismaClientValidationError`
+>    - นอกจากนี้ `requesterId: requester.id` / `otherRequester.id` เอา `User.id` ไปใส่ในฟิลด์ `Ticket.requesterId` ซึ่งอ้างอิงตาราง `RequesterUser.id` ค่ะ
+>    - **แนวทางแก้:** ดึง `relatedSystem` จาก `prisma.relatedSystem.findFirst({ where: { isActive: true } })` และ lookup `RequesterUser` จาก email (`reqJennifer`, `reqMichael`) แล้วส่ง `relatedSystemId`, `requestedPriority: TicketPriority.MEDIUM` และ `requesterId: reqJennifer.id` ให้ครบทั้ง `ownTicket` และ `otherTicket` ค่ะ
+> 
+> 2. **`server/src/routes/tickets.ts` (บรรทัด 226–231): การเช็ก `ticket.requesterId === currentUser.id` เสี่ยงเกิด Cross-model ID collision**
+>    ใน `GET /api/tickets/:id/actions-taken` มีเงื่อนไข:
+>    ```ts
+>    const isOwner =
+>      ticket.userId === currentUser.id ||
+>      ticket.requesterId === currentUser.id ||
+>      (ticket.requester && ticket.requester.id === currentUser.id) ||
+>      (ticket.requesterUser && ticket.requesterUser.email === currentUser.email);
+>    ```
+>    เนื่องจาก `ticket.requesterId` คือ `RequesterUser.id` ส่วน `currentUser.id` คือ `User.id` ถ้าเอาตัวเลข ID คนละตารางมาเทียบ `===` กันตรง ๆ อาจทำให้ ID ชนกันข้ามตารางและทำให้ Requester เปิดดู Actions Taken ของคนอื่นได้ (ขัดกับ BR-13 ที่แก้ใน PR #75)
+>    - **แนวทางแก้:** เอาบรรทัด `ticket.requesterId === currentUser.id` ออก แล้วเช็กเฉพาะ `ticket.userId === currentUser.id || ticket.requester?.id === currentUser.id || ticket.requester?.email === currentUser.email || ticket.requesterUser?.email === currentUser.email` ค่ะ
+> 
+> ---
+> 
+> ### 🟠 Should Fix: ความสอดคล้องของ Traceability Matrix และ API Spec
+> 
+> 3. **อัปเดต `docs/lab-04/tests.md` และปรับรหัส Test ID ใน `actions-taken.api.test.ts` ให้ตรงกัน**
+>    - ใน PR นี้ยังไม่ได้อัปเดตสถานะเทสต์ใน `docs/lab-04/tests.md` จาก `Planned` เป็น `Pass`
+>    - และรหัสเทสต์ใน `actions-taken.api.test.ts` (`API-01..05, API-08, API-12, API-14, API-15, API-16, API-17`) ยังไม่ตรงกับตารางใน `docs/lab-04/tests.md` ของ repo นี้ค่ะ (เช่น ใน `tests.md` รหัส `API-08` คือ Resolution Gate, `API-12` คือ Requester Dashboard, `API-14` คือ Concurrency 409 และยังไม่มี `API-15..17`)
+>    - **แนวทางแก้:** ปรับรหัสเทสต์ใน `actions-taken.api.test.ts` กับตารางใน `docs/lab-04/tests.md` ให้ตรงกันแบบ 1-ต่อ-1 และเปลี่ยนสถานะเทสต์ที่รันผ่านใน PR นี้เป็น `Pass` (พร้อมอัปเดต `docs/lab-04/ai-use.md` สำหรับ Issue 29 ด้วยนะคะ)
+> 
+> 4. **ปรับ `docs/lab-04/api-spec.md` (§2.1, §2.2) กับ `server/src/routes/tickets.ts` ให้ตรงกัน**
+>    - **`GET /api/tickets/:id/actions-taken/:actionId`:** ใน `specification.md` §8 และ `api-spec.md` §2.2 ระบุว่ามี endpoint ดึง Action รายตัว แต่ใน `tickets.ts` ยังไม่มี route นี้ (เลือกได้ว่าจะเพิ่ม route นี้ใน `tickets.ts` หรือเอาออกจาก spec ให้ตรงกันค่ะ)
+>    - **Response shape และการเรียงลำดับของ `GET /api/tickets/:id/actions-taken`:** ใน `api-spec.md` §2.1 เขียนว่าคืน `{ data: [...], meta: {...} }` และเรียง `desc` แต่โค้ดจริงใน `tickets.ts` คืนเป็น Array `res.status(200).json(actions)` และเรียง `actionDateTime: 'asc'` แนะนำให้แก้ `api-spec.md` §2.1 ให้ตรงกับที่โค้ดคืนจริง เพื่อไม่ให้ตอนทำ UI ใน Issue 30 สับสนค่ะ
+> 
+> ---
+> 
+> ### 🟡 Minor: จุดที่แนะนำให้เก็บเพิ่ม
+> - ใน `PATCH /:id/actions-taken/:actionId` โค้ดมีการล้าง `followUpNote = null` เมื่อ `isFollowUpRequired = false` ไว้ถูกต้องแล้ว แนะนำให้เพิ่ม test case ใน `actions-taken.api.test.ts` ที่ส่ง `PATCH { isFollowUpRequired: false }` แล้วเช็กว่า `followUpNote` กลายเป็น `null` จริงด้วยค่ะ
+> - ใน `POST` และ `PATCH`:
+>   - ถ้าส่ง `actionDateTime` ที่ไม่ใช่วันที่ที่ถูกต้อง (`isNaN(parsed.getTime())`) แนะนำให้ตอบ `400 Bad Request` แทนการ fallback เงียบ ๆ
+>   - เช็กความยาว `result.length > 1000` ทุกสถานะ (ไม่ใช่เฉพาะตอน `COMPLETED`) และเช็ก `attachmentNotes.length > 500` ให้ตอบ `400` แทนการ `.slice(0, 500)`
+>   - ปรับความยาวขั้นต่ำของ `followUpNote` ในโค้ด (`>= 1`) กับใน `api-spec.md` (`min 2 chars`) ให้ตรงกันค่ะ
+> 
+> แก้แล้วรัน `npm run build` กับ `npm test` เช็กอีกรอบ แล้ว ping มาได้เลยนะคะ เดี๋ยวรีบตรวจซ้ำและกด Approve + Merge ให้ค่ะ ขอบคุณมากค่ะ!
+
+
+#### 4.3.2 Author Response #1 (`titayaaa`, 2026-11-01T11:43:45Z)
+
+> > ตรวจโค้ด REST API, RBAC, tests และเอกสารของ PR #77 (Issue 29) เทียบกับ `schema.prisma`, `specification.md`, `api-spec.md` และ `tests.md` แล้วนะคะ ภาพรวมโครงสร้าง endpoint `GET/POST/PATCH /:id/actions-taken`, `GET /api/users/assignable`, การดึง `performedById` จาก JWT, `validateAssignee` (422) และ state machine ของ Action status ทำไว้ดีเลยค่ะ
+> > 
+> > แต่ขอ **Changes Requested** ก่อนนะคะ เพราะมีจุดที่ทำให้ `npm run build` (`tsc`) กับ `vitest` พังใน `beforeAll` และมีจุดเรื่อง ownership check กับ traceability matrix ที่ต้องปรับให้ตรงกันค่ะ
+> > 
+> > ### 🔴 Blocking: ต้องแก้ก่อน Merge
+> > 1. **`server/tests/lab-04/actions-taken.api.test.ts` (บรรทัด 62–85): ขาด `relatedSystemId` และ `requestedPriority` ใน `prisma.ticket.create` + ผูก `requesterId` ข้ามตาราง**
+> >    ใน `schema.prisma` โมเดล `Ticket` กำหนดให้ `relatedSystemId` และ `requestedPriority` เป็น required fields แต่ใน `beforeAll` ตอนสร้าง `ownTicket` และ `otherTicket` ไม่ได้ส่ง 2 ฟิลด์นี้เข้าไป ทำให้:
+> >    
+> >    * รัน `npm run build` (`tsc`) ไม่ผ่าน เพราะติด TypeScript error (`Property 'relatedSystemId' is missing`, `Property 'requestedPriority' is missing`)
+> >    * รัน `vitest run tests/lab-04/actions-taken.api.test.ts` พังตั้งแต่ `beforeAll` ด้วย `PrismaClientValidationError`
+> >    * นอกจากนี้ `requesterId: requester.id` / `otherRequester.id` เอา `User.id` ไปใส่ในฟิลด์ `Ticket.requesterId` ซึ่งอ้างอิงตาราง `RequesterUser.id` ค่ะ
+> >    * **แนวทางแก้:** ดึง `relatedSystem` จาก `prisma.relatedSystem.findFirst({ where: { isActive: true } })` และ lookup `RequesterUser` จาก email (`reqJennifer`, `reqMichael`) แล้วส่ง `relatedSystemId`, `requestedPriority: TicketPriority.MEDIUM` และ `requesterId: reqJennifer.id` ให้ครบทั้ง `ownTicket` และ `otherTicket` ค่ะ
+> > 2. **`server/src/routes/tickets.ts` (บรรทัด 226–231): การเช็ก `ticket.requesterId === currentUser.id` เสี่ยงเกิด Cross-model ID collision**
+> >    ใน `GET /api/tickets/:id/actions-taken` มีเงื่อนไข:
+> >    ```ts
+> >    const isOwner =
+> >      ticket.userId === currentUser.id ||
+> >      ticket.requesterId === currentUser.id ||
+> >      (ticket.requester && ticket.requester.id === currentUser.id) ||
+> >      (ticket.requesterUser && ticket.requesterUser.email === currentUser.email);
+> >    ```
+> >    
+> >    
+> >        
+> >          
+> >        
+> >    
+> >          
+> >        
+> >    
+> >        
+> >      
+> >    เนื่องจาก `ticket.requesterId` คือ `RequesterUser.id` ส่วน `currentUser.id` คือ `User.id` ถ้าเอาตัวเลข ID คนละตารางมาเทียบ `===` กันตรง ๆ อาจทำให้ ID ชนกันข้ามตารางและทำให้ Requester เปิดดู Actions Taken ของคนอื่นได้ (ขัดกับ BR-13 ที่แก้ใน PR #75)
+> >    
+> >    * **แนวทางแก้:** เอาบรรทัด `ticket.requesterId === currentUser.id` ออก แล้วเช็กเฉพาะ `ticket.userId === currentUser.id || ticket.requester?.id === currentUser.id || ticket.requester?.email === currentUser.email || ticket.requesterUser?.email === currentUser.email` ค่ะ
+> > 
+> > ### 🟠 Should Fix: ความสอดคล้องของ Traceability Matrix และ API Spec
+> > 3. **อัปเดต `docs/lab-04/tests.md` และปรับรหัส Test ID ใน `actions-taken.api.test.ts` ให้ตรงกัน**
+> >    
+> >    * ใน PR นี้ยังไม่ได้อัปเดตสถานะเทสต์ใน `docs/lab-04/tests.md` จาก `Planned` เป็น `Pass`
+> >    * และรหัสเทสต์ใน `actions-taken.api.test.ts` (`API-01..05, API-08, API-12, API-14, API-15, API-16, API-17`) ยังไม่ตรงกับตารางใน `docs/lab-04/tests.md` ของ repo นี้ค่ะ (เช่น ใน `tests.md` รหัส `API-08` คือ Resolution Gate, `API-12` คือ Requester Dashboard, `API-14` คือ Concurrency 409 และยังไม่มี `API-15..17`)
+> >    * **แนวทางแก้:** ปรับรหัสเทสต์ใน `actions-taken.api.test.ts` กับตารางใน `docs/lab-04/tests.md` ให้ตรงกันแบบ 1-ต่อ-1 และเปลี่ยนสถานะเทสต์ที่รันผ่านใน PR นี้เป็น `Pass` (พร้อมอัปเดต `docs/lab-04/ai-use.md` สำหรับ Issue 29 ด้วยนะคะ)
+> > 4. **ปรับ `docs/lab-04/api-spec.md` (§2.1, §2.2) กับ `server/src/routes/tickets.ts` ให้ตรงกัน**
+> >    
+> >    * **`GET /api/tickets/:id/actions-taken/:actionId`:** ใน `specification.md` §8 และ `api-spec.md` §2.2 ระบุว่ามี endpoint ดึง Action รายตัว แต่ใน `tickets.ts` ยังไม่มี route นี้ (เลือกได้ว่าจะเพิ่ม route นี้ใน `tickets.ts` หรือเอาออกจาก spec ให้ตรงกันค่ะ)
+> >    * **Response shape และการเรียงลำดับของ `GET /api/tickets/:id/actions-taken`:** ใน `api-spec.md` §2.1 เขียนว่าคืน `{ data: [...], meta: {...} }` และเรียง `desc` แต่โค้ดจริงใน `tickets.ts` คืนเป็น Array `res.status(200).json(actions)` และเรียง `actionDateTime: 'asc'` แนะนำให้แก้ `api-spec.md` §2.1 ให้ตรงกับที่โค้ดคืนจริง เพื่อไม่ให้ตอนทำ UI ใน Issue 30 สับสนค่ะ
+> > 
+> > ### 🟡 Minor: จุดที่แนะนำให้เก็บเพิ่ม
+> > * ใน `PATCH /:id/actions-taken/:actionId` โค้ดมีการล้าง `followUpNote = null` เมื่อ `isFollowUpRequired = false` ไว้ถูกต้องแล้ว แนะนำให้เพิ่ม test case ใน `actions-taken.api.test.ts` ที่ส่ง `PATCH { isFollowUpRequired: false }` แล้วเช็กว่า `followUpNote` กลายเป็น `null` จริงด้วยค่ะ
+> > * ใน `POST` และ `PATCH`:
+> >   
+> >   * ถ้าส่ง `actionDateTime` ที่ไม่ใช่วันที่ที่ถูกต้อง (`isNaN(parsed.getTime())`) แนะนำให้ตอบ `400 Bad Request` แทนการ fallback เงียบ ๆ
+> >   * เช็กความยาว `result.length > 1000` ทุกสถานะ (ไม่ใช่เฉพาะตอน `COMPLETED`) และเช็ก `attachmentNotes.length > 500` ให้ตอบ `400` แทนการ `.slice(0, 500)`
+> >   * ปรับความยาวขั้นต่ำของ `followUpNote` ในโค้ด (`>= 1`) กับใน `api-spec.md` (`min 2 chars`) ให้ตรงกันค่ะ
+> > 
+> > แก้แล้วรัน `npm run build` กับ `npm test` เช็กอีกรอบ แล้ว ping มาได้เลยนะคะ เดี๋ยวรีบตรวจซ้ำและกด Approve + Merge ให้ค่ะ ขอบคุณมากค่ะ!
+> 
+> ขอบคุณสำหรับรีวิวที่ละเอียดและแม่นยำมาก ๆ ค่ะ @jejaebubu ได้ทำการแก้ไขปรับปรุงครบถ้วนทุกข้อทั้ง Blocking, Should Fix และ Minor ใน commit f094823 เรียบร้อยแล้วค่ะ:
+> 
+> 1. **แก้ไข Ticket Setup ใน Test `beforeAll`**:
+>    - เพิ่ม `relatedSystemId: relatedSystem.id` และ `requestedPriority: TicketPriority.MEDIUM` ตามโมเดล `Ticket` ใน `schema.prisma`
+>    - ทำ lookup `RequesterUser` จากอีเมลของ requester (`reqJennifer` และ `reqMichael`) เพื่อผูก `requesterId` อย่างถูกต้องตรงตามโมเดล ไม่เอา `User.id` ไปใส่ข้ามตารางอีกต่อไป
+> 2. **ป้องกัน Cross-model ID Collision (BR-13)**:
+>    - นำเงื่อนไข `ticket.requesterId === currentUser.id` ออกใน `GET /api/tickets/:id/actions-taken` และ `GET /api/tickets/:id/actions-taken/:actionId`
+>    - ตรวจสอบความเป็นเจ้าของเฉพาะ `ticket.userId === currentUser.id || ticket.requester?.id === currentUser.id || ticket.requester?.email === currentUser.email || ticket.requesterUser?.email === currentUser.email`
+> 3. **เพิ่ม Endpoint ดึง Action รายตัว (`GET /:id/actions-taken/:actionId`)**:
+>    - เพิ่ม route `GET /api/tickets/:id/actions-taken/:actionId` ใน `server/src/routes/tickets.ts` พร้อมการตรวจสอบ Data Isolation อย่างรัดกุม
+> 4. **ปรับความสอดคล้องของ API Spec และ Traceability Matrix**:
+>    - ปรับ Response shape ใน `docs/lab-04/api-spec.md` §2.1 ให้เป็น Array `[ ... ]` เรียงตาม `actionDateTime: asc` ตรงตามการทำงานจริง
+>    - แมป Test ID ใน `server/tests/lab-04/actions-taken.api.test.ts` ให้ตรงกับ `docs/lab-04/tests.md` แบบ 1-ต่อ-1 (`API-01`..`06`, `UNIT-01`..`03`, `SAFE-01`) และอัปเดตสถานะเป็น `Pass` ครบถ้วน
+>    - บันทึก Prompt 9 และ Reflection ของ Issue 29 ลงใน `docs/lab-04/ai-use.md`
+> 5. **จุดเก็บตก Validation & Test Cases**:
+>    - ตรวจจับวันที่ไม่ถูกต้อง: ส่ง `actionDateTime` ผิดรูปแบบตอบกลับ `400 Bad Request` ทันทีทั้งใน POST และ PATCH
+>    - ตรวจสอบความยาว: `result.length > 1000` และ `attachmentNotes.length > 500` ตอบกลับ `400 Bad Request`
+>    - ปรับความยาวขั้นต่ำของ `followUpNote` เป็นอย่างน้อย 2 ตัวอักษร
+>    - เพิ่มเทสต์เคสการส่ง `PATCH { isFollowUpRequired: false }` แล้วตรวจสอบว่า `followUpNote` ถูกเคลียร์เป็น `null` จริง
+> 
+> ตรวจสอบการคอมไพล์ผ่านฉลุยทั้ง `npm run build` (tsc) ฝั่ง Server และ Client เรียบร้อยค่ะ รบกวนช่วยตรวจซ้ำอีกรอบนะคะ ขอบคุณมากค่ะ!
+
+
+#### 4.3.3 Review #2 — APPROVED (`jejaebubu`, 2026-11-01T12:00:20Z)
+
+**Verdict:** APPROVED (commit `f094823`)
+
+**Verbatim Review Comments:**
+
+> ### การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+> 
+> ตรวจ commit `f094823` แล้วนะคะ แก้ไขครบถ้วนทุกประเด็นที่แจ้งไว้ในรอบแรก ทั้งระดับ Blocking, Should Fix และ Minor เลยค่ะ:
+> 
+> 1. **Ticket Setup ใน `actions-taken.api.test.ts` (`beforeAll`):**
+>    - เพิ่ม `relatedSystemId` และ `requestedPriority: TicketPriority.MEDIUM` ให้กับ `ownTicket` และ `otherTicket` พร้อม lookup `RequesterUser` จากอีเมล (`reqJennifer`, `reqMichael`) เพื่อผูก `requesterId` ให้ตรงกับโมเดลจริงใน `schema.prisma`
+> 2. **Data Isolation & Cross-Model Ownership Protection (`server/src/routes/tickets.ts`):**
+>    - นำเงื่อนไข `ticket.requesterId === currentUser.id` ออก และตรวจสอบความเป็นเจ้าของผ่าน `ticket.userId === currentUser.id` ร่วมกับ `ticket.requester` / `ticket.requesterUser` email ตาม BR-13
+>    - เพิ่ม endpoint `GET /api/tickets/:id/actions-taken/:actionId` พร้อมการตรวจสิทธิ์ Data Isolation (`404 Not Found`) และเพิ่มเทสต์ครอบคลุมทั้ง Staff, Owner Requester, Other Requester และ Non-existent ID
+> 3. **Input Validation & Data Hygiene (`POST` & `PATCH`):**
+>    - ดัก `actionDateTime` ที่ไม่ถูกต้องให้ตอบ `400 Bad Request` ทั้งใน `POST` และ `PATCH`
+>    - ตรวจสอบความยาว `result` (ไม่เกิน 1000 ตัวอักษรทุกสถานะ และอย่างน้อย 2 ตัวอักษรเมื่อ `COMPLETED`), `attachmentNotes` (ไม่เกิน 500 ตัวอักษร) และ `followUpNote` (2–500 ตัวอักษรเมื่อ `isFollowUpRequired = true`)
+>    - เพิ่มเทสต์ตรวจสอบการส่ง `PATCH { isFollowUpRequired: false }` ยืนยันว่า `followUpNote` ถูกล้างเป็น `null` จริง
+> 4. **Traceability Matrix & Documentation (`tests.md`, `api-spec.md`, `ai-use.md`, `reviewer.md`):**
+>    - ปรับรหัสเทสต์ใน `actions-taken.api.test.ts` ให้ตรงกับตารางใน `docs/lab-04/tests.md` (`API-01..06`, `UNIT-01..03`, `SAFE-01` รวม 14 test blocks) และอัปเดตสถานะเป็น `Pass`
+>    - ปรับ `api-spec.md` §2.1 ให้ตรงกับ Array response (`actionDateTime: asc`) และอัปเดต `ai-use.md` (Prompt 9) กับ `reviewer.md` เรียบร้อย
+> 
+> โค้ด REST API และชุดทดสอบสมบูรณ์พร้อมสำหรับทำ UI ใน Issue 30 ต่อแล้วค่ะ ขออนุมัติ (**Approve**) และกด Merge เข้าสู่ `lab4-staging` ให้เลยนะคะ!
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #77 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `b13cb435cc1816edf2939f7ae59a3e321a7c43f0`, 2026-11-01T12:00:30Z) — **Closes PR #77**
+
+---
+
+### 4.4 PR #78: feat(ui): Actions Taken component on Ticket Detail, state sync, and A11Y (Issue #66) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#78](https://github.com/titayaaa/toktickit/pull/78)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/30-actions-taken-ui`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `36e2e531a7f70e3fe9dec2ed7e18d87fcff89698`, 2026-11-01T19:45:28Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `e34f19ee99e3bf99d03104603fcef7c74bf8f63a`
+
+#### 4.4.1 Review #1 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-01T12:39:14Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `c56436e`)
+
+**Verbatim Review Comments:**
+
+> ตรวจโค้ด `ActionsTaken.tsx`, `TicketDetail.tsx`, ชุดทดสอบ `ActionsTaken.test.tsx` และเอกสารของ PR #78 (Issue 30) เทียบกับระบบ Auth, Backend API และ UI Spec แล้วนะคะ ภาพรวมการออกแบบ UI ในธีม Zen Green, แบนเนอร์แจ้งเตือน Resolution Warning, โหมด Read-only สำหรับ Requester, Accessibility (`minHeight: 44`, `role="alert"`, ปิด Modal ด้วยปุ่ม `Escape`) และการป้องกัน Double Submit (`DUP-01`) ทำไว้ดีมากเลยค่ะ
+> 
+> แต่ขอ **Changes Requested** ก่อนนะคะ เพราะมีจุดสำคัญเรื่องคีย์ Token ใน `localStorage`, ข้อมูล `actionsTaken` ที่หายไปจาก response ของ `GET /api/tickets/:id` และการดึงข้อความ Error จาก Backend ที่จะทำให้การใช้งานบนหน้าเว็บจริงติดปัญหาค่ะ
+> 
+> ---
+> 
+> ### 🔴 Blocking: ต้องแก้ก่อน Merge
+> 
+> 1. **`client/src/components/ActionsTaken.tsx` (บรรทัด 108, 209, 279): ดึง Token จาก `localStorage.getItem('token')` ไม่ตรงกับ `AuthContext.tsx` ทำให้หน้าเว็บจริงติด `401 Unauthorized`**
+>    * **ปัญหา:** ใน `client/src/contexts/AuthContext.tsx` (บรรทัด 25) ระบบเก็บ JWT ไว้ใน `localStorage` ด้วยคีย์ `'toktickit_auth_token'` แต่ใน `ActionsTaken.tsx` ทั้ง 3 จุด (`loadAssignableStaff`, `handleSubmit`, `handleQuickStatusChange`) เรียก `localStorage.getItem('token')` ซึ่งบน Browser จริงจะได้ค่าเป็น `null` เสมอ
+>    * **ผลกระทบ:** เมื่อใช้งานจริงบนหน้าเว็บ การดึงรายชื่อ `/api/users/assignable` รวมถึงการกดสร้าง (`POST`) และแก้ไข/เปลี่ยนสถานะ (`PATCH`) จะไม่ได้แนบ `Authorization` header ไปด้วย ทำให้ติด `401 Unauthorized` ทั้งหมดค่ะ (ที่ชุดทดสอบ `ActionsTaken.test.tsx` ผ่านเพราะในเทสต์เซ็ต `localStorage.setItem('token', ...)` ไว้)
+>    * **แนวทางแก้:** สร้าง helper ดึง token ที่เช็กคีย์ `'toktickit_auth_token'` ก่อน แล้ว fallback ไปที่ `'token'` เพื่อรองรับทั้งหน้าเว็บจริงและ unit test ค่ะ เช่น `const getAuthToken = () => localStorage.getItem('toktickit_auth_token') || localStorage.getItem('token');`
+> 
+> 2. **`server/src/app.ts` (บรรทัด 579–605) & `TicketDetail.tsx`: `GET /api/tickets/:id` ลืมส่งฟิลด์ `actionsTaken` ออกมาใน JSON response ทำให้เปิดหน้า Ticket Detail แล้วรายการว่างเปล่าเสมอ**
+>    * **ปัญหา:**
+>      * ใน `TicketDetail.tsx` (บรรทัด 925) ส่ง `actions={ticket.actionsTaken || []}` ที่ได้จาก `GET /api/tickets/${ticketId}` เข้าไปใน `<ActionsTaken />`
+>      * แต่ใน `server/src/app.ts` แม้ว่าตอน query Prisma (บรรทัด 518–538) จะ `include: { actionsTaken: ... }` ไว้แล้ว แต่ตอน `res.status(200).json({ ... })` (บรรทัด 579–605) **ไม่ได้ใส่ `actionsTaken: ticket.actionsTaken`** ลงไปใน object ที่ส่งกลับ
+>      * ส่งผลให้บนหน้าเว็บจริง `ticket.actionsTaken` เป็น `undefined` เสมอ (แสดง `0` รายการแม้จะมีข้อมูลใน DB) และทำให้เทสต์ `GET /api/tickets/:id includes actionsTaken array for frontend rendering` ใน `server/tests/lab-04/actions-taken.api.test.ts` (บรรทัด 516) ไม่ผ่านด้วยค่ะ
+>    * **แนวทางแก้:** เพิ่ม `actionsTaken: ticket.actionsTaken,` ลงใน `res.status(200).json({ ... })` ของ `GET /api/tickets/:id` ใน `server/src/app.ts` (บรรทัด 605) ค่ะ
+> 
+> 3. **`client/src/components/ActionsTaken.tsx` (บรรทัด 236, 253, 292): อ่านข้อความ Error จาก `data.message` แทนที่จะรองรับ `data.error`**
+>    * **ปัญหา:** ใน `server/src/routes/tickets.ts` ทุก endpoint ของ Actions Taken ส่งข้อความแจ้งเตือนข้อผิดพลาดกลับมาในฟิลด์ `{ error: '...' }` แต่ใน `ActionsTaken.tsx` อ่านเฉพาะ `data.message` ทำให้เมื่อเกิด Validation error (เช่น 400 หรือ 422) ผู้ใช้ไม่เห็นข้อความจริงจากเซิร์ฟเวอร์ แต่เห็นเพียงข้อความ fallback `Failed to create/update action (HTTP 400)`
+>    * **แนวทางแก้:** ปรับทั้ง 3 จุดให้เช็ก `data.error || data.message || ...` ค่ะ
+> 
+> ---
+> 
+> ### 🟠 Should Fix: ความสอดคล้องของลำดับข้อมูล, Validation และ State Transition
+> 
+> 4. **ลำดับการแสดงผลเมื่อสร้าง Action ใหม่ (`ActionsTaken.tsx` บรรทัด 257)**
+>    * Backend เรียงลำดับ Actions Taken ตามเวลาจากเก่าไปใหม่ (`orderBy: [{ actionDateTime: 'asc' }, { createdAt: 'asc' }]`) แต่ใน `handleSubmit` ตอนสร้างรายการใหม่ (บรรทัด 257) ใช้ `const nextItems = [created, ...items];` ซึ่งเอารายการใหม่ไปไว้บนสุด พอรีเฟรชหน้าเว็บลำดับจะสลับลงมาอยู่ล่างสุด
+>    * **แนวทางแก้:** เปลี่ยนเป็น `const nextItems = [...items, created];` ให้เรียงลำดับสอดคล้องกับ Backend ค่ะ
+> 
+> 5. **ปรับความยาวฟิลด์ใน Validation และ `maxLength` ให้ตรงกับ Backend (`ActionsTaken.tsx` บรรทัด 194, 522, 549, 599)**
+>    * **`followUpNote`:** Backend กำหนดความยาว `2–500` ตัวอักษรเมื่อเปิด `isFollowUpRequired` แต่ฝั่ง UI เช็กแค่ `followUpNote.trim().length === 0` (ถ้ากรอก 1 ตัวอักษรจะผ่าน UI แต่ติด 400 ที่ Backend) และตั้ง `maxLength={1000}` แนะนำให้เช็ก `followUpNote.trim().length < 2` ใน `validate()` และปรับ `maxLength={500}` ค่ะ
+>    * **`actionDescription` และ `result`:** Backend จำกัดความยาวไม่เกิน `1,000` ตัวอักษร แต่ใน `<textarea>` ตั้ง `maxLength={2000}` แนะนำให้ปรับเป็น `maxLength={1000}` ทั้งสองช่องค่ะ
+> 
+> 6. **จำกัดตัวเลือก Status ในฟอร์มแก้ไข (`Edit Action Taken`) ตาม State Machine (`ActionsTaken.tsx` บรรทัด 497–510)**
+>    * Backend ไม่อนุญาตให้เปลี่ยนสถานะย้อนกลับจาก `IN_PROGRESS` ไป `PENDING` และไม่อนุญาตให้เปลี่ยนสถานะออกจาก `COMPLETED` หรือ `CANCELLED`
+>    * แนะนำให้กรอง `<option>` ของ Status ตอนแก้ไข (`editingAction`) ให้เลือกได้เฉพาะสถานะปัจจุบันและสถานะถัดไปที่อนุญาต (และบนการ์ดที่มีสถานะ `PENDING` อาจเพิ่มปุ่มลัดหรือให้เปลี่ยนเป็น `IN_PROGRESS` ได้สะดวกขึ้น) เพื่อไม่ให้ผู้ใช้เลือกสถานะที่ผิดกฎของ Backend ค่ะ
+> 
+> ---
+> 
+> ### 🟡 Minor: ข้อเสนอแนะเพิ่มเติม
+> 
+> * **ฟิลด์ `actionDateTime`:** ตาม Handout (§3, §4.1, §8.3) และ `ui-spec.md` (§3.1) ระบุให้รองรับการระบุหรือแก้ไข `Action Date/Time` (โดยมีค่าเริ่มต้นเป็นเวลาปัจจุบัน) หากเพิ่มช่อง `datetime-local` ในฟอร์มได้จะครบถ้วนตามสเปกมากยิ่งขึ้นค่ะ
+> * **ค่าสี Badge ใน `renderStatusBadge` (`ActionsTaken.tsx` บรรทัด 321–342):** ใน `ui-spec.md` (§1.1) กำหนดสี `PENDING` เป็นพื้นหลัง `#FFFBEB` / ตัวอักษร `#92400E` และ `IN_PROGRESS` เป็นพื้นหลัง `#EFF6FF` / ตัวอักษร `#1E40AF` (ในโค้ดใช้ `#FEF3C7` และ `#1D4ED8`) ปรับให้ตรงกันได้เลยนะคะ
+> * **ชื่อเคสทดสอบใน `ActionsTaken.test.tsx` (บรรทัด 904, 1079, 1188):** ในไฟล์เทสต์ระบุรหัส `UI-06` ซึ่งในตาราง `docs/lab-04/tests.md` รหัส `UI-06` เป็นของ *Requester Dashboard renders cards and attention list* แนะนำให้เปลี่ยนชื่อใน `ActionsTaken.test.tsx` เป็นรหัสของชุด Actions Taken (`UI-01` / `UI-02`) เพื่อไม่ให้รหัสเทสต์ชนกันค่ะ
+
+
+#### 4.4.2 Author Response #1 (`titayaaa`, 2026-11-01T17:58:19Z)
+
+> > ตรวจโค้ด `ActionsTaken.tsx`, `TicketDetail.tsx`, ชุดทดสอบ `ActionsTaken.test.tsx` และเอกสารของ PR #78 (Issue 30) เทียบกับระบบ Auth, Backend API และ UI Spec แล้วนะคะ ภาพรวมการออกแบบ UI ในธีม Zen Green, แบนเนอร์แจ้งเตือน Resolution Warning, โหมด Read-only สำหรับ Requester, Accessibility (`minHeight: 44`, `role="alert"`, ปิด Modal ด้วยปุ่ม `Escape`) และการป้องกัน Double Submit (`DUP-01`) ทำไว้ดีมากเลยค่ะ
+> > 
+> > แต่ขอ **Changes Requested** ก่อนนะคะ เพราะมีจุดสำคัญเรื่องคีย์ Token ใน `localStorage`, ข้อมูล `actionsTaken` ที่หายไปจาก response ของ `GET /api/tickets/:id` และการดึงข้อความ Error จาก Backend ที่จะทำให้การใช้งานบนหน้าเว็บจริงติดปัญหาค่ะ
+> > 
+> > ### 🔴 Blocking: ต้องแก้ก่อน Merge
+> > 1. **`client/src/components/ActionsTaken.tsx` (บรรทัด 108, 209, 279): ดึง Token จาก `localStorage.getItem('token')` ไม่ตรงกับ `AuthContext.tsx` ทำให้หน้าเว็บจริงติด `401 Unauthorized`**
+> >    
+> >    * **ปัญหา:** ใน `client/src/contexts/AuthContext.tsx` (บรรทัด 25) ระบบเก็บ JWT ไว้ใน `localStorage` ด้วยคีย์ `'toktickit_auth_token'` แต่ใน `ActionsTaken.tsx` ทั้ง 3 จุด (`loadAssignableStaff`, `handleSubmit`, `handleQuickStatusChange`) เรียก `localStorage.getItem('token')` ซึ่งบน Browser จริงจะได้ค่าเป็น `null` เสมอ
+> >    * **ผลกระทบ:** เมื่อใช้งานจริงบนหน้าเว็บ การดึงรายชื่อ `/api/users/assignable` รวมถึงการกดสร้าง (`POST`) และแก้ไข/เปลี่ยนสถานะ (`PATCH`) จะไม่ได้แนบ `Authorization` header ไปด้วย ทำให้ติด `401 Unauthorized` ทั้งหมดค่ะ (ที่ชุดทดสอบ `ActionsTaken.test.tsx` ผ่านเพราะในเทสต์เซ็ต `localStorage.setItem('token', ...)` ไว้)
+> >    * **แนวทางแก้:** สร้าง helper ดึง token ที่เช็กคีย์ `'toktickit_auth_token'` ก่อน แล้ว fallback ไปที่ `'token'` เพื่อรองรับทั้งหน้าเว็บจริงและ unit test ค่ะ เช่น `const getAuthToken = () => localStorage.getItem('toktickit_auth_token') || localStorage.getItem('token');`
+> > 2. **`server/src/app.ts` (บรรทัด 579–605) & `TicketDetail.tsx`: `GET /api/tickets/:id` ลืมส่งฟิลด์ `actionsTaken` ออกมาใน JSON response ทำให้เปิดหน้า Ticket Detail แล้วรายการว่างเปล่าเสมอ**
+> >    
+> >    * **ปัญหา:**
+> >      
+> >      * ใน `TicketDetail.tsx` (บรรทัด 925) ส่ง `actions={ticket.actionsTaken || []}` ที่ได้จาก `GET /api/tickets/${ticketId}` เข้าไปใน `<ActionsTaken />`
+> >      * แต่ใน `server/src/app.ts` แม้ว่าตอน query Prisma (บรรทัด 518–538) จะ `include: { actionsTaken: ... }` ไว้แล้ว แต่ตอน `res.status(200).json({ ... })` (บรรทัด 579–605) **ไม่ได้ใส่ `actionsTaken: ticket.actionsTaken`** ลงไปใน object ที่ส่งกลับ
+> >      * ส่งผลให้บนหน้าเว็บจริง `ticket.actionsTaken` เป็น `undefined` เสมอ (แสดง `0` รายการแม้จะมีข้อมูลใน DB) และทำให้เทสต์ `GET /api/tickets/:id includes actionsTaken array for frontend rendering` ใน `server/tests/lab-04/actions-taken.api.test.ts` (บรรทัด 516) ไม่ผ่านด้วยค่ะ
+> >    * **แนวทางแก้:** เพิ่ม `actionsTaken: ticket.actionsTaken,` ลงใน `res.status(200).json({ ... })` ของ `GET /api/tickets/:id` ใน `server/src/app.ts` (บรรทัด 605) ค่ะ
+> > 3. **`client/src/components/ActionsTaken.tsx` (บรรทัด 236, 253, 292): อ่านข้อความ Error จาก `data.message` แทนที่จะรองรับ `data.error`**
+> >    
+> >    * **ปัญหา:** ใน `server/src/routes/tickets.ts` ทุก endpoint ของ Actions Taken ส่งข้อความแจ้งเตือนข้อผิดพลาดกลับมาในฟิลด์ `{ error: '...' }` แต่ใน `ActionsTaken.tsx` อ่านเฉพาะ `data.message` ทำให้เมื่อเกิด Validation error (เช่น 400 หรือ 422) ผู้ใช้ไม่เห็นข้อความจริงจากเซิร์ฟเวอร์ แต่เห็นเพียงข้อความ fallback `Failed to create/update action (HTTP 400)`
+> >    * **แนวทางแก้:** ปรับทั้ง 3 จุดให้เช็ก `data.error || data.message || ...` ค่ะ
+> > 
+> > ### 🟠 Should Fix: ความสอดคล้องของลำดับข้อมูล, Validation และ State Transition
+> > 4. **ลำดับการแสดงผลเมื่อสร้าง Action ใหม่ (`ActionsTaken.tsx` บรรทัด 257)**
+> >    
+> >    * Backend เรียงลำดับ Actions Taken ตามเวลาจากเก่าไปใหม่ (`orderBy: [{ actionDateTime: 'asc' }, { createdAt: 'asc' }]`) แต่ใน `handleSubmit` ตอนสร้างรายการใหม่ (บรรทัด 257) ใช้ `const nextItems = [created, ...items];` ซึ่งเอารายการใหม่ไปไว้บนสุด พอรีเฟรชหน้าเว็บลำดับจะสลับลงมาอยู่ล่างสุด
+> >    * **แนวทางแก้:** เปลี่ยนเป็น `const nextItems = [...items, created];` ให้เรียงลำดับสอดคล้องกับ Backend ค่ะ
+> > 5. **ปรับความยาวฟิลด์ใน Validation และ `maxLength` ให้ตรงกับ Backend (`ActionsTaken.tsx` บรรทัด 194, 522, 549, 599)**
+> >    
+> >    * **`followUpNote`:** Backend กำหนดความยาว `2–500` ตัวอักษรเมื่อเปิด `isFollowUpRequired` แต่ฝั่ง UI เช็กแค่ `followUpNote.trim().length === 0` (ถ้ากรอก 1 ตัวอักษรจะผ่าน UI แต่ติด 400 ที่ Backend) และตั้ง `maxLength={1000}` แนะนำให้เช็ก `followUpNote.trim().length < 2` ใน `validate()` และปรับ `maxLength={500}` ค่ะ
+> >    * **`actionDescription` และ `result`:** Backend จำกัดความยาวไม่เกิน `1,000` ตัวอักษร แต่ใน `<textarea>` ตั้ง `maxLength={2000}` แนะนำให้ปรับเป็น `maxLength={1000}` ทั้งสองช่องค่ะ
+> > 6. **จำกัดตัวเลือก Status ในฟอร์มแก้ไข (`Edit Action Taken`) ตาม State Machine (`ActionsTaken.tsx` บรรทัด 497–510)**
+> >    
+> >    * Backend ไม่อนุญาตให้เปลี่ยนสถานะย้อนกลับจาก `IN_PROGRESS` ไป `PENDING` และไม่อนุญาตให้เปลี่ยนสถานะออกจาก `COMPLETED` หรือ `CANCELLED`
+> >    * แนะนำให้กรอง `<option>` ของ Status ตอนแก้ไข (`editingAction`) ให้เลือกได้เฉพาะสถานะปัจจุบันและสถานะถัดไปที่อนุญาต (และบนการ์ดที่มีสถานะ `PENDING` อาจเพิ่มปุ่มลัดหรือให้เปลี่ยนเป็น `IN_PROGRESS` ได้สะดวกขึ้น) เพื่อไม่ให้ผู้ใช้เลือกสถานะที่ผิดกฎของ Backend ค่ะ
+> > 
+> > ### 🟡 Minor: ข้อเสนอแนะเพิ่มเติม
+> > * **ฟิลด์ `actionDateTime`:** ตาม Handout (§3, §4.1, §8.3) และ `ui-spec.md` (§3.1) ระบุให้รองรับการระบุหรือแก้ไข `Action Date/Time` (โดยมีค่าเริ่มต้นเป็นเวลาปัจจุบัน) หากเพิ่มช่อง `datetime-local` ในฟอร์มได้จะครบถ้วนตามสเปกมากยิ่งขึ้นค่ะ
+> > * **ค่าสี Badge ใน `renderStatusBadge` (`ActionsTaken.tsx` บรรทัด 321–342):** ใน `ui-spec.md` (§1.1) กำหนดสี `PENDING` เป็นพื้นหลัง `#FFFBEB` / ตัวอักษร `#92400E` และ `IN_PROGRESS` เป็นพื้นหลัง `#EFF6FF` / ตัวอักษร `#1E40AF` (ในโค้ดใช้ `#FEF3C7` และ `#1D4ED8`) ปรับให้ตรงกันได้เลยนะคะ
+> > * **ชื่อเคสทดสอบใน `ActionsTaken.test.tsx` (บรรทัด 904, 1079, 1188):** ในไฟล์เทสต์ระบุรหัส `UI-06` ซึ่งในตาราง `docs/lab-04/tests.md` รหัส `UI-06` เป็นของ _Requester Dashboard renders cards and attention list_ แนะนำให้เปลี่ยนชื่อใน `ActionsTaken.test.tsx` เป็นรหัสของชุด Actions Taken (`UI-01` / `UI-02`) เพื่อไม่ให้รหัสเทสต์ชนกันค่ะ
+> 
+> ขอบคุณสำหรับรีวิวที่ละเอียดและรอบคอบมากค่ะ @jejaebubu ได้ดำเนินการแก้ไขครบทั้ง 3 Required Changes (Blocking), 3 Should Fix และ 3 Minor Suggestions ทั้งหมดใน commit `5ecac1a` เรียบร้อยแล้วค่ะ:
+> 
+> 1. **Auth Token Retrieval (`ActionsTaken.tsx`)**: เพิ่ม helper `getAuthToken()` ตรวจสอบทั้ง `toktickit_auth_token` และ `token` ในทั้ง 3 จุด (`loadAssignableStaff`, `handleSubmit`, `handleQuickStatusChange`) ใช้งานได้ถูกต้องทั้งบนเบราว์เซอร์จริงและในชุดทดสอบ
+> 2. **ส่ง `actionsTaken` ใน `GET /api/tickets/:id` (`server/src/app.ts`)**: เพิ่ม `actionsTaken: ticket.actionsTaken` ใน `res.status(200).json({ ... })` เรียบร้อยแล้ว ทำให้หน้า Ticket Detail แสดงรายการที่ดึงมาจากฐานข้อมูลได้ทันที
+> 3. **การอ่าน Error Message (`ActionsTaken.tsx`)**: ปรับปรุงทั้ง 3 จุดให้อ่าน `data.error || data.message || ...` เพื่อแสดงข้อความแจ้งเตือนข้อผิดพลาดจาก backend ได้อย่างถูกต้อง
+> 4. **ลำดับการแสดงผล (`ActionsTaken.tsx`)**: ปรับการอัปเดต state รายการใหม่เป็น `const nextItems = [...items, created];` เพื่อเรียงตามลำดับเวลาจากอดีตไปปัจจุบันตรงกับ Backend
+> 5. **Validation & Field Length Limits**:
+>    - ปรับ `validate()` ให้ตรวจสอบ `followUpNote.trim().length < 2` พร้อมกำหนด `maxLength={500}` บน textarea
+>    - กำหนด `maxLength={1000}` บนช่อง `action-description` และ `action-result` ตรงตามสเปก
+> 6. **จำกัด Status ใน Modal แก้ไขตาม State Machine**:
+>    - หาก Action เป็น `COMPLETED` หรือ `CANCELLED` จะล็อกไม่ให้เปลี่ยนสถานะย้อนกลับ
+>    - หาก Action เป็น `IN_PROGRESS` จะแสดงเฉพาะตัวเลือก `IN_PROGRESS`, `COMPLETED`, `CANCELLED`
+>    - หาก Action เป็น `PENDING` สามารถเลือกไปสถานะถัดไปได้ตามกฎ
+> 7. **ฟิลด์ Action Date/Time (`ActionsTaken.tsx`)**: เพิ่มฟิลด์ `actionDateTime` (`type="datetime-local"`) ในฟอร์มทั้งตอนสร้างและแก้ไข พร้อมตั้งค่าเริ่มต้นเป็นเวลาปัจจุบัน (`new Date().toISOString()`) ตามข้อกำหนดใน Handout และ `ui-spec.md` §3.1
+> 8. **ปรับคู่สี Status Badge**: ปรับ `PENDING` เป็นพื้นหลัง `#FFFBEB` / ตัวอักษร `#92400E` และ `IN_PROGRESS` เป็นพื้นหลัง `#EFF6FF` / ตัวอักษร `#1E40AF` ตรงตาม Zen Green Design Tokens
+> 9. **ปรับรหัสเคสทดสอบ (`ActionsTaken.test.tsx`)**: เปลี่ยนรหัสเทสต์จาก `UI-06` เป็น `UI-02` เพื่อไม่ให้ซ้ำซ้อนกับรหัสเทสต์ของ Dashboard ใน `docs/lab-04/tests.md`
+> 
+> ผลการรันชุดทดสอบฝั่ง Client ผ่านครบ 12 test files / 63 tests และ build production bundle ผ่าน 100% ค่ะ รบกวนช่วยตรวจทานซ้ำอีกครั้งนะคะ ขอบคุณมากค่ะ
+
+
+#### 4.4.3 Review #2 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-01T18:57:19Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `5ecac1a`)
+
+**Verbatim Review Comments:**
+
+> ตรวจ commit `5ecac1a` รอบที่ 2 อย่างละเอียดแล้วนะคะ ขอบคุณที่ตามเก็บทั้ง 9 ข้อให้ค่ะ แต่จากการไล่เช็กโค้ดและไฟล์ `reviewer.md` พบจุดที่ต้องรบกวนช่วยปรับแก้อีก 4 จุดก่อนกด Approve & Merge นะคะ:
+> 
+> 1. **เวลาในช่อง `actionDateTime` (`datetime-local`) เลื่อนถอยหลัง 7 ชั่วโมงทุกครั้งที่เปิดฟอร์ม/กดบันทึก (`ActionsTaken.tsx` บรรทัด 120, 136–138)**
+>    * **ปัญหา:** `<input type="datetime-local" />` ใช้เวลาแบบ Local Time (`YYYY-MM-DDTHH:mm`) แต่ใน `openCreateForm` และ `openEditForm` ใช้ `.toISOString().slice(0, 16)` ซึ่งเป็นเวลา UTC พอเปิดในโซนเวลาไทย (UTC+7) เวลาจะถอยหลังไป 7 ชั่วโมง และทุกครั้งที่กด Edit แล้วกด Save (`new Date(actionDateTime).toISOString()`) เวลาของรายการนั้นจะถูกเลื่อนถอยหลังไปเรื่อย ๆ ครั้งละ 7 ชั่วโมงค่ะ
+>    * **แนวทางแก้:** สร้าง helper แปลง `Date` เป็น Local `YYYY-MM-DDTHH:mm` สำหรับใส่ใน state `actionDateTime` แทนการใช้ `.toISOString().slice(0, 16)` ค่ะ เช่น:
+>      `const toLocalDateTimeInput = (iso?: string) => { const d = iso ? new Date(iso) : new Date(); const pad = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };`
+> 
+> 2. **การกดปุ่มลัด `Complete` บนการ์ดทำให้ `editingAction.status` กลายเป็น `COMPLETED` แล้วล็อกช่อง Status (`ActionsTaken.tsx` บรรทัด 133, 267, 495)**
+>    * **ปัญหา:** ใน `handleQuickStatusChange` (บรรทัด 267) เรียก `openEditForm({ ...action, status: 'COMPLETED' })` ซึ่งทำให้ `editingAction.status` ถูกทับเป็น `'COMPLETED'` ส่งผลให้ `<select id="action-status">` (บรรทัด 495–501) เข้าใจผิดว่า Action นี้อยู่ในสถานะ Terminal (`COMPLETED`) ไปแล้วและสั่ง `disabled` ล็อกช่องเลือกสถานะทันที ทั้งที่สถานะจริงใน DB ยังเป็น `PENDING` หรือ `IN_PROGRESS`
+>    * **แนวทางแก้:** ปรับ `openEditForm(action: ActionTakenItem, initialStatus?: string)` ให้เก็บ `setEditingAction(action)` ตามสถานะจริงใน DB เหมือนเดิม แล้วเซ็ต `setStatus(initialStatus ?? action.status)` แทนค่ะ (และตอนกดปุ่ม `Complete` ให้เรียก `openEditForm(action, 'COMPLETED')`)
+> 
+> 3. **ความถูกต้องของบันทึกใน `docs/lab-04/reviewer.md` (บรรทัด 623–669)**
+>    * ในหัวข้อ `Round 1 Review by @jejaebubu (Changes Requested)` (บรรทัด 623–643) บันทึกไว้แค่ 8 ข้อ (ในหมวด Minor มีแค่ 2 ข้อ ขาดข้อ `ฟิลด์ actionDateTime` ซึ่งไปโผล่เป็นข้อ 9 ในฝั่ง Author Response แทน) รบกวนปรับข้อความใน `Review Comments (Verbatim)` ให้ครบทั้ง 9 ข้อตรงกับคอมเมนต์จริงบน GitHub ด้วยนะคะ
+>    * ในหัวข้อ `Round 1 Author Response by @titayaaa` (บรรทัด 669) ระบุว่า `ดำเนินการ commit ใน 2d6f47e` แต่ commit จริงบน PR คือ `5ecac1a` รบกวนอัปเดตเลข commit ให้ตรงกันด้วยค่ะ
+> 
+> 4. **เพิ่มเคสทดสอบใน `client/src/test/lab-04/ActionsTaken.test.tsx`**
+>    * รบกวนเพิ่ม test ยืนยันการเปิด Edit Modal (ตรวจว่าการกรองตัวเลือก Status ตาม State Machine ทำงานถูกต้อง และใช้คีย์ `toktickit_auth_token` ได้จริง) อีกสัก 1 เคสนะคะ
+> 
+> แก้ 4 จุดนี้เสร็จแล้วทักมาได้เลยนะคะ เดี๋ยวรีบตรวจและกด Approve & Merge ให้ทันทีค่ะ ขอบคุณมากค่ะ!
+
+
+#### 4.4.4 Author Response #2 (`titayaaa`, 2026-11-01T19:33:54Z)
+
+> > ตรวจ commit `5ecac1a` รอบที่ 2 อย่างละเอียดแล้วนะคะ ขอบคุณที่ตามเก็บทั้ง 9 ข้อให้ค่ะ แต่จากการไล่เช็กโค้ดและไฟล์ `reviewer.md` พบจุดที่ต้องรบกวนช่วยปรับแก้อีก 4 จุดก่อนกด Approve & Merge นะคะ:
+> > 
+> > 1. **เวลาในช่อง `actionDateTime` (`datetime-local`) เลื่อนถอยหลัง 7 ชั่วโมงทุกครั้งที่เปิดฟอร์ม/กดบันทึก (`ActionsTaken.tsx` บรรทัด 120, 136–138)**
+> >    
+> >    * **ปัญหา:** `<input type="datetime-local" />` ใช้เวลาแบบ Local Time (`YYYY-MM-DDTHH:mm`) แต่ใน `openCreateForm` และ `openEditForm` ใช้ `.toISOString().slice(0, 16)` ซึ่งเป็นเวลา UTC พอเปิดในโซนเวลาไทย (UTC+7) เวลาจะถอยหลังไป 7 ชั่วโมง และทุกครั้งที่กด Edit แล้วกด Save (`new Date(actionDateTime).toISOString()`) เวลาของรายการนั้นจะถูกเลื่อนถอยหลังไปเรื่อย ๆ ครั้งละ 7 ชั่วโมงค่ะ
+> >    * **แนวทางแก้:** สร้าง helper แปลง `Date` เป็น Local `YYYY-MM-DDTHH:mm` สำหรับใส่ใน state `actionDateTime` แทนการใช้ `.toISOString().slice(0, 16)` ค่ะ เช่น:
+> >      `const toLocalDateTimeInput = (iso?: string) => { const d = iso ? new Date(iso) : new Date(); const pad = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };`
+> > 2. **การกดปุ่มลัด `Complete` บนการ์ดทำให้ `editingAction.status` กลายเป็น `COMPLETED` แล้วล็อกช่อง Status (`ActionsTaken.tsx` บรรทัด 133, 267, 495)**
+> >    
+> >    * **ปัญหา:** ใน `handleQuickStatusChange` (บรรทัด 267) เรียก `openEditForm({ ...action, status: 'COMPLETED' })` ซึ่งทำให้ `editingAction.status` ถูกทับเป็น `'COMPLETED'` ส่งผลให้ `<select id="action-status">` (บรรทัด 495–501) เข้าใจผิดว่า Action นี้อยู่ในสถานะ Terminal (`COMPLETED`) ไปแล้วและสั่ง `disabled` ล็อกช่องเลือกสถานะทันที ทั้งที่สถานะจริงใน DB ยังเป็น `PENDING` หรือ `IN_PROGRESS`
+> >    * **แนวทางแก้:** ปรับ `openEditForm(action: ActionTakenItem, initialStatus?: string)` ให้เก็บ `setEditingAction(action)` ตามสถานะจริงใน DB เหมือนเดิม แล้วเซ็ต `setStatus(initialStatus ?? action.status)` แทนค่ะ (และตอนกดปุ่ม `Complete` ให้เรียก `openEditForm(action, 'COMPLETED')`)
+> > 3. **ความถูกต้องของบันทึกใน `docs/lab-04/reviewer.md` (บรรทัด 623–669)**
+> >    
+> >    * ในหัวข้อ `Round 1 Review by @jejaebubu (Changes Requested)` (บรรทัด 623–643) บันทึกไว้แค่ 8 ข้อ (ในหมวด Minor มีแค่ 2 ข้อ ขาดข้อ `ฟิลด์ actionDateTime` ซึ่งไปโผล่เป็นข้อ 9 ในฝั่ง Author Response แทน) รบกวนปรับข้อความใน `Review Comments (Verbatim)` ให้ครบทั้ง 9 ข้อตรงกับคอมเมนต์จริงบน GitHub ด้วยนะคะ
+> >    * ในหัวข้อ `Round 1 Author Response by @titayaaa` (บรรทัด 669) ระบุว่า `ดำเนินการ commit ใน 2d6f47e` แต่ commit จริงบน PR คือ `5ecac1a` รบกวนอัปเดตเลข commit ให้ตรงกันด้วยค่ะ
+> > 4. **เพิ่มเคสทดสอบใน `client/src/test/lab-04/ActionsTaken.test.tsx`**
+> >    
+> >    * รบกวนเพิ่ม test ยืนยันการเปิด Edit Modal (ตรวจว่าการกรองตัวเลือก Status ตาม State Machine ทำงานถูกต้อง และใช้คีย์ `toktickit_auth_token` ได้จริง) อีกสัก 1 เคสนะคะ
+> > 
+> > แก้ 4 จุดนี้เสร็จแล้วทักมาได้เลยนะคะ เดี๋ยวรีบตรวจและกด Approve & Merge ให้ทันทีค่ะ ขอบคุณมากค่ะ!
+> 
+> ขอบคุณ @jejaebubu สำหรับการตรวจทานรอบที่ 2 อย่างละเอียดถี่ถ้วนมากค่ะ ได้ดำเนินการปรับปรุงและแก้ไขครบถ้วนทั้ง 4 จุดเรียบร้อยแล้วค่ะ:
+> 
+> 1. **แก้ไขปัญหา Timezone Shift ในช่อง `actionDateTime` (`ActionsTaken.tsx`)**:
+>    - เพิ่ม helper `toLocalDateTimeInput(iso?: string)` สำหรับแปลงเวลาเป็น Local Time string ฟอร์แมต `YYYY-MM-DDTHH:mm`
+>    - ปรับ `openCreateForm` และ `openEditForm` ให้เรียกใช้ helper ดังกล่าวแทน `.toISOString().slice(0, 16)` ซึ่งเป็น UTC ทำให้เวลาไม่ถอยหลัง 7 ชั่วโมงเมื่อเปิดฟอร์มหรือบันทึกข้อมูลในเขตเวลาไทย (UTC+7)
+> 2. **แก้ไขการล็อกช่อง Status เมื่อกดปุ่ม Quick Complete (`ActionsTaken.tsx`)**:
+>    - ปรับ signature ของฟังก์ชันเป็น `openEditForm(action: ActionTakenItem, initialStatus?: string)`
+>    - ให้ `setEditingAction(action)` เก็บข้อมูลสถานะจริงจากฐานข้อมูลเหมือนเดิม เพื่อให้ State Machine Guard ประเมินสถานะก่อนหน้าได้อย่างถูกต้อง และกำหนด `setStatus(initialStatus ?? action.status)` เป็นค่าเริ่มต้นของฟอร์ม
+>    - เมื่อกดปุ่ม Complete ด่วน จะเรียก `openEditForm(action, 'COMPLETED')` ทำให้ modal เปิดขึ้นพร้อมเลือกสถานะ COMPLETED ให้ทันทีโดยที่ Dropdown ไม่ถูก disabled ล็อกค้าง
+> 3. **ปรับปรุงความถูกต้องของเอกสาร `docs/lab-04/reviewer.md`**:
+>    - ปรับข้อความ Round 1 Review by @jejaebubu ให้มีครบทั้ง 9 ข้อโดยเพิ่มข้อ 3 ในหมวด Minor เรื่องฟิลด์ `actionDateTime` ตรงกับคอมเมนต์จริง
+>    - อัปเดตเลขอ้างอิง commit ใน Round 1 Author Response จาก `2d6f47e` เป็น `5ecac1a` ให้ตรงกับประวัติคอมมิตจริงบน GitHub
+>    - บันทึกบทสนทนาการรีวิว Round 2 ทั้งข้อเสนอแนะและคำตอบรับอย่างครบถ้วน
+> 4. **เพิ่มเคสทดสอบ Edit Modal และ State Machine ใน `ActionsTaken.test.tsx`**:
+>    - เพิ่มเคสทดสอบ `UI-02: verifies Edit modal filters Status by State Machine and uses toktickit_auth_token`
+>    - ทดสอบยืนยันว่าการเปิด Edit Modal ดึง `toktickit_auth_token` ส่งไปยัง header `Authorization: Bearer ...` สำเร็จ
+>    - ทดสอบยืนยันว่า State Machine กรองสถานะสำหรับ Action ที่เป็น `IN_PROGRESS` ให้เหลือเฉพาะ `IN_PROGRESS`, `COMPLETED`, และ `CANCELLED` (ไม่มี `PENDING`)
+>    - ทดสอบยืนยันว่าการกด Quick Complete เปิด Edit modal ด้วยสถานะ COMPLETED โดยช่อง select ไม่ถูก disabled
+> 
+> ผลการรันเทสต์ฝั่ง Client ผ่านครบ 12 test files / 64 tests (100%) และรัน `npm run build` ผ่านสมบูรณ์ 0 errors รบกวนช่วยตรวจทานและ Approve & Merge ได้เลยนะคะ ขอบคุณมากค่ะ
+
+
+#### 4.4.5 Review #3 — APPROVED (`jejaebubu`, 2026-11-01T19:45:07Z)
+
+**Verdict:** APPROVED (commit `e34f19e`)
+
+**Verbatim Review Comments:**
+
+> ตรวจสอบ commit `e34f19e` รอบที่ 3 เรียบร้อยแล้วนะคะ แก้ไขครบถ้วนสมบูรณ์ทั้ง 4 จุดแล้วค่ะ:
+> 
+> 1. ✅ **Local DateTime Helper (`ActionsTaken.tsx`):** เพิ่ม `toLocalDateTimeInput()` แปลงเวลาเป็น Local Time (`YYYY-MM-DDTHH:mm`) ทั้งใน `openCreateForm` และ `openEditForm` แก้ปัญหาเวลาเลื่อนถอยหลัง 7 ชั่วโมงเรียบร้อย
+> 2. ✅ **Quick Complete Status Select (`ActionsTaken.tsx`):** ปรับ `openEditForm(action, initialStatus)` ให้คง `editingAction` ตามสถานะจริงใน DB และตั้งค่าเริ่มต้น `status` เป็น `COMPLETED` โดยไม่ล็อกช่อง `<select>` ค้าง
+> 3. ✅ **บันทึกใน `docs/lab-04/reviewer.md`:** อัปเดตรายการรีวิวรอบที่ 1 ครบทั้ง 9 ข้อ, แก้เลขอ้างอิง commit เป็น `5ecac1a` และบันทึกประวัติรอบที่ 2 ครบถ้วน
+> 4. ✅ **Component Test (`ActionsTaken.test.tsx`):** เพิ่มเทสต์ตรวจสอบการใช้คีย์ `toktickit_auth_token`, การกรองตัวเลือก Status ตาม State Machine ในโหมดแก้ไข และการกดปุ่มลัด `Complete` เรียบร้อย
+> 
+> ขอ **Approve** และกด Merge เข้า `lab4-staging` ให้เลยนะคะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #78 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `36e2e531a7f70e3fe9dec2ed7e18d87fcff89698`, 2026-11-01T19:45:28Z) — **Closes PR #78**
+
+---
+
+### 4.5 PR #79: feat(workflow): implement Ticket workflow operations, resolution gate, and optimistic concurrency (Issue #31) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#79](https://github.com/titayaaa/toktickit/pull/79)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/31-ticket-workflow`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `1a056c2cc5767e25a8181115d6e974d9011e3d60`, 2026-11-01T21:12:18Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `810bdb3c50a9ead38c06d414bbfdcc908c2f29d0`
+
+#### 4.5.1 Review #1 — COMMENTED (`jejaebubu`, 2026-11-01T20:49:58Z)
+
+**Verdict:** COMMENTED (commit `a3a3150`)
+
+**Verbatim Review Comments:**
+
+> ตรวจโค้ด Ticket Workflow, Resolution Gate, Optimistic Concurrency และชุดทดสอบของ PR #79 (Issue 31) เทียบกับ `schema.prisma`, `specification.md`, `api-spec.md` และ `tests.md` อย่างละเอียดรอบด้านแล้วนะคะ ภาพรวมทำออกมาได้อย่างยอดเยี่ยมและรัดกุมมากค่ะ 
+> 
+> ### จุดเด่นที่ทำได้ดีมาก
+> 1. **Resolution Gate Enforcement (BR-09, AC-07, AC-08):** ใน `server/src/routes/staff.ts` (`PATCH /api/staff/tickets/:id/resolve`) ตรวจจับ Actions Taken ที่ค้างสถานะ `PENDING` หรือ `IN_PROGRESS` ได้อย่างแม่นยำ ปฏิเสธด้วย `409 Conflict` (`RESOLUTION_GATE_BLOCKED`) พร้อมส่ง `unresolvedCount` และ `blockingActions` ให้ลูกค้านำไปแสดงผลได้อย่างชัดเจน
+> 2. **Optimistic Concurrency Protection (BR-14, AC-12):** ตรวจสอบ `expectedUpdatedAt` กับ `ticket.updatedAt` ในทั้งสอง Endpoint พร้อมปัดเศษความคลาดเคลื่อนระดับ 1 วินาที (`Math.abs > 1000`) ตาม RFC 7231 ตอบกลับด้วย `409 Conflict` (`STALE_UPDATE_CONFLICT`) ป้องกันปัญหาแย่งกันแก้ไขข้อมูลได้อย่างสมบูรณ์
+> 3. **State Machine Transition Matrix (BR-11, WORKFLOW-01):** บังคับใช้เงื่อนไขตามตาราง 9 สถานะใน `VALID_TRANSITIONS` บล็อกไม่ให้ข้ามจาก `NEW`/`OPEN` ไป `RESOLVED` โดยตรง และบังคับใช้ `/resolve` พร้อม `resolutionSummary` 3–500 ตัวอักษร
+> 4. **UX & Warning Banners (UI-04):** ใน `TicketDetail.tsx` แสดงแบนเนอร์สีเหลืองเตือน Resolution Gate ทั้งบน Operational Toolbar และภายใน Resolve Modal รวมถึงการแจ้งเตือน Stale update เมื่อเกิด Conflict (409)
+> 5. **Test Suite:** ชุดทดสอบ `ticket-workflow.api.test.ts` (API-07 ถึง API-10, API-14, WORKFLOW-01) และ `TicketWorkflow.test.tsx` (UI-04 4 เคส) ครอบคลุมครบถ้วน รันผ่าน 100%
+> 
+> ---
+> 
+> ### ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Should Fix & Minor)
+> 
+> 1. **State Transition ใน `TicketDetail.tsx` (บรรทัด 483–485) ขาดสถานะ `PENDING` ในเคส `REOPENED`**
+>    * ใน `server/src/routes/staff.ts` และ `specification.md` Section 5.1 กำหนดให้สถานะ `REOPENED` สามารถย้ายไป `PENDING` (พักรอ Vendor) ได้
+>    * แต่ใน `TicketDetail.tsx` ฟังก์ชัน `getAllowedNextStatuses` ระบุ:
+>      `case 'REOPENED': return ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'];`
+>    * แนะนำให้เพิ่ม `'PENDING'` เข้าไปในอาร์เรย์เป็น `['IN_PROGRESS', 'PENDING', 'RESOLVED', 'CANCELLED']` เพื่อให้เจ้าหน้าที่สามารถเลือกสถานะนี้จาก Dropdown บนหน้าเว็บได้ค่ะ
+> 2. **บันทึก AI Pairing Log ใน `docs/lab-04/ai-use.md` สำหรับ Issue 31**
+>    * แนะนำให้เพิ่ม Prompt 11 และ Section 3.5 Reflection สำหรับ Ticket Workflow, Resolution Gate และ Optimistic Concurrency ใน `docs/lab-04/ai-use.md` ให้ครบถ้วนตามเกณฑ์ส่งงานของ Lab 4 ค่ะ
+> 3. **อัปเดตเอกสาร `docs/lab-04/api-spec.md` (หัวข้อ 3.1 และ 3.2)**
+>    * นำคำว่า `*(Planned for Issue 31)*` ออก และปรับตัวอย่าง JSON response ของ Conflict (409) ให้ตรงกับโครงสร้างจริง (`code: 'RESOLUTION_GATE_BLOCKED'` / `'STALE_UPDATE_CONFLICT'`)
+> 4. **การส่ง `relatedSystemId` ใน `ticket-workflow.api.test.ts`**
+>    * ในฟังก์ชันทดสอบมีการระบุ `relatedSystemId: relatedSystem?.id || null` เนื่องจากฟิลด์นี้ใน `schema.prisma` เป็น required (`Int` ไม่ nullable) แนะนำให้ใช้ `relatedSystem.id` ตรง ๆ เหมือนกับ `categoryId: category.id` ค่ะ
+
+
+#### 4.5.2 Author Response #1 (`titayaaa`, 2026-11-01T21:00:27Z)
+
+> > ตรวจโค้ด Ticket Workflow, Resolution Gate, Optimistic Concurrency และชุดทดสอบของ PR #79 (Issue 31) เทียบกับ `schema.prisma`, `specification.md`, `api-spec.md` และ `tests.md` อย่างละเอียดรอบด้านแล้วนะคะ ภาพรวมทำออกมาได้อย่างยอดเยี่ยมและรัดกุมมากค่ะ
+> > 
+> > ### จุดเด่นที่ทำได้ดีมาก
+> > 1. **Resolution Gate Enforcement (BR-09, AC-07, AC-08):** ใน `server/src/routes/staff.ts` (`PATCH /api/staff/tickets/:id/resolve`) ตรวจจับ Actions Taken ที่ค้างสถานะ `PENDING` หรือ `IN_PROGRESS` ได้อย่างแม่นยำ ปฏิเสธด้วย `409 Conflict` (`RESOLUTION_GATE_BLOCKED`) พร้อมส่ง `unresolvedCount` และ `blockingActions` ให้ลูกค้านำไปแสดงผลได้อย่างชัดเจน
+> > 2. **Optimistic Concurrency Protection (BR-14, AC-12):** ตรวจสอบ `expectedUpdatedAt` กับ `ticket.updatedAt` ในทั้งสอง Endpoint พร้อมปัดเศษความคลาดเคลื่อนระดับ 1 วินาที (`Math.abs > 1000`) ตาม RFC 7231 ตอบกลับด้วย `409 Conflict` (`STALE_UPDATE_CONFLICT`) ป้องกันปัญหาแย่งกันแก้ไขข้อมูลได้อย่างสมบูรณ์
+> > 3. **State Machine Transition Matrix (BR-11, WORKFLOW-01):** บังคับใช้เงื่อนไขตามตาราง 9 สถานะใน `VALID_TRANSITIONS` บล็อกไม่ให้ข้ามจาก `NEW`/`OPEN` ไป `RESOLVED` โดยตรง และบังคับใช้ `/resolve` พร้อม `resolutionSummary` 3–500 ตัวอักษร
+> > 4. **UX & Warning Banners (UI-04):** ใน `TicketDetail.tsx` แสดงแบนเนอร์สีเหลืองเตือน Resolution Gate ทั้งบน Operational Toolbar และภายใน Resolve Modal รวมถึงการแจ้งเตือน Stale update เมื่อเกิด Conflict (409)
+> > 5. **Test Suite:** ชุดทดสอบ `ticket-workflow.api.test.ts` (API-07 ถึง API-10, API-14, WORKFLOW-01) และ `TicketWorkflow.test.tsx` (UI-04 4 เคส) ครอบคลุมครบถ้วน รันผ่าน 100%
+> > 
+> > ### ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Should Fix & Minor)
+> > 1. **State Transition ใน `TicketDetail.tsx` (บรรทัด 483–485) ขาดสถานะ `PENDING` ในเคส `REOPENED`**
+> >    
+> >    * ใน `server/src/routes/staff.ts` และ `specification.md` Section 5.1 กำหนดให้สถานะ `REOPENED` สามารถย้ายไป `PENDING` (พักรอ Vendor) ได้
+> >    * แต่ใน `TicketDetail.tsx` ฟังก์ชัน `getAllowedNextStatuses` ระบุ:
+> >      `case 'REOPENED': return ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'];`
+> >    * แนะนำให้เพิ่ม `'PENDING'` เข้าไปในอาร์เรย์เป็น `['IN_PROGRESS', 'PENDING', 'RESOLVED', 'CANCELLED']` เพื่อให้เจ้าหน้าที่สามารถเลือกสถานะนี้จาก Dropdown บนหน้าเว็บได้ค่ะ
+> > 2. **บันทึก AI Pairing Log ใน `docs/lab-04/ai-use.md` สำหรับ Issue 31**
+> >    
+> >    * แนะนำให้เพิ่ม Prompt 11 และ Section 3.5 Reflection สำหรับ Ticket Workflow, Resolution Gate และ Optimistic Concurrency ใน `docs/lab-04/ai-use.md` ให้ครบถ้วนตามเกณฑ์ส่งงานของ Lab 4 ค่ะ
+> > 3. **อัปเดตเอกสาร `docs/lab-04/api-spec.md` (หัวข้อ 3.1 และ 3.2)**
+> >    
+> >    * นำคำว่า `*(Planned for Issue 31)*` ออก และปรับตัวอย่าง JSON response ของ Conflict (409) ให้ตรงกับโครงสร้างจริง (`code: 'RESOLUTION_GATE_BLOCKED'` / `'STALE_UPDATE_CONFLICT'`)
+> > 4. **การส่ง `relatedSystemId` ใน `ticket-workflow.api.test.ts`**
+> >    
+> >    * ในฟังก์ชันทดสอบมีการระบุ `relatedSystemId: relatedSystem?.id || null` เนื่องจากฟิลด์นี้ใน `schema.prisma` เป็น required (`Int` ไม่ nullable) แนะนำให้ใช้ `relatedSystem.id` ตรง ๆ เหมือนกับ `categoryId: category.id` ค่ะ
+> 
+> ขอบคุณ @jejaebubu สำหรับการตรวจทานที่ละเอียดรอบคอบและช่วยแนะนำจุดต่อยอดให้สมบูรณ์ยิ่งขึ้นค่ะ! 
+> 
+> @titayaaa ได้ดำเนินการปรับแก้ครบถ้วนทั้ง 4 ข้อเสนอแนะใน commit `810bdb3` เรียบร้อยแล้วนะคะ:
+> 1. **เพิ่มสถานะ 'PENDING' ในเคส REOPENED ของ `TicketDetail.tsx`**: ปรับ `getAllowedNextStatuses` ในเคส `'REOPENED'` เป็น `['IN_PROGRESS', 'PENDING', 'RESOLVED', 'CANCELLED']` ให้ตรงกับ State Transition Matrix ใน Section 5.1 และ backend `VALID_TRANSITIONS`
+> 2. **บันทึก AI Pairing Log ใน `docs/lab-04/ai-use.md`**: เพิ่ม Prompt 11 และ Section 3.5 Reflection สำหรับ Issue 31 (Resolution Gate, Optimistic Concurrency, Clock Skew Tolerance และ Preventive UI) ครบถ้วนตามเกณฑ์ส่งงาน
+> 3. **อัปเดต `docs/lab-04/api-spec.md` (หัวข้อ 3.1 และ 3.2)**: นำหมายเหตุ *(Planned for Issue 31)* ออก และปรับปรุงตัวอย่าง JSON response ของ HTTP 409 Conflict ให้มีฟิลด์ `code: "STALE_UPDATE_CONFLICT"` และ `code: "RESOLUTION_GATE_BLOCKED"` พร้อม `unresolvedCount` และ `blockingActions` ตรงกับ response จริงจาก Backend
+> 4. **ปรับการส่ง `relatedSystemId` ใน `ticket-workflow.api.test.ts`**: เปลี่ยนจาก `relatedSystem?.id || null` เป็น `relatedSystem.id` ตรง ๆ ทุกจุด ให้สอดคล้องกับ schema type `Int` (Non-nullable)
+> 
+> ผลการรันชุดทดสอบ Client ผ่าน 13/13 test files (68/68 tests 100%), Server Typecheck ผ่าน 0 errors, และ Client build (`tsc && vite build`) ผ่านเรียบร้อยค่ะ รบกวนช่วยตรวจทานรอบสุดท้ายและพิจารณา Approve & Merge ได้เลยนะคะ ขอบคุณมากค่ะ!
+
+
+#### 4.5.3 Review #2 — APPROVED (`jejaebubu`, 2026-11-01T21:12:03Z)
+
+**Verdict:** APPROVED (commit `810bdb3`)
+
+**Verbatim Review Comments:**
+
+> ตรวจ commit `810bdb3` รอบสุดท้ายอย่างละเอียดแล้วนะคะ ขอบคุณที่เก็บงานและปรับแก้ทั้ง 4 จุดได้อย่างรวดเร็วและสมบูรณ์แบบมากค่ะ:
+>  
+> 1. **State Transition ใน `TicketDetail.tsx`:** เพิ่มสถานะ `'PENDING'` ในเคส `'REOPENED'` เรียบร้อย ทำให้เจ้าหน้าที่สามารถพักงานรอ Vendor ได้ตาม Business Matrix ใน `specification.md`
+> 2. **AI Pairing Log ใน `docs/lab-04/ai-use.md`:** บันทึก Prompt 11 และ Section 3.5 Reflection ครบถ้วนตามเกณฑ์ส่งงานของ Lab 4
+> 3. **API Documentation ใน `docs/lab-04/api-spec.md`:** ปรับปรุง Error schema ของ HTTP 409 Conflict ให้ตรงกับ Implementation จริง และนำหมายเหตุ Planned ออกเรียบร้อย
+> 4. **Prisma Type Safety ใน `ticket-workflow.api.test.ts`:** แก้ไขการส่ง `relatedSystemId: relatedSystem.id` เป็น Type-safe Non-null เรียบร้อย
+> 5. **Verification & Build:** รันชุดทดสอบ Client (`TicketWorkflow.test.tsx`, `ActionsTaken.test.tsx`) ผ่าน 100% และ Client production build ผ่านฉลุยค่ะ
+>  
+> ภาพรวมฟีเจอร์ Ticket Workflow, Resolution Gate และ Optimistic Concurrency ทำออกมาได้มาตรฐานระดับ Production ครบถ้วนตาม Requirement ทุกข้อ ขอ **Approve** ให้ Merge เข้า `lab4-staging` ได้เลยค่ะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #79 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `1a056c2cc5767e25a8181115d6e974d9011e3d60`, 2026-11-01T21:12:18Z) — **Closes PR #79**
+
+---
+
+### 4.6 PR #80: feat(dashboard): implement IT Staff Dashboard API, summary metrics, and UI screen (Issue #32, #68) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#80](https://github.com/titayaaa/toktickit/pull/80)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/32-staff-dashboard`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `ba347fb8ec5e4e5b1d3b24939df89556fccdf105`, 2026-11-01T22:20:59Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `cd3f61fd1b013c4709aab808a2d7995b3e374ce4`
+
+#### 4.6.1 Review #1 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-01T22:09:12Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `5859006`)
+
+**Verbatim Review Comments:**
+
+> ตรวจโค้ด REST API, การคำนวณ Operational Metrics, หน้าจอ UI `StaffDashboard.tsx` และชุดทดสอบของ PR #80 (Issue 32) เทียบกับ `schema.prisma`, `specification.md`, `api-spec.md` และ `ui-spec.md` อย่างละเอียดรอบด้านแล้วนะคะ ภาพรวมการจัดเลย์เอาต์ธีม Zen Green, การ์ดสรุปสถิติ 4 ใบ, ตาราง Responsive Urgent Queue และการเชื่อมโยง Drill-down ไปยัง Queue ทำไว้ดีมากเลยค่ะ
+> 
+> แต่ขอ **Changes Requested** ก่อนนะคะ เนื่องจากมีจุดสำคัญเรื่องการยืนยันตัวตน (Authentication) บนหน้าเว็บจริง และ Foreign Key Constraint ในชุดทดสอบที่ต้องรบกวนช่วยปรับแก้ก่อน Merge ค่ะ:
+>  
+> ### 🔴 Blocking: ต้องแก้ก่อน Merge
+> 1. **`client/src/components/StaffDashboard.tsx` (บรรทัด 122, 126): ขาด `Authorization` Header ใน `fetchDashboardData` ทำให้หน้าเว็บจริงเสี่ยงติด `401 Unauthorized`**
+>    - **ปัญหา:** ใน `fetchDashboardData` เรียก `fetch('/api/staff/dashboard')` และ fallback `fetch('/api/dashboard/staff')` โดยไม่ได้ส่ง `headers` ใด ๆ
+>    - ในระบบ TokTickIT ผู้ใช้เก็บ JWT token ไว้ใน `localStorage` ด้วยคีย์ `'toktickit_auth_token'` (ตาม `AuthContext.tsx`) หากผู้ใช้รีเฟรชหน้าเว็บหรือใช้งานในกรณีที่ cookie ไม่ถูกส่ง API จะปฏิเสธด้วย `401 Unauthorized` ส่งผลให้หน้า Dashboard โหลดข้อมูลไม่ขึ้นและแสดง error ทันที
+>    - **แนวทางแก้:** ดึง token จาก `useAuth()` หรือ `localStorage.getItem('toktickit_auth_token')` แล้วส่ง headers ในคำสั่ง fetch เช่น:
+>      ```ts
+>      const token = localStorage.getItem('toktickit_auth_token');
+>      const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+>      const res = await fetch('/api/staff/dashboard', { headers });
+>      ```
+> 
+> 2. **`server/tests/lab-04/staff-dashboard.api.test.ts` (บรรทัด 75, 98, 115): ผูก `requesterId: requesterUser.id` ข้ามตาราง และไม่ได้ส่ง `userId`**
+>    - **ปัญหา:** ใน `beforeAll` ตอนสร้างตั๋วทดสอบ มีการระบุ `requesterId: requesterUser.id` โดยตรง ซึ่ง `requesterUser` มาจากตาราง `User` (`Role.REQUESTER`)
+>    - ตาม `schema.prisma` โมเดล `Ticket` ฟิลด์ `requesterId` ชี้ไปยัง `RequesterUser.id` ส่วน `User.id` จะเชื่อมผ่านฟิลด์ `userId` (`relation("TicketRequester")`) หากรันกับฐานข้อมูลจริงจะเกิด Foreign Key Constraint Failed และทำให้ `ticket.requester` ใน endpoint `/dashboard` มีค่าเป็น `null`
+>    - **แนวทางแก้:** ปรับให้เหมือนกับ `ticket-workflow.api.test.ts` (PR #79) โดยค้นหาหรือสร้าง `RequesterUser` (`reqJennifer`) ก่อน แล้วส่ง `requesterId: reqJennifer.id` พร้อมทั้งส่ง `userId: requesterUser.id` ค่ะ
+> 
+> ---
+> 
+> ### 🟠 Should Fix: ความสอดคล้องของ Filter Drill-Down
+> 3. **`client/src/components/StaffDashboard.tsx` (บรรทัด 334): การคลิกการ์ด "My Pending Actions" ขาดการกรอง `ownerFilter: 'me'`**
+>    - ตอนคลิกการ์ด My Pending Actions มีการเรียก `onDrillDown?.({ status: 'IN_PROGRESS' })` เพียงอย่างเดียว ทำให้พอนำทางไปหน้าคิวตั๋ว ระบบจะแสดงตั๋ว In Progress ของทุกคนในระบบ แทนที่จะแสดงเฉพาะงานของตนเอง
+>   - **แนวทางแก้:** ปรับเป็น `onDrillDown?.({ status: 'IN_PROGRESS', ownerFilter: 'me' })`
+> 
+> 4. **`client/src/components/StaffDashboard.tsx` (บรรทัด 369): Status Casing ใน Hidden Alias**
+>    - ในแท็ก `<span data-testid="staff-metric-card-in-progress" onClick={() => onDrillDown?.({ status: 'In Progress' })}>...</span>` ส่งค่า `'In Progress'` (มีช่องว่าง) แต่ใน Dropdown ของ `StaffTicketQueue.tsx` ตัวเลือกใช้ค่า value เป็น `'IN_PROGRESS'` แนะนำให้ปรับเป็น `status: 'IN_PROGRESS'` ให้ตรงกันค่ะ
+> 
+> ฝากช่วยปรับแก้ 4 จุดนี้ แล้วอัปเดตบันทึกใน `reviewer.md` อีกนิดนะคะ พร้อม Approve ให้ในรอบถัดไปทันทีค่ะ ขอบคุณมากค่ะ
+
+
+#### 4.6.2 Author Response #1 (`titayaaa`, 2026-11-01T22:15:16Z)
+
+> > ตรวจโค้ด REST API, การคำนวณ Operational Metrics, หน้าจอ UI `StaffDashboard.tsx` และชุดทดสอบของ PR #80 (Issue 32) เทียบกับ `schema.prisma`, `specification.md`, `api-spec.md` และ `ui-spec.md` อย่างละเอียดรอบด้านแล้วนะคะ ภาพรวมการจัดเลย์เอาต์ธีม Zen Green, การ์ดสรุปสถิติ 4 ใบ, ตาราง Responsive Urgent Queue และการเชื่อมโยง Drill-down ไปยัง Queue ทำไว้ดีมากเลยค่ะ
+> > 
+> > แต่ขอ **Changes Requested** ก่อนนะคะ เนื่องจากมีจุดสำคัญเรื่องการยืนยันตัวตน (Authentication) บนหน้าเว็บจริง และ Foreign Key Constraint ในชุดทดสอบที่ต้องรบกวนช่วยปรับแก้ก่อน Merge ค่ะ:
+> > 
+> > ### 🔴 Blocking: ต้องแก้ก่อน Merge
+> > 1. **`client/src/components/StaffDashboard.tsx` (บรรทัด 122, 126): ขาด `Authorization` Header ใน `fetchDashboardData` ทำให้หน้าเว็บจริงเสี่ยงติด `401 Unauthorized`**
+> >    
+> >    * **ปัญหา:** ใน `fetchDashboardData` เรียก `fetch('/api/staff/dashboard')` และ fallback `fetch('/api/dashboard/staff')` โดยไม่ได้ส่ง `headers` ใด ๆ
+> >    * ในระบบ TokTickIT ผู้ใช้เก็บ JWT token ไว้ใน `localStorage` ด้วยคีย์ `'toktickit_auth_token'` (ตาม `AuthContext.tsx`) หากผู้ใช้รีเฟรชหน้าเว็บหรือใช้งานในกรณีที่ cookie ไม่ถูกส่ง API จะปฏิเสธด้วย `401 Unauthorized` ส่งผลให้หน้า Dashboard โหลดข้อมูลไม่ขึ้นและแสดง error ทันที
+> >    * **แนวทางแก้:** ดึง token จาก `useAuth()` หรือ `localStorage.getItem('toktickit_auth_token')` แล้วส่ง headers ในคำสั่ง fetch เช่น:
+> >      ```ts
+> >      const token = localStorage.getItem('toktickit_auth_token');
+> >      const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+> >      const res = await fetch('/api/staff/dashboard', { headers });
+> >      ```
+> > 2. **`server/tests/lab-04/staff-dashboard.api.test.ts` (บรรทัด 75, 98, 115): ผูก `requesterId: requesterUser.id` ข้ามตาราง และไม่ได้ส่ง `userId`**
+> >    
+> >    * **ปัญหา:** ใน `beforeAll` ตอนสร้างตั๋วทดสอบ มีการระบุ `requesterId: requesterUser.id` โดยตรง ซึ่ง `requesterUser` มาจากตาราง `User` (`Role.REQUESTER`)
+> >    * ตาม `schema.prisma` โมเดล `Ticket` ฟิลด์ `requesterId` ชี้ไปยัง `RequesterUser.id` ส่วน `User.id` จะเชื่อมผ่านฟิลด์ `userId` (`relation("TicketRequester")`) หากรันกับฐานข้อมูลจริงจะเกิด Foreign Key Constraint Failed และทำให้ `ticket.requester` ใน endpoint `/dashboard` มีค่าเป็น `null`
+> >    * **แนวทางแก้:** ปรับให้เหมือนกับ `ticket-workflow.api.test.ts` (PR #79) โดยค้นหาหรือสร้าง `RequesterUser` (`reqJennifer`) ก่อน แล้วส่ง `requesterId: reqJennifer.id` พร้อมทั้งส่ง `userId: requesterUser.id` ค่ะ
+> > 
+> > ### 🟠 Should Fix: ความสอดคล้องของ Filter Drill-Down
+> > 3. **`client/src/components/StaffDashboard.tsx` (บรรทัด 334): การคลิกการ์ด "My Pending Actions" ขาดการกรอง `ownerFilter: 'me'`**
+> >    
+> >    * ตอนคลิกการ์ด My Pending Actions มีการเรียก `onDrillDown?.({ status: 'IN_PROGRESS' })` เพียงอย่างเดียว ทำให้พอนำทางไปหน้าคิวตั๋ว ระบบจะแสดงตั๋ว In Progress ของทุกคนในระบบ แทนที่จะแสดงเฉพาะงานของตนเอง
+> > 
+> > * **แนวทางแก้:** ปรับเป็น `onDrillDown?.({ status: 'IN_PROGRESS', ownerFilter: 'me' })`
+> > 
+> > 4. **`client/src/components/StaffDashboard.tsx` (บรรทัด 369): Status Casing ใน Hidden Alias**
+> >    
+> >    * ในแท็ก `<span data-testid="staff-metric-card-in-progress" onClick={() => onDrillDown?.({ status: 'In Progress' })}>...</span>` ส่งค่า `'In Progress'` (มีช่องว่าง) แต่ใน Dropdown ของ `StaffTicketQueue.tsx` ตัวเลือกใช้ค่า value เป็น `'IN_PROGRESS'` แนะนำให้ปรับเป็น `status: 'IN_PROGRESS'` ให้ตรงกันค่ะ
+> > 
+> > ฝากช่วยปรับแก้ 4 จุดนี้ แล้วอัปเดตบันทึกใน `reviewer.md` อีกนิดนะคะ พร้อม Approve ให้ในรอบถัดไปทันทีค่ะ ขอบคุณมากค่ะ
+> 
+> ขอบคุณ @jejaebubu สำหรับการตรวจทานที่ละเอียดรอบคอบและช่วยจับจุดสำคัญเรื่อง Auth Header และ Foreign Key Constraint ค่ะ ได้ดำเนินการแก้ไขปรับปรุงครบทั้ง 4 ประเด็นใน commit cd3f61f เรียบร้อยแล้วค่ะ:
+> 
+> 1. **เพิ่ม Authorization Header ใน `fetchDashboardData` (`StaffDashboard.tsx`)**:
+>    - ดึง JWT token จาก `localStorage.getItem('toktickit_auth_token')` และแนบ `Authorization: Bearer <token>` ไปกับคำขอทั้ง endpoint หลัก `/api/staff/dashboard` และ endpoint สำรอง `/api/dashboard/staff` เรียบร้อยค่ะ
+> 2. **แก้ไขการผูก Foreign Key ของตั๋วทดสอบใน `staff-dashboard.api.test.ts`**:
+>    - ค้นหา/สร้างข้อมูลในตาราง `RequesterUser` (`reqJennifer`) และส่ง `requesterId: reqJennifer.id` คู่กับ `userId: requesterUser.id` ในการสร้างตั๋วทดสอบทั้ง 4 ใบ ถูกต้องตรงตาม schema.prisma เรียบร้อยค่ะ
+> 3. **ปรับการกรอง Drill-Down ของการ์ด My Pending Actions (`StaffDashboard.tsx`)**:
+>    - ปรับการคลิกการ์ดเป็น `onDrillDown?.({ status: 'IN_PROGRESS', ownerFilter: 'me' })` เพื่อให้แสดงเฉพาะตั๋ว In Progress ที่เป็นงานของตนเอง พร้อมเพิ่ม assertion ยืนยันใน `StaffDashboard.test.tsx` เรียบร้อยค่ะ
+> 4. **ปรับ Status Casing ใน Hidden Alias (`StaffDashboard.tsx`)**:
+>    - ปรับแก้ค่าสถานะใน `staff-metric-card-in-progress` เป็น `'IN_PROGRESS'` ให้ตรงกับ Enum Dropdown เรียบร้อยค่ะ
+> 5. **อัปเดตบันทึกใน `docs/lab-04/reviewer.md`**:
+>    - บันทึกการรีวิวรอบที่ 1 และการแก้ไขครบถ้วนสมบูรณ์แล้วค่ะ
+> 
+> รันชุดทดสอบ Client ผ่านครบ 19/19 tests (100%), Client build ผ่าน 0 errors, Server typecheck ผ่าน 0 errors และผลการทดสอบ Backend Dashboard API ผ่านเรียบร้อยค่ะ รบกวนช่วยตรวจทานรอบที่ 2 อีกครั้งนะคะ ขอบคุณมากค่ะ!
+
+
+#### 4.6.3 Review #2 — APPROVED (`jejaebubu`, 2026-11-01T22:20:52Z)
+
+**Verdict:** APPROVED (commit `cd3f61f`)
+
+**Verbatim Review Comments:**
+
+> ตรวจ commit `cd3f61f` ในการรีวิวรอบที่ 2 อย่างละเอียดรอบด้านแล้วนะคะ ขอบคุณที่ดำเนินการแก้ไขและปรับปรุงครบทั้ง 4 ประเด็นได้อย่างรวดเร็วและประณีตมากค่ะ:
+> 
+> 1. **Authentication Reliability (`StaffDashboard.tsx`):** มีการดึง JWT จาก `localStorage` (`toktickit_auth_token`) และแนบ `Authorization: Bearer` ไปกับ request ทั้งสอง endpoint ทำให้หน้า Dashboard โหลดข้อมูลได้อย่างเสถียร ไม่หลุด `401 Unauthorized`
+> 2. **Prisma Foreign Key Safety (`staff-dashboard.api.test.ts`):** ปรับการเชื่อมโยง Foreign Key เป็น `requesterId: reqJennifer.id` และ `userId: requesterUser.id` ถูกต้องตาม `schema.prisma` 100%
+> 3. **Precise Drill-Down Filtering:** การ์ด My Pending Actions กรองทั้ง `status: 'IN_PROGRESS'` และ `ownerFilter: 'me'` สอดคล้องกับบทบาทหน้าที่ของเจ้าหน้าที่ พร้อมอัปเดตชุดทดสอบยืนยัน
+> 4. **Enum Consistency:** ปรับ Status Casing ใน Hidden Alias เป็น `'IN_PROGRESS'` สอดรับกับ Dropdown ของ Queue
+> 5. **Documentation & Verification:** บันทึกประวัติการรีวิวใน `docs/lab-04/reviewer.md` ครบถ้วน รันเทสต์ 75/75 ผ่าน 100% และ production build ผ่านฉลุย 0 errors
+> 
+> คุณภาพโค้ดและชุดทดสอบยอดเยี่ยมมาก ขอ **Approve** ให้ Merge เข้า `lab4-staging` ได้เลยค่ะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #80 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `ba347fb8ec5e4e5b1d3b24939df89556fccdf105`, 2026-11-01T22:20:59Z) — **Closes PR #80**
+
+---
+
+### 4.7 PR #81: feat(dashboard): implement Requester Dashboard API, personal metrics, and UI screen (Issue #33, #69) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#81](https://github.com/titayaaa/toktickit/pull/81)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/33-requester-dashboard`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `ce5a56682345553159b02a052dcc53b5efc4bbc5`, 2026-11-02T03:55:14Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `7e48b315f7dac5a77cdb64153e52c7a268a586d1`
+
+#### 4.7.1 Review #1 — APPROVED (`jejaebubu`, 2026-11-02T03:55:03Z)
+
+**Verdict:** APPROVED (commit `7e48b31`)
+
+**Verbatim Review Comments:**
+
+> ตรวจโค้ด REST API, Data Isolation, หน้าจอ UI `RequesterDashboard.tsx`, ชุดทดสอบ และเอกสารประกอบของ PR #81 (Issue 33) เทียบกับ `specification.md`, `api-spec.md`, `ui-spec.md` และ `tests.md` อย่างละเอียดรอบด้านแล้วนะคะ ภาพรวมทำออกมาได้อย่างยอดเยี่ยมและประณีตมากค่ะ 
+> 
+> ### จุดเด่นที่ทำได้ดีมาก
+> 1. **Strict Data Isolation & Multi-Version Ownership (BR-13, AC-10, API-12):** ใน `server/src/routes/requester.ts` ออกแบบเงื่อนไข `ownershipWhere` ตรวจสอบทั้ง `userId` และอีเมลของทั้งสองโมเดล (`requesterUser.email` และ `requester.email`) ทำให้แยกข้อมูลของ Requester แต่ละคนได้อย่างสมบูรณ์แบบ ไม่เกิดปัญหา ID ชนกันข้ามโมเดล และรองรับตั๋วแบบ Legacy ได้อย่างไร้รอยต่อ
+> 2. **Action Required Notification Banner (UI-06, FR-13):** แถบเตือนสีม่วง/Amber (`#EDE7F6` / `#512DA8`) แสดงตั๋วสถานะ `WAITING_FOR_REQUESTER` ได้เด่นชัด พร้อมปุ่มกด "Inspect & Respond →" ช่วยให้ผู้ใช้ทราบทันทีว่ามีตั๋วที่รอข้อมูลเพิ่มเติม
+> 3. **Seamless Drill-Down to MyTickets:** การส่ง `initialStatus` ไปยัง `MyTickets.tsx` พร้อมทั้งขยายตัวเลือกสถานะใน Dropdown ครบทั้ง 9 สถานะ ช่วยให้การคลิกการ์ดสถิติแล้วเปิดดูรายการตั๋วที่เกี่ยวข้องทำงานได้อย่างถูกต้อง
+> 4. **Responsive Layout & Accessibility (STYLE-01, RESP-01, WCAG AA):** จัดเลย์เอาต์สลับระหว่าง Desktop Table และ Mobile Card Stack ได้อย่างลงตัว ปุ่มและการ์ดมี Touch target $\ge 44\text{px}$ กำหนด `overflowX: 'hidden'` ป้องกันหน้าจอเลื่อนแนวนอน และมี Empty State พร้อมปุ่ม CTA ชัดเจน
+> 5. **Defensive Token & Date Handling:** มีการแนบ Header `Authorization: Bearer` พร้อมรองรับ Token fallback และแปลงวันเวลาแบบ Safe Date Serialization ป้องกันปัญหา Runtime Exception
+> 6. **Test Coverage & Build Verification:** ชุดทดสอบ Client ผ่านครบ 81/81 tests (100%), Production build ผ่าน 0 errors และบันทึก `ai-use.md` (Prompt 13 & Reflection 3.7) ครบถ้วนตามเกณฑ์ส่งงาน
+> 
+> คุณภาพของฟีเจอร์และชุดทดสอบสมบูรณ์แบบตามเกณฑ์ทุกข้อ ขอ **Approve** ให้ Merge เข้า `lab4-staging` ได้เลยค่ะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #81 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `ce5a56682345553159b02a052dcc53b5efc4bbc5`, 2026-11-02T03:55:14Z) — **Closes PR #81**
+
+---
+
+### 4.8 PR #82: test(regression): full regression of Lab 1-3 suites with Lab 4 features (Issue #34, #70) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#82](https://github.com/titayaaa/toktickit/pull/82)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/34-final-hardening`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `858d2ec0749aa5e2a65d283077bcd875c48a2742`, 2026-11-02T09:08:15Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `2c5d703dfe31474d2fe6a8ddfdf5445b407b3f64`
+
+#### 4.8.1 Review #1 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-02T07:54:15Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `52c686b`)
+
+**Verbatim Review Comments:**
+
+> ตรวจสอบผลการรันชุดทดสอบย้อนหลัง (Full Regression Suite), การ Hardening ระบบ, ผลการ Build และเอกสารประกอบของ PR #82 (Issue 34) เทียบกับข้อกำหนด `REG-01`, `REG-02`, `AC-14` และ `FR-15` เรียบร้อยแล้วนะคะ
+> 
+> ภาพรวมการ Hardening ระบบ (Token fallback, Safe Date serialization, Status Enum ใน MyTickets) และผลการรัน Client Vitest ผ่านครบ 81/81 tests ทำได้ยอดเยี่ยมมากค่ะ แต่ขอส่งเป็น **Changes Requested** ก่อนเพื่อให้เก็บรายละเอียดความครบถ้วนของเอกสารและตารางรีวิว 4 จุดก่อนกด Approve & Merge นะคะ:
+> 
+> ### 🔴 จุดที่ต้องปรับแก้ก่อนอนุมัติ (Required Changes)
+> 1. **บันทึกประวัติการรีวิว PR #113 ใน Part 2 ของ `docs/lab-04/reviewer.md`**:
+>    - ใน Part 2 (บันทึกฝั่งที่ `@titayaaa` รีวิว `@jejaebubu`) มีบันทึกไว้ถึงแค่ `PR #112` แต่ยังขาดหัวข้อ `### PR #113: Issue #9: Lab 1–3 Regression Test Suite and System Hardening` ซึ่งทางเพื่อนได้รีวิวและอนุมัติ Merge เข้า `lab4-staging` ไปแล้ว (merge SHA: `5158f3a`) รบกวนเพิ่มบันทึกของ PR #113 ลงใน Part 2 ให้ครบถ้วนสมบูรณ์ค่ะ
+> 
+> ---
+> 
+> ### 🟠 ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Improvement Suggestions)
+> 2. **เพิ่มพาธชุดทดสอบฝั่ง Client ในตาราง `docs/lab-04/tests.md` สำหรับ `REG-01` และ `REG-02`**:
+>    - ในตารางแถว `REG-01` และ `REG-02` ปัจจุบันระบุเฉพาะ `server/tests/lab-02/*.test.ts` และ `server/tests/lab-03/*.test.ts` เพื่อให้ครอบคลุมการทำ Regression ทั้ง Full-stack แนะนำให้เติมพาธฝั่ง Client เข้าไปด้วยค่ะ เช่น:
+>      - `REG-01`: `server/tests/lab-02/*.test.ts, client/src/test/lab-02/*.test.tsx`
+>      - `REG-02`: `server/tests/lab-03/*.test.ts, client/src/test/lab-03/*.test.tsx`
+> 3. **ระบุสรุปผลการรันชุดทดสอบฝั่ง Server ใน Scope & Objectives ของ PR #82 (`reviewer.md`)**:
+>    - ปัจจุบันระบุเฉพาะ Client Vitest (15 files / 81 passed) แนะนำให้ระบุสรุปผลการรันของฝั่ง Server Vitest Suite เพิ่มเติม เพื่อแสดงให้เห็นว่าผ่านการตรวจสอบ Regression ครบทั้ง Frontend และ Backend ค่ะ
+> 4. **ทยอยอัปเดตตาราง Checklist Section 2 ใน `docs/lab-04/reviewer.md`**:
+>    - ในตาราง Peer Review Checklist & Criteria รายการข้อ 1 ถึง 5 (Spec Completeness, Actions Taken Model, Resolution Gate, Dashboards, RBAC) ได้รับการ Merge เข้า staging ครบถ้วนแล้ว สามารถเริ่มปรับสถานะจาก `⏳ Pending` เป็น `✅ Verified` เพื่อเตรียมสรุปผลในโค้งสุดท้ายได้เลยค่ะ
+> 
+> ฝากช่วยปรับแก้ 4 จุดนี้ แล้วอัปเดต commit เข้ามาอีกครั้งนะคะ พร้อม Approve ให้ในรอบถัดไปทันทีค่ะ ขอบคุณมากค่ะ
+
+
+#### 4.8.2 Author Response #1 (`titayaaa`, 2026-11-02T08:58:49Z)
+
+> > ตรวจสอบผลการรันชุดทดสอบย้อนหลัง (Full Regression Suite), การ Hardening ระบบ, ผลการ Build และเอกสารประกอบของ PR #82 (Issue 34) เทียบกับข้อกำหนด `REG-01`, `REG-02`, `AC-14` และ `FR-15` เรียบร้อยแล้วนะคะ
+> > 
+> > ภาพรวมการ Hardening ระบบ (Token fallback, Safe Date serialization, Status Enum ใน MyTickets) และผลการรัน Client Vitest ผ่านครบ 81/81 tests ทำได้ยอดเยี่ยมมากค่ะ แต่ขอส่งเป็น **Changes Requested** ก่อนเพื่อให้เก็บรายละเอียดความครบถ้วนของเอกสารและตารางรีวิว 4 จุดก่อนกด Approve & Merge นะคะ:
+> > 
+> > ### 🔴 จุดที่ต้องปรับแก้ก่อนอนุมัติ (Required Changes)
+> > 1. **บันทึกประวัติการรีวิว PR #113 ใน Part 2 ของ `docs/lab-04/reviewer.md`**:
+> >    
+> >    * ใน Part 2 (บันทึกฝั่งที่ `@titayaaa` รีวิว `@jejaebubu`) มีบันทึกไว้ถึงแค่ `PR #112` แต่ยังขาดหัวข้อ `### PR #113: Issue #9: Lab 1–3 Regression Test Suite and System Hardening` ซึ่งทางเพื่อนได้รีวิวและอนุมัติ Merge เข้า `lab4-staging` ไปแล้ว (merge SHA: `5158f3a`) รบกวนเพิ่มบันทึกของ PR #113 ลงใน Part 2 ให้ครบถ้วนสมบูรณ์ค่ะ
+> > 
+> > ### 🟠 ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Improvement Suggestions)
+> > 2. **เพิ่มพาธชุดทดสอบฝั่ง Client ในตาราง `docs/lab-04/tests.md` สำหรับ `REG-01` และ `REG-02`**:
+> >    
+> >    * ในตารางแถว `REG-01` และ `REG-02` ปัจจุบันระบุเฉพาะ `server/tests/lab-02/*.test.ts` และ `server/tests/lab-03/*.test.ts` เพื่อให้ครอบคลุมการทำ Regression ทั้ง Full-stack แนะนำให้เติมพาธฝั่ง Client เข้าไปด้วยค่ะ เช่น:
+> >      
+> >      * `REG-01`: `server/tests/lab-02/*.test.ts, client/src/test/lab-02/*.test.tsx`
+> >      * `REG-02`: `server/tests/lab-03/*.test.ts, client/src/test/lab-03/*.test.tsx`
+> > 3. **ระบุสรุปผลการรันชุดทดสอบฝั่ง Server ใน Scope & Objectives ของ PR #82 (`reviewer.md`)**:
+> >    
+> >    * ปัจจุบันระบุเฉพาะ Client Vitest (15 files / 81 passed) แนะนำให้ระบุสรุปผลการรันของฝั่ง Server Vitest Suite เพิ่มเติม เพื่อแสดงให้เห็นว่าผ่านการตรวจสอบ Regression ครบทั้ง Frontend และ Backend ค่ะ
+> > 4. **ทยอยอัปเดตตาราง Checklist Section 2 ใน `docs/lab-04/reviewer.md`**:
+> >    
+> >    * ในตาราง Peer Review Checklist & Criteria รายการข้อ 1 ถึง 5 (Spec Completeness, Actions Taken Model, Resolution Gate, Dashboards, RBAC) ได้รับการ Merge เข้า staging ครบถ้วนแล้ว สามารถเริ่มปรับสถานะจาก `⏳ Pending` เป็น `✅ Verified` เพื่อเตรียมสรุปผลในโค้งสุดท้ายได้เลยค่ะ
+> > 
+> > ฝากช่วยปรับแก้ 4 จุดนี้ แล้วอัปเดต commit เข้ามาอีกครั้งนะคะ พร้อม Approve ให้ในรอบถัดไปทันทีค่ะ ขอบคุณมากค่ะ
+> 
+> ขอบคุณ [@jejaebubu](https://github.com/jejaebubu) มากค่ะ สำหรับการตรวจทาน Full Regression Suite และข้อเสนอแนะที่ละเอียดรอบด้านมากค่ะ ได้ดำเนินการปรับปรุงแก้ไขครบถ้วนทั้ง 4 จุดใน commit `2c5d703` เรียบร้อยแล้วค่ะ:
+> 
+> 1. **บันทึกประวัติการรีวิว PR #113 ใน Part 2 ของ `docs/lab-04/reviewer.md` (Required Change):**
+>    - เพิ่มหัวข้อ `### PR #113: feat(regression): Lab 1–3 Regression Test Suite and System Hardening (Issue #9)` ใน Part 2 บันทึกประวัติการรีวิวรอบที่ 1 (Changes Requested), คำชี้แจง Author Response (commit `abb8ea3`), การตรวจประเมินรอบที่ 2 (Approved) และบันทึกการ Merge สำเร็จ (Merge SHA: `5158f3a`) ไว้อย่างครบถ้วนสมบูรณ์ค่ะ
+> 2. **เพิ่มพาธชุดทดสอบฝั่ง Client สำหรับ REG-01 และ REG-02 ใน `docs/lab-04/tests.md`:**
+>    - อัปเดตคอลัมน์ Automated Test File ในตารางข้อกำหนดการทดสอบ:
+>      - `REG-01`: `server/tests/lab-02/*.test.ts`, `client/src/test/lab-02/*.test.tsx`
+>      - `REG-02`: `server/tests/lab-03/*.test.ts`, `client/src/test/lab-03/*.test.tsx`
+>      ครอบคลุมการตรวจสอบความเข้ากันได้ย้อนหลังแบบ Full-stack ทั้ง Frontend และ Backend ค่ะ
+> 3. **ระบุสรุปผลการรันชุดทดสอบฝั่ง Server ใน Scope & Objectives ของ PR #82 (`docs/lab-04/reviewer.md`):**
+>    - เพิ่มสรุปผลการรัน Server Vitest Suite: 19 test files / 112 passed (Lab 1–4) ควบคู่กับ Client Vitest Suite: 15 files / 81 passed รวมเป็น 34 files / 193 passed (100% Zero Regression) ค่ะ
+> 4. **อัปเดตตาราง Checklist Section 2 ใน `docs/lab-04/reviewer.md` เป็น ✅ Verified:**
+>    - ปรับสถานะรายการข้อ 1 ถึง 5 (Spec Completeness, Actions Taken Model, Resolution Gate Rule, Operational Dashboards, RBAC & Security) จาก `⏳ Pending` เป็น `✅ Verified` พร้อมระบุหมายเหตุการผ่านการตรวจสอบและการ Merge เข้าสู่ `lab4-staging` ครบถ้วนแล้วค่ะ
+> 
+> ผลการทดสอบ Client Vitest ผ่านครบ 15/15 files (81/81 tests) และผลการ Build ทั้ง Frontend (`tsc && vite build`) และ Backend (`tsc`) ผ่านสมบูรณ์ 0 errors ค่ะ รบกวน [@jejaebubu](https://github.com/jejaebubu) ช่วยตรวจสอบอีกครั้งนะคะ ขอบคุณมากค่ะ!
+
+
+#### 4.8.3 Review #2 — APPROVED (`jejaebubu`, 2026-11-02T09:08:06Z)
+
+**Verdict:** APPROVED (commit `2c5d703`)
+
+**Verbatim Review Comments:**
+
+> ### การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+> 
+> ตรวจสอบ commit `2c5d703` ซ้ำอย่างละเอียดรอบด้านแล้วนะคะ ดำเนินการปรับปรุงแก้ไขเอกสารและบันทึกประวัติการรีวิวได้ครบถ้วนสมบูรณ์ทั้ง 4 จุดอย่างยอดเยี่ยมมากค่ะ:
+> 
+> 1. **บันทึกประวัติ PR #113 ครบถ้วนสมบูรณ์**: เพิ่มบันทึกการรีวิวของ PR #113 ลงใน Part 2 ของ `docs/lab-04/reviewer.md` พร้อมรายละเอียดผลการตรวจทั้งสองรอบและ Merge commit `5158f3a` ครบถ้วนตามมาตรฐาน
+> 2. **ความครอบคลุมของ Regression Matrix**: อัปเดตพาธชุดทดสอบฝั่ง Client (`client/src/test/lab-02/*.test.tsx` และ `client/src/test/lab-03/*.test.tsx`) ใน `docs/lab-04/tests.md` ครบทั้ง Full-stack
+> 3. **ตัวเลขสรุปผลการทดสอบแม่นยำ**: ระบุผลการทดสอบทั้ง Server Vitest (19 files / 112 passed) และ Client Vitest (15 files / 81 passed) รวม 34 files / 193 passed (Zero Regression) ไว้อย่างชัดเจน
+> 4. **Checklist Section 2 พร้อมส่งมอบ**: ปรับสถานะ Checklist รายการ 1–5 ใน Section 2 เป็น `✅ Verified` เรียบร้อยแล้ว
+> 
+> ผลการ Build ฝั่ง Client (`tsc && vite build`) และ Server ทำได้เรียบร้อยปราศจากข้อผิดพลาด เอกสารมีความสอดคล้องและมีคุณภาพระดับโปรดักชัน
+> 
+> ขอ **Approve** และพร้อมให้ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #82 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `858d2ec0749aa5e2a65d283077bcd875c48a2742`, 2026-11-02T09:08:15Z) — **Closes PR #82**
+
+---
+
+### 4.9 PR #83: test(e2e): Playwright E2E suites, responsive audits, and visual evidence (Issue #35, #71) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#83](https://github.com/titayaaa/toktickit/pull/83)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `feature/35-e2e-and-visual`
+- **Target Branch:** `lab4-staging`
+- **Current Status:** Approved & Merged (merge commit `b4dee7ea4a87f48ef2fafa15b53f34a4c01abb67`, 2026-11-03T10:05:47Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `25fa6b62f3514b588ed504f272d68a34dd211b34`
+
+#### 4.9.1 Review #1 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-02T09:25:35Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `7267eff`)
+
+**Verbatim Review Comments:**
+
+> ตรวจสอบโค้ดชุดทดสอบ Playwright E2E (`e2e/lab-04/*.spec.ts`), ภาพหลักฐาน Responsive (`artifacts/lab-04/screenshots/`), และเอกสารประกอบของ PR #83 (Issue 35) อย่างละเอียดรอบด้านแล้วนะคะ
+> 
+> ขอส่งเป็น **Changes Requested** ก่อนนะคะ เนื่องจากพบจุดสำคัญที่ทำให้ชุดทดสอบ Playwright ล้มเหลวทันที (Immediate Test Failure) จากความไม่ตรงกันระหว่าง Selector ในไฟล์ทดสอบกับโค้ด React Component จริงของตัวโปรเจกต์ค่ะ:
+> 
+> ### 🔴 Blocking Issues: ต้องปรับแก้เพื่อให้ E2E รันผ่านจริง
+> 
+> 1. **ฟังก์ชัน `login()` ใน E2E ไม่ตรงกับ `Login.tsx`:**
+>    - ใน E2E ทุกไฟล์ค้นหา `page.getByTestId("login-email")`, `login-password`, และ `login-submit`
+>    - แต่ใน `client/src/components/Login.tsx` ปัจจุบันใช้อินพุต `id="email"`, `id="password"` และปุ่ม submit โดยไม่มี `data-testid` ดังกล่าว ส่งผลให้ชุดทดสอบ Timeout ล้มเหลวตั้งแต่ขั้นตอนแรก
+>    - **แนวทางแก้:** เติม `data-testid="login-email"`, `data-testid="login-password"`, `data-testid="login-submit"`, และ `data-testid="login-card"` ลงใน `Login.tsx` หรือปรับฟังก์ชัน helper `login()` ใน E2E ให้ค้นหาผ่าน `#email`, `#password` และ `button[type="submit"]`
+> 
+> 2. **Header Navigation และการสลับหน้าจอใน `App.tsx`:**
+>    - ฟังก์ชัน `navigateHeader()` ใน E2E ค้นหา `header-nav-*`, `header-nav-toggle`, `header-user-menu`, และ `header-logout` ซึ่งไม่มีอยู่ใน `App.tsx`
+>    - **แนวทางแก้:** เพิ่ม `data-testid` ที่เกี่ยวข้องลงใน Navigation Tabs และปุ่ม Logout ของ `App.tsx` เพื่อให้ชุดทดสอบคลิกสลับหน้าจอและสลับผู้ใช้งานระหว่าง Requester และ IT Staff ได้จริง
+> 
+> 3. **ฟิลด์บังคับและปุ่ม Submit ใน `CreateTicketForm.tsx`:**
+>    - ใน `CreateTicketForm.tsx` ปุ่มส่งตั๋วยังไม่มี `data-testid="submit-ticket-btn"` และฟอร์มมีการตรวจสอบว่าต้องเลือก `categoryId` และ `relatedSystemId` ด้วย
+>    - ใน `actions-taken-flow.spec.ts` และ `ticket-resolution.spec.ts` ตอนนี้กรอกเพียง Summary, Description และ Priority ทำให้ติด Validation Error
+>    - **แนวทางแก้:** เพิ่ม `data-testid="submit-ticket-btn"` และ `data-testid="success-alert"` ใน `CreateTicketForm.tsx` พร้อมปรับใน E2E ให้เลือก Category และ Related System ให้ครบถ้วนก่อนกด Submit
+> 
+> 4. **Selector ไม่ตรงกับโค้ดจริงใน `TicketDetail.tsx` และ `StaffTicketQueue.tsx`:**
+>    - ใน `ticket-resolution.spec.ts` และ `actions-taken-flow.spec.ts` มีการเรียกหา `detail-status`, `back-to-my-tickets`, `queue-search`, `queue-search-btn`, `resolution-gate-modal` ซึ่งไม่ตรงกับ `TicketDetail.tsx` (ที่ใช้ `ticket-status-badge`, `ticket-detail-back-button`, `modal-resolution-gate-warning`)
+>    - **แนวทางแก้:** ปรับจูน selector ในไฟล์ spec ให้ตรงกับ testid จริงในคอมโพเนนต์ หรือเติม testid ในคอมโพเนนต์ให้ครอบคลุม Flow การทำงาน
+> 
+> 5. **Metric Card Selector ใน `RequesterDashboard.tsx`:**
+>    - ใน `dashboards.spec.ts` ค้นหาการ์ด `my-open`, `closed` และพาเนล `requester-recent-tickets-table`
+>    - ในขณะที่คอมโพเนนต์จริงใช้ `requester-metric-card-open`, `requester-metric-card-waiting`, `requester-metric-card-recent`, `requester-metric-card-resolved` และ `requester-recent-table`
+>    - **แนวทางแก้:** ปรับลูปใน `dashboards.spec.ts` ให้ตรงกับชื่อการ์ดและตารางจริงใน `RequesterDashboard.tsx`
+> 
+> รบกวนช่วยปรับจูนตัวเลือกและคอมโพเนนต์ให้สอดคล้องกัน แล้วอัปเดต commit เข้ามาอีกครั้งนะคะ พร้อมตรวจซ้ำและ Approve ให้ในรอบถัดไปทันทีค่ะ ขอบคุณมากค่ะ
+
+
+#### 4.9.2 Author Response #1 (`titayaaa`, 2026-11-03T07:37:45Z)
+
+> > ตรวจสอบโค้ดชุดทดสอบ Playwright E2E (`e2e/lab-04/*.spec.ts`), ภาพหลักฐาน Responsive (`artifacts/lab-04/screenshots/`), และเอกสารประกอบของ PR #83 (Issue 35) อย่างละเอียดรอบด้านแล้วนะคะ
+> > 
+> > ขอส่งเป็น **Changes Requested** ก่อนนะคะ เนื่องจากพบจุดสำคัญที่ทำให้ชุดทดสอบ Playwright ล้มเหลวทันที (Immediate Test Failure) จากความไม่ตรงกันระหว่าง Selector ในไฟล์ทดสอบกับโค้ด React Component จริงของตัวโปรเจกต์ค่ะ:
+> > 
+> > ### 🔴 Blocking Issues: ต้องปรับแก้เพื่อให้ E2E รันผ่านจริง
+> > 1. **ฟังก์ชัน `login()` ใน E2E ไม่ตรงกับ `Login.tsx`:**
+> >    
+> >    * ใน E2E ทุกไฟล์ค้นหา `page.getByTestId("login-email")`, `login-password`, และ `login-submit`
+> >    * แต่ใน `client/src/components/Login.tsx` ปัจจุบันใช้อินพุต `id="email"`, `id="password"` และปุ่ม submit โดยไม่มี `data-testid` ดังกล่าว ส่งผลให้ชุดทดสอบ Timeout ล้มเหลวตั้งแต่ขั้นตอนแรก
+> >    * **แนวทางแก้:** เติม `data-testid="login-email"`, `data-testid="login-password"`, `data-testid="login-submit"`, และ `data-testid="login-card"` ลงใน `Login.tsx` หรือปรับฟังก์ชัน helper `login()` ใน E2E ให้ค้นหาผ่าน `#email`, `#password` และ `button[type="submit"]`
+> > 2. **Header Navigation และการสลับหน้าจอใน `App.tsx`:**
+> >    
+> >    * ฟังก์ชัน `navigateHeader()` ใน E2E ค้นหา `header-nav-*`, `header-nav-toggle`, `header-user-menu`, และ `header-logout` ซึ่งไม่มีอยู่ใน `App.tsx`
+> >    * **แนวทางแก้:** เพิ่ม `data-testid` ที่เกี่ยวข้องลงใน Navigation Tabs และปุ่ม Logout ของ `App.tsx` เพื่อให้ชุดทดสอบคลิกสลับหน้าจอและสลับผู้ใช้งานระหว่าง Requester และ IT Staff ได้จริง
+> > 3. **ฟิลด์บังคับและปุ่ม Submit ใน `CreateTicketForm.tsx`:**
+> >    
+> >    * ใน `CreateTicketForm.tsx` ปุ่มส่งตั๋วยังไม่มี `data-testid="submit-ticket-btn"` และฟอร์มมีการตรวจสอบว่าต้องเลือก `categoryId` และ `relatedSystemId` ด้วย
+> >    * ใน `actions-taken-flow.spec.ts` และ `ticket-resolution.spec.ts` ตอนนี้กรอกเพียง Summary, Description และ Priority ทำให้ติด Validation Error
+> >    * **แนวทางแก้:** เพิ่ม `data-testid="submit-ticket-btn"` และ `data-testid="success-alert"` ใน `CreateTicketForm.tsx` พร้อมปรับใน E2E ให้เลือก Category และ Related System ให้ครบถ้วนก่อนกด Submit
+> > 4. **Selector ไม่ตรงกับโค้ดจริงใน `TicketDetail.tsx` และ `StaffTicketQueue.tsx`:**
+> >    
+> >    * ใน `ticket-resolution.spec.ts` และ `actions-taken-flow.spec.ts` มีการเรียกหา `detail-status`, `back-to-my-tickets`, `queue-search`, `queue-search-btn`, `resolution-gate-modal` ซึ่งไม่ตรงกับ `TicketDetail.tsx` (ที่ใช้ `ticket-status-badge`, `ticket-detail-back-button`, `modal-resolution-gate-warning`)
+> >    * **แนวทางแก้:** ปรับจูน selector ในไฟล์ spec ให้ตรงกับ testid จริงในคอมโพเนนต์ หรือเติม testid ในคอมโพเนนต์ให้ครอบคลุม Flow การทำงาน
+> > 5. **Metric Card Selector ใน `RequesterDashboard.tsx`:**
+> >    
+> >    * ใน `dashboards.spec.ts` ค้นหาการ์ด `my-open`, `closed` และพาเนล `requester-recent-tickets-table`
+> >    * ในขณะที่คอมโพเนนต์จริงใช้ `requester-metric-card-open`, `requester-metric-card-waiting`, `requester-metric-card-recent`, `requester-metric-card-resolved` และ `requester-recent-table`
+> >    * **แนวทางแก้:** ปรับลูปใน `dashboards.spec.ts` ให้ตรงกับชื่อการ์ดและตารางจริงใน `RequesterDashboard.tsx`
+> > 
+> > รบกวนช่วยปรับจูนตัวเลือกและคอมโพเนนต์ให้สอดคล้องกัน แล้วอัปเดต commit เข้ามาอีกครั้งนะคะ พร้อมตรวจซ้ำและ Approve ให้ในรอบถัดไปทันทีค่ะ ขอบคุณมากค่ะ
+> 
+> ขอบคุณสำหรับคำแนะนำและการตรวจสอบอย่างละเอียดรอบด้านมากๆ ค่ะคุณเจเจ้ (@jejaebubu)! 
+> 
+> ได้ดำเนินการปรับปรุงแก้ไขโค้ด ชุดทดสอบ Playwright E2E และบันทึกประวัติการรีวิวลงในเอกสารครบทั้ง 5 จุดเรียบร้อยแล้วใน Commit `7af52d9` และ `25fa6b6`:
+> 
+> 1. **Harmonize `login()` & `Login.tsx`**:
+>    - เพิ่ม `data-testid="login-card"`, `login-email`, `login-password`, และ `login-submit` ใน `Login.tsx`
+>    - ปรับฟังก์ชัน `login()` ใน E2E spec ให้รองรับ Fallback Selectors (`[data-testid="login-email"], #email`, `button[type="submit"]`) เพื่อความเสถียรในการรัน
+> 2. **Harmonize Header Navigation & `navigateHeader()`**:
+>    - เพิ่ม `data-testid="header-user-menu"`, `header-logout`, `header-nav-dashboard`, `header-nav-admin-users`, `header-nav-staff-queue`, `header-nav-create-ticket`, `header-nav-my-tickets` ใน `App.tsx`
+>    - ปรับ `navigateHeader()` ให้ตรวจจับและคลิกแท็บที่แสดงผลอยู่บนหน้าจอได้ทันที รองรับทั้ง Desktop Navbar และ Mobile Navigation Toggle
+> 3. **`CreateTicketForm.tsx` & Category/Related System Selection**:
+>    - เพิ่ม `data-testid="submit-ticket-btn"` และ `data-testid="success-alert"` ใน `CreateTicketForm.tsx`
+>    - ใน `actions-taken-flow.spec.ts` และ `ticket-resolution.spec.ts` เพิ่มคำสั่งเลือกลำดับ Category และ Related System จาก Select Options ก่อนกดสร้างตั๋ว ป้องกันฟอร์มติดสถานะ Validation Blocked
+> 4. **Harmonize Ticket Details & Queue Selectors**:
+>    - จัดระเบียบ `data-testid` ใน `TicketDetail.tsx`, `StaffTicketQueue.tsx`, และ `ActionsTaken.tsx` ให้ตรงกับมาตรฐาน React Testing Library
+>    - อัปเดต E2E Locators ให้รองรับทั้งคลาสและการเลือกสองทาง (Dual Locators) เพื่อให้เชื่อมโยงกับ Flow การทำงานได้อย่างสมบูรณ์
+> 5. **Metric Cards ใน `RequesterDashboard.tsx` & `dashboards.spec.ts`**:
+>    - ปรับ Loop ใน `dashboards.spec.ts` ให้ค้นหา `open`, `waiting`, `recent`, `resolved` และตาราง `requester-recent-table` ตรงกับ Component เป๊ะๆ
+> 6. **บันทึกประวัติการรีวิวใน `docs/lab-04/reviewer.md`**:
+>    - บันทึกข้อเสนอแนะรอบที่ 1 และคำชี้แจง Author Response ลงในตารางประวัติการรีวิวเรียบร้อยแล้ว
+> 
+> **ผลการทดสอบการทำงานย้อนหลัง (Regression & Build Verification):**
+> - Client Vitest Suite: ผ่านครบ **81/81 tests** (15 test files)
+> - Client Production Build (`tsc && vite build`): ผ่านสมบูรณ์ (Code 0)
+> - Server Build (`tsc`): ผ่านสมบูรณ์ (Code 0)
+> 
+> รบกวนคุณเจเจ้ตรวจสอบอีกครั้งนะคะ หากเรียบร้อยแล้วสามารถกด Approve และ Merge เข้าสู่ `lab4-staging` ได้เลยค่ะ ขอบคุณมากๆ เลยค่ะ!
+
+
+#### 4.9.3 Review #2 — APPROVED (`jejaebubu`, 2026-11-03T10:05:30Z)
+
+**Verdict:** APPROVED (commit `25fa6b6`)
+
+**Verbatim Review Comments:**
+
+> ### ✅ การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+>  
+>  ตรวจสอบ Commit `7af52d9` และ `25fa6b6` อย่างละเอียดรอบด้านแล้วนะคะ ดำเนินการปรับปรุงแก้ไขทั้งตัวคอมโพเนนต์และชุดทดสอบ Playwright E2E ได้อย่างยอดเยี่ยม รวดเร็ว และประณีตมากค่ะ:
+>  
+>  1. **Authentication & Navigation Resiliency**: เพิ่ม `data-testid` ครบถ้วนใน `Login.tsx` และ `App.tsx` พร้อมปรับฟังก์ชัน helper (`login()`, `navigateHeader()`) ให้ใช้ Dual Locators รองรับทั้ง Desktop และ Mobile Viewports ได้อย่างสมบูรณ์แบบ
+>  2. **Form Interaction & Validation Harmonization**: เพิ่มการเลือก Category และ Related System ใน `CreateTicketForm.tsx` ทำให้ขั้นตอนการสร้างตั๋วใน E2E ทำงานได้จริงและไม่ติด Validation Error
+>  3. **Complete Workflow Verification**: เชื่อมโยงตัวเลือกใน `TicketDetail.tsx` และ `StaffTicketQueue.tsx` ครอบคลุมทั้ง Advisory Flag ของ Requester, การบล็อก 409 Conflict ของ Resolution Gate และการ Resolve ตั๋วสำเร็จหลังเคลียร์ Action ครบ
+>  4. **Dashboard Metric Alignment**: ปรับจูน Selector ใน `RequesterDashboard.tsx` และ `dashboards.spec.ts` ให้ตรงกัน 100%
+>  5. **Audit Trail & Documentation**: บันทึกประวัติการรีวิวรอบที่ 1 และ Author Response ลงใน `docs/lab-04/reviewer.md` ครบถ้วนตามมาตรฐานวิศวกรรมซอฟต์แวร์
+>  
+>  ผลการ Build (`tsc && vite build`) และ Client Vitest (15 files / 81 passed) ผ่านสมบูรณ์ 0 errors
+>  
+>  ขอ **Approve** และพร้อมให้ดำเนินการ Merge เข้าสู่สาขา `lab4-staging` ได้เลยค่ะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #83 เข้า `lab4-staging` เรียบร้อย (Merge SHA: `b4dee7ea4a87f48ef2fafa15b53f34a4c01abb67`, 2026-11-03T10:05:47Z) — **Closes PR #83**
+
+---
+
+### 4.10 PR #84: PR-10: Sprint 4 Documentation and Release Integration to Main (Issue #36, #72) (`titayaaa/toktickit`)
+
+- **PR URL:** [titayaaa/toktickit#84](https://github.com/titayaaa/toktickit/pull/84)
+- **Author:** `@titayaaa` (ฑิตญา ผ่องสกุล)
+- **Reviewer:** `@jejaebubu` (GitHub: [jejaebubu](https://github.com/jejaebubu))
+- **Source Branch:** `release/lab04-staging-to-main`
+- **Target Branch:** `main`
+- **Current Status:** Approved & Merged (merge commit `06a40356e0f653f3c67f5b5126d885907bbc0e92`, 2026-11-03T19:57:48Z)
+- **Merged by:** `@jejaebubu`
+- **Latest Reviewed Commit:** `b21bff913b7f8fbc545b0077d81326687bdb9379`
+
+#### 4.10.1 Review #1 — APPROVED (`jejaebubu`, 2026-11-03T17:45:38Z)
+
+**Verdict:** APPROVED (commit `02d67a4`)
+
+**Verbatim Review Comments:**
+
+> ## 🟢 Peer Review: Approved (PR #84 - Sprint 4 Release Integration to Main)
+>  
+>  **Reviewer:** `@jejaebubu`  
+>  **Target Branch:** `main`  
+>  **Status:** ✅ **Approved (พร้อมให้ Merge เข้าสู่ `main` ได้เลยค่ะ)**
+>  
+>  ---
+>  
+>  ### 🌟 ภาพรวมการประเมิน (Executive Summary)
+>  ตรวจสอบการผสานรวมโค้ด (Release Integration) จากสาขา `release/lab04-staging-to-main` เข้าสู่ `main` ครบถ้วนทุกไฟล์แล้วนะคะ ชื่นชมการควบคุมคุณภาพและการรวบรวมฟีเจอร์ของ Sprint 4 ทั้ง 9 หัวข้อย่อย (PR #75 ถึง PR #83) เข้าด้วยกันได้อย่างไร้รอยต่อ ปราศจาก Conflict และผ่านการตรวจสอบ Regression ครบ 100% สมบูรณ์แบบตามมาตรฐานวิศวกรรมซอฟต์แวร์ค่ะ
+>  
+>  ---
+>  
+>  ### 🔍 รายละเอียดการตรวจสอบความพร้อมของ Release (Release Audit Checklist)
+>  
+>  1. **Feature Completeness & Integrity:**
+>     - รวมฟังก์ชัน Actions Taken (Prisma Schema, Migration, APIs, UI), Ticket State Transition Matrix, Resolution Gate (HTTP 409 Conflict), IT Staff Dashboard, Requester Dashboard, ตลอดจนระบบ System Hardening ไว้อย่างครบถ้วนสมบูรณ์
+>  2. **Full Regression & Quality Gate:**
+>     - ชุดทดสอบ Backend API (Supertest): ผ่านครบ **19 files / 112 passed (100%)**
+>     - ชุดทดสอบ Frontend Unit/Component (Vitest): ผ่านครบ **15 files / 81 passed (100%)**
+>     - Playwright End-to-End Suites (3 suites บน Desktop, Tablet, Mobile): ผ่านครบทุก Viewport
+>     - Production Builds: ทั้งฝั่ง Client (`tsc && vite build`) และ Server (`tsc`) ผ่านสมบูรณ์ 0 errors
+>  3. **Documentation & Release Artifacts:**
+>     - `README.md`: อัปเดตผังโฟลเดอร์, ฟีเจอร์ภาพรวมของ Lab 4, จำนวนชุดทดสอบ และคำสั่งรัน E2E ไว้อย่างถูกต้อง ละเอียด ชัดเจน
+>     - `docs/lab-04/ai-use.md`: บันทึก Prompt 16 และ Reflection 3.10 เกี่ยวกับการทำ Release Governance ครบถ้วน
+>     - `docs/lab-04/reviewer.md`: บันทึกประวัติการรีวิวครบทั้ง Part 1 (PR #75–#84) และ Part 2 (PR #104–#115) อย่างโปร่งใสและตรวจสอบย้อนกลับได้จริง
+>     - ภาพหลักฐานหน้าจอ 24 ภาพบน Responsive Viewports จัดเก็บใน `artifacts/lab-04/screenshots/` ครบถ้วนตามมาตรฐาน WCAG 2.1 AA
+>  
+>  คุณภาพงานยอดเยี่ยมมากค่ะ ขอ **Approve** และยินดีด้วยกับการปิด Sprint 4 (Lab 4) อย่างสมบูรณ์แบบนะคะ! พร้อมให้ Merge เข้าสู่ `main` ได้ทันทีค่ะ
+
+
+#### 4.10.2 Review #2 — CHANGES_REQUESTED (`jejaebubu`, 2026-11-03T17:50:19Z)
+
+**Verdict:** CHANGES_REQUESTED (commit `02d67a4`)
+
+**Verbatim Review Comments:**
+
+> ตรวจสอบโค้ดผสานรวม (Integration Diffs), ชุดทดสอบ Full Regression, ผลการ Build และเอกสารกำกับรุ่นทั้งหมดของ PR #84 (Issue 36 / PR-10) อย่างละเอียดรอบด้านแล้วนะคะ
+> 
+> ภาพรวมการรวมโค้ดทั้ง 9 ฟีเจอร์ย่อย (PR #75–#83) เข้าสู่สาขา `main` ทำได้เรียบร้อย ไร้ข้อผิดพลาด และผลการ Build/Test ผ่าน 100% ค่ะ แต่ขอส่งเป็น **Changes Requested** ในรอบแรกก่อน เพื่อให้ปรับปรุงความถูกต้องของเอกสาร 3 จุดก่อนกด Final Approve & Merge นะคะ:
+> 
+> ### 🔴 จุดที่ต้องปรับแก้ก่อนอนุมัติ (Required Changes)
+> 
+>  1. **บันทึกประวัติการรีวิว PR #115 ใน Part 2 ของ `docs/lab-04/reviewer.md` ให้สมบูรณ์:**
+>     - ใน Part 2 ใต้หัวข้อ `### PR #115: PR-11: Sprint 4 Documentation and Release Integration to Main (Issue #11)` ปัจจุบันมีเพียง Scope และสถานะยังค้างอยู่ที่ `⏳ Pending Review`
+>     - รบกวนเพิ่มบันทึก Review Trail (Round 1 Review, Author Response, Round 2 Review และ Merge Event) ของ PR #115 ลงใน Part 2 ให้ครบถ้วนสมบูรณ์เหมือนกับทุก PR ก่อนหน้าค่ะ
+>  
+>  2. **แก้ไขข้อความบรรยาย Dashboard Metric Cards ใน `README.md` ให้ตรงกับระบบจริง:**
+>     - **IT Staff Dashboard (บรรทัด 156):** มีการระบุ `Breached/At Risk SLA` ซึ่งใน `specification.md` (Section 3.2 ข้อ 1) ระบุชัดเจนว่า SLA Engine เป็น Explicit Exclusion (Out of Scope) และในระบบจริงคือการ์ด `Urgent Tickets` แนะนำปรับเป็น:
+>       *(Unassigned Tickets, My Assigned Tickets, Urgent Tickets, และ My Pending Actions)*
+>     - **Requester Dashboard (บรรทัด 158):** มีการระบุ `Awaiting Staff Action` ซึ่งในระบบจริง (`RequesterDashboard.tsx`) และตาม FR-13 คือการ์ด `Waiting for Your Input` (`WAITING_FOR_REQUESTER`)
+>  
+>  ### 🟠 ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Improvement Suggestions)
+>  
+>  3. **เพิ่มแถวบันทึกผล Release Verification ใน `docs/lab-04/tests.md`:**
+>     - ในตาราง Section 2 ของ `tests.md` ปัจจุบันมีถึงแค่แถว `REG-02` แนะนำให้เพิ่มแถวสำหรับ Release Verification (เช่น `REL-01: Full-stack Regression & Production Build on main branch` ระบุผล 112 server + 81 client tests, Playwright 3 viewports, Zero build error) เพื่อให้ Traceability Matrix ปิดสมบูรณ์ 100% ค่ะ
+>  
+>  ฝากช่วยปรับแก้ 3 จุดนี้ แล้วอัปเดต commit เข้ามาอีกครั้งนะคะ พร้อมเข้ามาตรวจซ้ำและ Approve & Merge เข้าสู่ `main` ให้ทันทีค่ะ ขอบคุณมากค่ะ
+
+
+#### 4.10.3 Author Response #1 (`titayaaa`, 2026-11-03T19:44:49Z)
+
+> > ตรวจสอบโค้ดผสานรวม (Integration Diffs), ชุดทดสอบ Full Regression, ผลการ Build และเอกสารกำกับรุ่นทั้งหมดของ PR #84 (Issue 36 / PR-10) อย่างละเอียดรอบด้านแล้วนะคะ
+> > 
+> > ภาพรวมการรวมโค้ดทั้ง 9 ฟีเจอร์ย่อย (PR #75–#83) เข้าสู่สาขา `main` ทำได้เรียบร้อย ไร้ข้อผิดพลาด และผลการ Build/Test ผ่าน 100% ค่ะ แต่ขอส่งเป็น **Changes Requested** ในรอบแรกก่อน เพื่อให้ปรับปรุงความถูกต้องของเอกสาร 3 จุดก่อนกด Final Approve & Merge นะคะ:
+> > 
+> > ### 🔴 จุดที่ต้องปรับแก้ก่อนอนุมัติ (Required Changes)
+> > 1. **บันทึกประวัติการรีวิว PR #115 ใน Part 2 ของ `docs/lab-04/reviewer.md` ให้สมบูรณ์:**
+> >    
+> >    * ใน Part 2 ใต้หัวข้อ `### PR #115: PR-11: Sprint 4 Documentation and Release Integration to Main (Issue #11)` ปัจจุบันมีเพียง Scope และสถานะยังค้างอยู่ที่ `⏳ Pending Review`
+> >    * รบกวนเพิ่มบันทึก Review Trail (Round 1 Review, Author Response, Round 2 Review และ Merge Event) ของ PR #115 ลงใน Part 2 ให้ครบถ้วนสมบูรณ์เหมือนกับทุก PR ก่อนหน้าค่ะ
+> > 2. **แก้ไขข้อความบรรยาย Dashboard Metric Cards ใน `README.md` ให้ตรงกับระบบจริง:**
+> >    
+> >    * **IT Staff Dashboard (บรรทัด 156):** มีการระบุ `Breached/At Risk SLA` ซึ่งใน `specification.md` (Section 3.2 ข้อ 1) ระบุชัดเจนว่า SLA Engine เป็น Explicit Exclusion (Out of Scope) และในระบบจริงคือการ์ด `Urgent Tickets` แนะนำปรับเป็น:
+> >      _(Unassigned Tickets, My Assigned Tickets, Urgent Tickets, และ My Pending Actions)_
+> >    * **Requester Dashboard (บรรทัด 158):** มีการระบุ `Awaiting Staff Action` ซึ่งในระบบจริง (`RequesterDashboard.tsx`) และตาม FR-13 คือการ์ด `Waiting for Your Input` (`WAITING_FOR_REQUESTER`)
+> > 
+> > ### 🟠 ข้อเสนอแนะเพิ่มเติมเพื่อความสมบูรณ์แบบ (Improvement Suggestions)
+> > 3. **เพิ่มแถวบันทึกผล Release Verification ใน `docs/lab-04/tests.md`:**
+> >    
+> >    * ในตาราง Section 2 ของ `tests.md` ปัจจุบันมีถึงแค่แถว `REG-02` แนะนำให้เพิ่มแถวสำหรับ Release Verification (เช่น `REL-01: Full-stack Regression & Production Build on main branch` ระบุผล 112 server + 81 client tests, Playwright 3 viewports, Zero build error) เพื่อให้ Traceability Matrix ปิดสมบูรณ์ 100% ค่ะ
+> > 
+> > ฝากช่วยปรับแก้ 3 จุดนี้ แล้วอัปเดต commit เข้ามาอีกครั้งนะคะ พร้อมเข้ามาตรวจซ้ำและ Approve & Merge เข้าสู่ `main` ให้ทันทีค่ะ ขอบคุณมากค่ะ
+> 
+> ขอบคุณ @jejaebubu สำหรับการตรวจทาน Release PR #84 อย่างละเอียดรอบคอบมากค่ะ ดำเนินการปรับปรุงและแก้ไขครบถ้วนทั้ง 3 จุดเรียบร้อยแล้วใน commit `b21bff9` ค่ะ:
+> 
+> 1. **บันทึกประวัติการรีวิว PR #115 ใน Part 2 (`docs/lab-04/reviewer.md`)**:
+>    - บันทึก Review Trail ของ PR #115 ใน Part 2 ครบถ้วนทั้ง Round 1 Review (`CHANGES_REQUESTED`), Author Response (`fc4b7b6`), และขั้นตอน Round 2 Verification แบบ Verbatim สมบูรณ์ 100% เหมือนกับทุก PR ก่อนหน้าเรียบร้อยค่ะ
+> 2. **แก้ไขข้อความบรรยาย Dashboard Metric Cards ใน `README.md`**:
+>    - **IT Staff Dashboard:** ปรับข้อความเป็นการ์ดที่ใช้งานจริงในระบบ: *(Unassigned Tickets, My Assigned Tickets, Urgent Tickets, and My Pending Actions)* โดยตัดคำว่า Breached/At Risk SLA ออกตรงตามข้อกำหนด Out-of-Scope ของ SLA Engine
+>    - **Requester Dashboard:** ปรับข้อความเป็นการ์ดตามระบบจริงและ FR-13: *(Total Open, Waiting for Your Input, Recently Updated, Resolved)* โดยเปลี่ยนจาก Awaiting Staff Action เป็น Waiting for Your Input (`WAITING_FOR_REQUESTER`)
+> 3. **เพิ่มแถวบันทึกผล Release Verification ใน `docs/lab-04/tests.md`**:
+>    - เพิ่มแถว `REL-01` ในตาราง Section 2: `REL-01: Full-stack Regression & Production Build verification on main branch` พร้อมระบุผลการรัน 112 server + 81 client tests, Playwright E2E suites บน 3 viewports, และ build bundle ผ่าน 0 errors (สถานะ Pass) ปิด Traceability Matrix ครบถ้วน 100%
+> 
+> ดำเนินการพุชอัปเดตขึ้นสาขา `release/lab04-staging-to-main` เรียบร้อยแล้วค่ะ รบกวนช่วยตรวจทานซ้ำอีกครั้งและกด **Approve & Merge** เข้าสู่ `main` ได้เลยนะคะ ขอบคุณมากค่ะ!
+
+
+#### 4.10.4 Review #3 — APPROVED (`jejaebubu`, 2026-11-03T19:53:54Z)
+
+**Verdict:** APPROVED (commit `b21bff9`)
+
+**Verbatim Review Comments:**
+
+> ### ✅ การตรวจประเมินรอบที่ 2 (Round 2 Review — APPROVED)
+>  
+>  ตรวจสอบ Commit `b21bff9` ซ้ำอย่างละเอียดรอบด้านแล้วนะคะ ดำเนินการปรับปรุงแก้ไขทั้ง 3 จุดได้อย่างยอดเยี่ยม รวดเร็ว และประณีตมากค่ะ:
+>  
+>  1. **Complete Peer Review Audit Trail**: บันทึกบทสนทนาการรีวิวของ PR #115 ใน Part 2 ของ `docs/lab-04/reviewer.md` ครบถ้วนทั้ง Round 1, Author Response (`fc4b7b6`) และ Round 2 Workflow แบบ Verbatim สมบูรณ์ 100%
+>  2. **Accurate Dashboard Specifications**: แก้ไขข้อความบรรยายการ์ดตัวชี้วัดใน `README.md` ทั้งฝั่ง IT Staff และ Requester ให้ตรงกับข้อกำหนดใน `specification.md` และคอมโพเนนต์จริงในระบบ
+>  3. **Closed Test Traceability Matrix**: เพิ่มแถว `REL-01` ในตาราง `docs/lab-04/tests.md` ยืนยันผลการทดสอบ Full Regression (Server 112, Client 81, Playwright 3 Viewports) และผลการ Build สำเร็จ 0 errors
+>  
+>  โค้ดและเอกสารมีความสมบูรณ์แบบระดับ Production-ready พร้อมสำหรับการส่งมอบงาน
+>  
+>  ขอ **Approve** และยินดีด้วยกับการปิด Sprint 4 (Lab 4) อย่างเป็นทางการค่ะ! พร้อมให้ดำเนินการ Merge สาขา `release/lab04-staging-to-main` เข้าสู่ `main` ได้ทันทีค่ะ
+
+
+**คำวินิจฉัย:** **APPROVED & MERGED** — Reviewer (@jejaebubu) อนุมัติและเป็นผู้กด Merge PR #84 เข้า `main` เรียบร้อย (Merge SHA: `06a40356e0f653f3c67f5b5126d885907bbc0e92`, 2026-11-03T19:57:48Z) — **Closes PR #84**
+
+---
+
+## 5. Full Review Trail — Additional Partner Reviews (`Achikan/TokTickIT`)
+
+### 5.1 PR #86: Issue 34: IT Staff Dashboard (API + UI) (`Achikan/TokTickIT`)
 
 - **PR URL:** [Achikan/TokTickIT#86](https://github.com/Achikan/TokTickIT/pull/86)
 - **Author:** `@Achikan` (Achikan)
@@ -1167,7 +2402,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 - **Merged by:** `@jejaebubu`
 - **Latest Reviewed Commit:** `621db34052cb10f21d82977b52331246ead04472`
 
-#### 4.2.1 Review #1 — Changes Requested (`jejaebubu`, 2026-10-31 23:36 UTC+7)
+#### 5.1.1 Review #1 — Changes Requested (`jejaebubu`, 2026-10-31 23:36 UTC+7)
 
 **Review ID:** `5723788673`  
 **Commit Reviewed:** `4e1c30122d1e4e023f16085d48d6c89e05719a01`  
@@ -1303,7 +2538,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 > - `csrfProtection` บน GET ไม่น่าจำเป็น
 > - `pageSize` เปลี่ยนจาก 10 → 20 และ max 50 → 100 อาจกระทบ test
 
-#### 4.2.2 Author Response #1 (`Achikan`, commit `2bc78ab`)
+#### 5.1.2 Author Response #1 (`Achikan`, commit `2bc78ab`)
 
 **Response Date:** 2026-10-31 17:39 UTC (2026-11-01 00:39 UTC+7)
 
@@ -1330,7 +2565,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >    - Client: 17 test files ผ่านทั้งหมด (**133/133 passed**)
 >    - Build ผ่านทั้ง Server และ Client ไม่มี regression ค่ะ
 
-#### 4.2.3 Review #2 — Commented (`jejaebubu`, 2026-11-01 01:19 UTC+7)
+#### 5.1.3 Review #2 — Commented (`jejaebubu`, 2026-11-01 01:19 UTC+7)
 
 **Review ID:** `5724248896`  
 **Commit Reviewed:** `2bc78abdcdff66772fd86f675015edd89e5b4fe2`  
@@ -1397,7 +2632,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >
 > แก้แล้วบอกมาได้เลยค่ะ เดี๋ยวรีบช่วยเช็กรอบถัดไปให้ ขอบคุณมากค่ะ 
 
-#### 4.2.4 Author Response #2 (`Achikan`, commit `178d559`)
+#### 5.1.4 Author Response #2 (`Achikan`, commit `178d559`)
 
 **Response Date:** 2026-10-31 19:02 UTC (2026-11-01 02:02 UTC+7)
 
@@ -1412,7 +2647,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >
 > Verified: server `tsc --noEmit` clean; full server suite green; client `tsc --noEmit` clean; client full suite 133/133. Requester create/view/attach flows untouched.
 
-#### 4.2.5 Review #3 — Changes Requested (`jejaebubu`, 2026-11-01 02:43 UTC+7)
+#### 5.1.5 Review #3 — Changes Requested (`jejaebubu`, 2026-11-01 02:43 UTC+7)
 
 **Review ID:** `5724630453`  
 **Commit Reviewed:** `178d559d26017f6949c106853c66e249fbd329fc`  
@@ -1453,7 +2688,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >
 > ถ้าแก้ 2 ประเด็นหลักนี้ครบแล้ว ก็น่าจะ approve ได้เลยค่ะ
 
-#### 4.2.6 Author Response #3 (`Achikan`, commit `621db34`)
+#### 5.1.6 Author Response #3 (`Achikan`, commit `621db34`)
 
 **Response Date:** 2026-10-31 23:49 UTC (2026-11-01 06:49 UTC+7)
 
@@ -1467,7 +2702,7 @@ Reviewer ตรวจสอบการแก้ไขใน commits `8750764` (
 >
 > Verified: server tsc clean, client tsc clean, server dashboard+queue tests 38/38, client full suite 136/136. Nit (href) left as drilldown URLs so links still carry query params.
 
-#### 4.2.7 Review #4 — Approved (`jejaebubu`, 2026-11-01 16:50 UTC+7)
+#### 5.1.7 Review #4 — Approved (`jejaebubu`, 2026-11-01 16:50 UTC+7)
 
 **Review ID:** `5727471865`  
 **Commit Reviewed:** `621db34052cb10f21d82977b52331246ead04472`  
